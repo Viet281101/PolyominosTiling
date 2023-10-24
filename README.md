@@ -14,8 +14,14 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 - [ThreeJS](https://threejs.org/)
 
 
+### Expériments liens:
+
+- [Les pentominos](https://www.monunivers.com/pento/)
+
+
 ### Group:
 
 - NGUYEN Viet -- 20006303
 - GEOFFROY Damien -- 21007431 
+
 
