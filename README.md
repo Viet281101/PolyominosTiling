@@ -14,7 +14,7 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 - [ThreeJS](https://threejs.org/)
 
 
-### Expériments liens:
+### Autres liens:
 
 - [Les pentominos](https://www.monunivers.com/pento/)
 
