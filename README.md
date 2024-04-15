@@ -17,6 +17,8 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 ### Autres liens:
 
 - [Les pentominos](https://www.monunivers.com/pento/)
+- [Tiling Polyominoes Game](https://demonstrations.wolfram.com/TilingPolyominoesGame/)
+- [Tiling with Pentominos](https://demonstrations.wolfram.com/TilingWithPentominos/)
 
 
 ### Group:
