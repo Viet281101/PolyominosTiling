@@ -1,8 +1,20 @@
 class MainApp {
 	constructor() {
+		this.canvas = document.getElementById('myCanvas');
+		this.ctx = this.canvas.getContext('2d');
+		this.buttons = [];
 		this.loadIconPage();
-		this.createContent();
-		this.applyStyles();
+		this.resizeCanvas();
+		this.drawContent();
+		this.addEventListeners();
+
+		// Resize canvas on window resize
+		window.addEventListener('resize', () => {
+			this.resizeCanvas();
+			this.drawContent();
+		});
+		const html = document.querySelector('html');
+		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%', margin: '0', padding: '0', });
 	};
 	loadIconPage() {
 		let icon_page = document.createElement('link');
@@ -10,58 +22,67 @@ class MainApp {
 		icon_page.href = './assets/icon.png';
 		document.head.appendChild(icon_page);
 	};
-	createContent() {
-		const container = document.createElement('div');
-		container.className = 'content';
-		document.body.appendChild(container);
-
-		const title = document.createElement('h1');
-		title.textContent = "Pavages de Polyominos";
-		container.appendChild(title);
-
-		const buttonConfigs = [
-			{ text: "2D Version", href: "./2D/index.html" },
-			{ text: "3D Version", href: "./3D/index.html" }
-		];
-		buttonConfigs.forEach(config => {
-			const button = document.createElement('a');
-			button.textContent = button.title = config.text;
-			button.href = config.href;
-			button.className = "button";
-			container.appendChild(button);
-		});
+	resizeCanvas() {
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
 	};
-	applyStyles() {
-		Object.assign(document.body.style, {
-			height: '100%', margin: '0',
-			alignItems: 'center', justifyContent: 'center',
-			fontFamily: 'Arial, sans-serif'
-		});
+	drawContent() {
+		// Clear canvas
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		const container = document.querySelector('.content');
-		Object.assign(container.style, {
-			display: 'flex', flexDirection: 'column', zIndex: '2',
-			alignItems: 'center', justifyContent: 'center'
-		});
+		// Draw title
+		this.ctx.font = '30px Arial';
+		this.ctx.textAlign = 'center';
+		this.ctx.fillText('Pavages de Polyominos', this.canvas.width / 2, 50);
 
-		const title = document.querySelector('h1');
-		Object.assign(title.style, { marginBottom: '20px', marginTop: '20px' });
+		// Draw buttons
+		this.buttons = [];  // Clear previous buttons
+		this.drawButton('2D Version', this.canvas.width / 2, 150, () => { window.location.href = './2D/index.html'; });
+		this.drawButton('3D Version', this.canvas.width / 2, 250, () => { window.location.href = './3D/index.html'; });
+	};
+	drawButton(text, x, y, onClick) {
+		const buttonWidth = 200;
+		const buttonHeight = 50;
 
-		const buttons = document.querySelectorAll('.button');
-		buttons.forEach(button => {
-			button.style.backgroundColor = '#4CAF50';
-			Object.assign(button.style, {
-				fontSize: '20px',
-				padding: '10px 20px',
-				margin: '10px',
-				cursor: 'pointer',
-				textDecoration: 'none',
-				color: 'white',
-				border: 'none', borderRadius: '5px',
-				transition: 'background-color 0.3s ease'
+		this.ctx.fillStyle = '#4CAF50';
+		this.ctx.fillRect(x - buttonWidth / 2, y - buttonHeight / 2, buttonWidth, buttonHeight);
+
+		this.ctx.fillStyle = '#fff';
+		this.ctx.font = '20px Arial';
+		this.ctx.fillText(text, x, y);
+
+		this.buttons.push({ text, x, y, width: buttonWidth, height: buttonHeight, onClick });
+	};
+	addEventListeners() {
+		this.canvas.addEventListener('click', (e) => {
+			const rect = this.canvas.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			this.buttons.forEach(button => {
+				if (mouseX > button.x - button.width / 2 &&
+					mouseX < button.x + button.width / 2 &&
+					mouseY > button.y - button.height / 2 &&
+					mouseY < button.y + button.height / 2) {
+					button.onClick();
+				}
 			});
-			button.addEventListener('mouseover', (e) => { e.target.style.backgroundColor = '#45a049'; });
-			button.addEventListener('mouseout', (e) => { e.target.style.backgroundColor = '#4CAF50'; });
+		});
+		this.canvas.addEventListener('mousemove', (e) => {
+			const rect = this.canvas.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			let cursor = 'default';
+			this.buttons.forEach(button => {
+				if (mouseX > button.x - button.width / 2 &&
+					mouseX < button.x + button.width / 2 &&
+					mouseY > button.y - button.height / 2 &&
+					mouseY < button.y + button.height / 2) {
+					cursor = 'pointer';
+				}
+			});
+			this.canvas.style.cursor = cursor;
 		});
 	};
 };
