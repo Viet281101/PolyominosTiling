@@ -3,18 +3,19 @@ class MainApp {
 		this.canvas = document.getElementById('myCanvas');
 		this.ctx = this.canvas.getContext('2d');
 		this.buttons = [];
+
+		this.initialize();
+		this.addEventListeners();
+	};
+	initialize() {
 		this.loadIconPage();
 		this.resizeCanvas();
 		this.drawContent();
-		this.addEventListeners();
-
-		// Resize canvas on window resize
-		window.addEventListener('resize', () => {
-			this.resizeCanvas();
-			this.drawContent();
-		});
+		this.hideScrollbars();
+	};
+	hideScrollbars() {
 		const html = document.querySelector('html');
-		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%', margin: '0', padding: '0', });
+		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%' });
 	};
 	loadIconPage() {
 		let icon_page = document.createElement('link');
