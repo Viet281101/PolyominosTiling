@@ -23,7 +23,7 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 
 ### Group:
 
-- NGUYEN Viet -- 20006303
-- GEOFFROY Damien -- 21007431 
+- [NGUYEN Viet](https://github.com/Viet281101) -- 20006303
+- [GEOFFROY Damien](https://github.com/D-TheProgrammer) -- 21007431 
 
 

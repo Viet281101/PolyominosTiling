@@ -1,4 +1,4 @@
-class Polyomino {
+export class Polyomino {
 	constructor(width, height, x, y, color) {
 		this.width = width;
 		this.height = height;

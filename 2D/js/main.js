@@ -1,3 +1,5 @@
+import { Polyomino } from './polyomino.js';
+
 class MainApp {
 	constructor() {
 		this.canvas = document.getElementById('myCanvas');
@@ -10,25 +12,38 @@ class MainApp {
 	};
 
 	init() {
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
+		this.resizeCanvas();
 		this.drawGrid();
 		this.createPolyominoes();
 		this.addEventListeners();
+
+		window.addEventListener('resize', () => {
+			this.resizeCanvas();
+			this.drawGrid();
+			this.redraw();
+		});
 	};
+
+	resizeCanvas() {
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
+		this.gridOffsetX = (this.canvas.width - this.cols * this.gridSize) / 2;
+		this.gridOffsetY = (this.canvas.height - this.rows * this.gridSize) / 2;
+	}
 
 	drawGrid() {
 		this.ctx.strokeStyle = '#000';
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		for (let i = 0; i <= this.cols; i++) {
 			this.ctx.beginPath();
-			this.ctx.moveTo(i * this.gridSize, 0);
-			this.ctx.lineTo(i * this.gridSize, this.rows * this.gridSize);
+			this.ctx.moveTo(this.gridOffsetX + i * this.gridSize, this.gridOffsetY);
+			this.ctx.lineTo(this.gridOffsetX + i * this.gridSize, this.gridOffsetY + this.rows * this.gridSize);
 			this.ctx.stroke();
 		}
 		for (let j = 0; j <= this.rows; j++) {
 			this.ctx.beginPath();
-			this.ctx.moveTo(0, j * this.gridSize);
-			this.ctx.lineTo(this.cols * this.gridSize, j * this.gridSize);
+			this.ctx.moveTo(this.gridOffsetX, this.gridOffsetY + j * this.gridSize);
+			this.ctx.lineTo(this.gridOffsetX + this.cols * this.gridSize, this.gridOffsetY + j * this.gridSize);
 			this.ctx.stroke();
 		}
 	};
@@ -36,6 +51,8 @@ class MainApp {
 	createPolyominoes() {
 		this.polyominoes.push(new Polyomino(4, 1, 100, 100, 'red'));
 		this.polyominoes.push(new Polyomino(2, 2, 200, 100, 'blue'));
+		this.polyominoes.push(new Polyomino(1, 1, 300, 100, 'green')); // Monomino
+		this.polyominoes.push(new Polyomino(1, 3, 400, 100, 'purple')); // Tromino
 		this.drawPolyominoes();
 	};
 
