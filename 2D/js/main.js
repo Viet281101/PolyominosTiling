@@ -14,9 +14,10 @@ class MainApp {
 			rotateLeft: new Image(),
 			rotateRight: new Image()
 		};
-		this.icons.flip.src = '../assets/ic_flip.png';
-		this.icons.rotateLeft.src = '../assets/ic_rotate_left.png';
-		this.icons.rotateRight.src = '../assets/ic_rotate_right.png';
+		const as = "../assets/";
+		this.icons.flip.src = as+'ic_flip.png';
+		this.icons.rotateLeft.src = as+'ic_rotate_left.png';
+		this.icons.rotateRight.src = as+'ic_rotate_right.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.init();
 	};
