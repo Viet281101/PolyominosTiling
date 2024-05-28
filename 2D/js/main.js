@@ -8,6 +8,16 @@ class MainApp {
 		this.rows = 10;
 		this.cols = 10;
 		this.polyominoes = [];
+		this.selectedPolyomino = null;
+		this.icons = {
+			flip: new Image(),
+			rotateLeft: new Image(),
+			rotateRight: new Image()
+		};
+		const assPath = '../assets/';
+		this.icons.flip.src = assPath + 'ic_flip.png';
+		this.icons.rotateLeft.src = assPath + 'ic_rotate_left.png';
+		this.icons.rotateRight.src = assPath + 'ic_rotate_right.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.init();
 	};
@@ -33,7 +43,19 @@ class MainApp {
 	addEventListeners() {
 		this.canvas.addEventListener('mousedown', (e) => {
 			const mousePos = this.gridBoard.getMousePos(e);
-			this.polyominoes.forEach(polyomino => polyomino.onMouseDown(mousePos));
+			let clickedOnIcon = false;
+			if (this.selectedPolyomino) {
+				clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
+			}
+			if (!clickedOnIcon) {
+				this.polyominoes.forEach(polyomino => {
+					polyomino.onMouseDown(mousePos);
+					if (polyomino.isDragging) {
+						this.selectedPolyomino = polyomino;
+					}
+				});
+			}
+			this.redraw();
 		});
 
 		this.canvas.addEventListener('mousemove', (e) => {
@@ -44,11 +66,12 @@ class MainApp {
 
 		this.canvas.addEventListener('mouseup', (e) => {
 			this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
+			this.redraw();
 		});
 
 		window.addEventListener('keydown', (e) => {
-			if (e.key === 'r') {
-				this.polyominoes.forEach(polyomino => polyomino.rotate());
+			if (e.key === 'r' && this.selectedPolyomino) {
+				this.selectedPolyomino.rotate();
 				this.redraw();
 			}
 		});
@@ -58,6 +81,10 @@ class MainApp {
 		this.gridBoard.clear();
 		this.gridBoard.drawGrid();
 		this.drawPolyominoes();
+		if (this.selectedPolyomino) {
+			this.selectedPolyomino.drawSelection(this.gridBoard.ctx, this.gridSize);
+			this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
+		}
 	};
 };
 

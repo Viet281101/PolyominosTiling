@@ -8,6 +8,7 @@ export class Polyomino {
 		this.isDragging = false;
 		this.offsetX = 0;
 		this.offsetY = 0;
+		this.iconSize = 16;
 	};
 
 	draw(ctx, gridSize) {
@@ -20,6 +21,20 @@ export class Polyomino {
 				}
 			}
 		}
+	};
+
+	drawSelection(ctx, gridSize) {
+		ctx.strokeStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.strokeRect(this.x, this.y, this.shape[0].length * gridSize, this.shape.length * gridSize);
+	};
+
+	drawIcons(ctx, gridSize, icons) {
+		const centerX = this.x + (this.shape[0].length * gridSize) / 2;
+		const centerY = this.y + (this.shape.length * gridSize) / 2;
+		ctx.drawImage(icons.flip, centerX - this.iconSize, centerY - gridSize - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+		ctx.drawImage(icons.rotateLeft, centerX - gridSize - this.iconSize * 2, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+		ctx.drawImage(icons.rotateRight, centerX + gridSize, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
 	};
 
 	contains(mouseX, mouseY, gridSize) {
@@ -36,6 +51,40 @@ export class Polyomino {
 			}
 		}
 		return false;
+	};
+
+	checkIconsClick(mousePos) {
+		const centerX = this.x + (this.shape[0].length * this.app.gridSize) / 2;
+		const centerY = this.y + (this.shape.length * this.app.gridSize) / 2;
+		const icons = [
+			{ type: 'flip', x: centerX - this.iconSize, y: centerY - this.app.gridSize - this.iconSize },
+			{ type: 'rotateLeft', x: centerX - this.app.gridSize - this.iconSize * 2, y: centerY - this.iconSize },
+			{ type: 'rotateRight', x: centerX + this.app.gridSize, y: centerY - this.iconSize }
+		];
+
+		for (let icon of icons) {
+			if (mousePos.x >= icon.x && mousePos.x < icon.x + this.iconSize * 2 &&
+				mousePos.y >= icon.y && mousePos.y < icon.y + this.iconSize * 2) {
+				this.handleIconClick(icon.type);
+				return true;
+			}
+		}
+		return false;
+	};
+
+	handleIconClick(type) {
+		switch (type) {
+			case 'flip':
+				this.flip();
+				break;
+			case 'rotateLeft':
+				this.rotateLeft();
+				break;
+			case 'rotateRight':
+				this.rotateRight();
+				break;
+		}
+		this.app.redraw();
 	};
 
 	onMouseDown(mousePos) {
@@ -66,6 +115,22 @@ export class Polyomino {
 			}
 		}
 		this.shape = newShape;
+	};
+
+	rotateLeft() {
+		this.rotate();
+		this.rotate();
+		this.rotate();
+	};
+
+	rotateRight() {
+		this.rotate();
+	};
+
+	flip() {
+		for (let row of this.shape) {
+			row.reverse();
+		}
 	};
 };
 
