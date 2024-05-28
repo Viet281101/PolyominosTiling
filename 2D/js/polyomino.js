@@ -11,22 +11,17 @@ export class Polyomino {
 		this.iconSize = 16;
 	};
 
-	draw(ctx, gridSize) {
+	draw(ctx, gridSize, isSelected) {
 		ctx.fillStyle = this.color;
 		for (let i = 0; i < this.shape.length; i++) {
 			for (let j = 0; j < this.shape[i].length; j++) {
 				if (this.shape[i][j] === 1) {
 					ctx.fillRect(this.x + j * gridSize, this.y + i * gridSize, gridSize, gridSize);
+					ctx.strokeStyle = isSelected ? 'white' : 'black';
 					ctx.strokeRect(this.x + j * gridSize, this.y + i * gridSize, gridSize, gridSize);
 				}
 			}
 		}
-	};
-
-	drawSelection(ctx, gridSize) {
-		ctx.strokeStyle = 'white';
-		ctx.lineWidth = 2;
-		ctx.strokeRect(this.x, this.y, this.shape[0].length * gridSize, this.shape.length * gridSize);
 	};
 
 	drawIcons(ctx, gridSize, icons) {

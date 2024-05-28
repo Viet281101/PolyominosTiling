@@ -4,10 +4,12 @@
 
 ### Work (Travail) :
 
-- EN:
+- **EN**:
+
 Learn about the Polyominoes and give the solutions of tiling with one or several fixed pieces, in 2D with the Canvas API, in 3D with the three.js library.
 
-- FR:
+- **FR**:
+
 Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec une ou plusieurs pièces fixées, en 2D avec l'API Canvas, en 3D avec la librairie three.js. 
 
 

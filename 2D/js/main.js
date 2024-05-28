@@ -14,10 +14,9 @@ class MainApp {
 			rotateLeft: new Image(),
 			rotateRight: new Image()
 		};
-		const assPath = '../assets/';
-		this.icons.flip.src = assPath + 'ic_flip.png';
-		this.icons.rotateLeft.src = assPath + 'ic_rotate_left.png';
-		this.icons.rotateRight.src = assPath + 'ic_rotate_right.png';
+		this.icons.flip.src = '../assets/ic_flip.png';
+		this.icons.rotateLeft.src = '../assets/ic_rotate_left.png';
+		this.icons.rotateRight.src = '../assets/ic_rotate_right.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.init();
 	};
@@ -37,7 +36,7 @@ class MainApp {
 	};
 
 	drawPolyominoes() {
-		this.polyominoes.forEach(polyomino => polyomino.draw(this.gridBoard.ctx, this.gridSize));
+		this.polyominoes.forEach(polyomino => polyomino.draw(this.gridBoard.ctx, this.gridSize, this.selectedPolyomino === polyomino));
 	};
 
 	addEventListeners() {
@@ -48,12 +47,17 @@ class MainApp {
 				clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
 			}
 			if (!clickedOnIcon) {
+				let selected = false;
 				this.polyominoes.forEach(polyomino => {
 					polyomino.onMouseDown(mousePos);
 					if (polyomino.isDragging) {
 						this.selectedPolyomino = polyomino;
+						selected = true;
 					}
 				});
+				if (!selected) {
+					this.selectedPolyomino = null;
+				}
 			}
 			this.redraw();
 		});
@@ -81,8 +85,7 @@ class MainApp {
 		this.gridBoard.clear();
 		this.gridBoard.drawGrid();
 		this.drawPolyominoes();
-		if (this.selectedPolyomino) {
-			this.selectedPolyomino.drawSelection(this.gridBoard.ctx, this.gridSize);
+		if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
 			this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
 		}
 	};
