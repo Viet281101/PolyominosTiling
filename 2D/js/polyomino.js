@@ -88,6 +88,7 @@ export class Polyomino {
 			this.offsetX = mousePos.x - this.x;
 			this.offsetY = mousePos.y - this.y;
 		}
+		this.app.canvas.style.cursor = 'grabbing';
 	};
 
 	onMouseMove(mousePos) {
@@ -99,6 +100,7 @@ export class Polyomino {
 
 	onMouseUp() {
 		this.isDragging = false;
+		this.app.canvas.style.cursor = 'default';
 	};
 
 	rotate() {
