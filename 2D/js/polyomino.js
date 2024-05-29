@@ -5,6 +5,8 @@ export class Polyomino {
 		this.y = y;
 		this.originalX = x;
 		this.originalY = y;
+		this.lastX = x;
+		this.lastY = y;
 		this.color = color;
 		this.app = app;
 		this.isDragging = false;
@@ -97,6 +99,9 @@ export class Polyomino {
 			this.offsetX = mousePos.x - this.x;
 			this.offsetY = mousePos.y - this.y;
 			this.app.selectedPolyomino = this;
+
+			this.lastX = this.x;
+			this.lastY = this.y;
 		}
 		this.app.canvas.style.cursor = 'grabbing';
 	};
@@ -128,10 +133,10 @@ export class Polyomino {
 					this.app.placePolyomino(this);
 					this.isPlaced = true;
 				} else {
-					this.resetPosition();
+					this.x = this.lastX;
+					this.y = this.lastY;
 				}
 			}
-
 			this.app.redraw();
 		}
 	};
