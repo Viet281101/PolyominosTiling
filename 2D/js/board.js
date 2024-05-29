@@ -47,6 +47,14 @@ export class GridBoard {
 		};
 	};
 
+	getTouchPos(e) {
+		const rect = this.canvas.getBoundingClientRect();
+		return {
+			x: e.touches[0].clientX - rect.left,
+			y: e.touches[0].clientY - rect.top
+		};
+	};
+
 	clear() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	};
