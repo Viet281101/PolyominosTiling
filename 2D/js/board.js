@@ -125,4 +125,21 @@ export class GridBoard {
 		}
 		return false;
 	};
+
+	removePolyomino(polyomino) {
+		const { x, y, shape } = polyomino;
+		const gridSize = this.gridSize;
+		const offsetX = this.gridOffsetX;
+		const offsetY = this.gridOffsetY;
+
+		for (let i = 0; i < shape.length; i++) {
+			for (let j = 0; j < shape[i].length; j++) {
+				if (shape[i][j] === 1) {
+					const posX = Math.floor((x - offsetX) / gridSize) + j;
+					const posY = Math.floor((y - offsetY) / gridSize) + i;
+					this.grid[posY][posX] = null;
+				}
+			}
+		}
+	};
 };

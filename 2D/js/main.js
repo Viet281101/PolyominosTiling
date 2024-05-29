@@ -88,8 +88,12 @@ class MainApp {
 		if (!clickedOnIcon) {
 			let selected = false;
 			this.polyominoes.forEach(polyomino => {
-				polyomino.onMouseDown(mousePos);
-				if (polyomino.isDragging) {
+				if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
+					if (polyomino.isPlaced) {
+						this.gridBoard.removePolyomino(polyomino);
+						polyomino.isPlaced = false;
+					}
+					polyomino.onMouseDown(mousePos);
 					this.selectedPolyomino = polyomino;
 					selected = true;
 				}
@@ -122,10 +126,7 @@ class MainApp {
 
 	placePolyomino(polyomino) {
 		this.gridBoard.placePolyomino(polyomino);
-		const index = this.polyominoes.indexOf(polyomino);
-		if (index > -1) {
-			this.polyominoes.splice(index, 1);
-		}
+		polyomino.isPlaced = true;
 		this.selectedPolyomino = null;
 		this.redraw();
 	};

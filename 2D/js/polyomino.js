@@ -89,9 +89,14 @@ export class Polyomino {
 
 	onMouseDown(mousePos) {
 		if (this.contains(mousePos.x, mousePos.y, this.app.gridSize)) {
+			if (this.isPlaced) {
+				this.app.gridBoard.removePolyomino(this);
+				this.isPlaced = false;
+			}
 			this.isDragging = true;
 			this.offsetX = mousePos.x - this.x;
 			this.offsetY = mousePos.y - this.y;
+			this.app.selectedPolyomino = this;
 		}
 		this.app.canvas.style.cursor = 'grabbing';
 	};
@@ -121,6 +126,7 @@ export class Polyomino {
 			if (this.app.gridBoard.isInBounds(this)) {
 				if (!this.app.gridBoard.isOverlapping(this)) {
 					this.app.placePolyomino(this);
+					this.isPlaced = true;
 				} else {
 					this.resetPosition();
 				}
