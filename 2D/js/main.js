@@ -109,7 +109,7 @@ class MainApp {
 	handleMouseUp() {
 		this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
 		this.redraw();
-	};	
+	};
 
 	redraw() {
 		this.gridBoard.clear();
@@ -118,6 +118,16 @@ class MainApp {
 		if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
 			this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
 		}
+	};
+
+	placePolyomino(polyomino) {
+		this.gridBoard.placePolyomino(polyomino);
+		const index = this.polyominoes.indexOf(polyomino);
+		if (index > -1) {
+			this.polyominoes.splice(index, 1);
+		}
+		this.selectedPolyomino = null;
+		this.redraw();
 	};
 };
 

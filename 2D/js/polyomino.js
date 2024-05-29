@@ -120,7 +120,7 @@ export class Polyomino {
 
 			if (this.app.gridBoard.isInBounds(this)) {
 				if (!this.app.gridBoard.isOverlapping(this)) {
-					this.app.gridBoard.placePolyomino(this);
+					this.app.placePolyomino(this);
 				} else {
 					this.resetPosition();
 				}
