@@ -121,14 +121,15 @@ class MainApp {
 
 		this.polyominoes.forEach(polyomino => polyomino.draw());
 
-		this.ctx.font = '40px Helvetica';
+		this.ctx.font = '30px Helvetica';
 		this.ctx.fillStyle = 'black';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText('Polyominoes Tiling (Pavages de Polyominos)', this.canvas.width / 2, 50);
+		this.ctx.fillText('Polyominoes Tiling', this.canvas.width / 2, 50);
+		this.ctx.fillText('(Pavages de Polyominos)', this.canvas.width / 2, 100);
 
 		this.buttons = [];
-		this.drawButton('2D Version', this.canvas.width / 2, 150, () => { window.location.href = './2D/index.html'; });
-		this.drawButton('3D Version', this.canvas.width / 2, 250, () => { window.location.href = './3D/index.html'; });
+		this.drawButton('2D Version', this.canvas.width / 2, 200, () => { window.location.href = './2D/index.html'; });
+		this.drawButton('3D Version', this.canvas.width / 2, 300, () => { window.location.href = './3D/index.html'; });
 	};
 
 	drawButton(text, x, y, onClick) {

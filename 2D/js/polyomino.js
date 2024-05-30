@@ -3,9 +3,14 @@ export class Polyomino {
 		this.shape = shape;
 		this.x = x;
 		this.y = y;
+		this.originalX = x;
+		this.originalY = y;
+		this.lastX = x;
+		this.lastY = y;
 		this.color = color;
 		this.app = app;
 		this.isDragging = false;
+		this.isPlaced = false;
 		this.offsetX = 0;
 		this.offsetY = 0;
 		this.iconSize = 16;
@@ -25,11 +30,13 @@ export class Polyomino {
 	};
 
 	drawIcons(ctx, gridSize, icons) {
-		const centerX = this.x + (this.shape[0].length * gridSize) / 2;
-		const centerY = this.y + (this.shape.length * gridSize) / 2;
-		ctx.drawImage(icons.flip, centerX - this.iconSize, centerY - gridSize - this.iconSize, this.iconSize * 2, this.iconSize * 2);
-		ctx.drawImage(icons.rotateLeft, centerX - gridSize - this.iconSize * 2, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
-		ctx.drawImage(icons.rotateRight, centerX + gridSize, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+		if (!this.isPlaced) {
+			const centerX = this.x + (this.shape[0].length * gridSize) / 2;
+			const centerY = this.y + (this.shape.length * gridSize) / 2;
+			ctx.drawImage(icons.flip, centerX - this.iconSize, centerY - gridSize - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+			ctx.drawImage(icons.rotateLeft, centerX - gridSize - this.iconSize * 2, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+			ctx.drawImage(icons.rotateRight, centerX + gridSize, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+		}
 	};
 
 	contains(mouseX, mouseY, gridSize) {
@@ -84,9 +91,17 @@ export class Polyomino {
 
 	onMouseDown(mousePos) {
 		if (this.contains(mousePos.x, mousePos.y, this.app.gridSize)) {
+			if (this.isPlaced) {
+				this.app.gridBoard.removePolyomino(this);
+				this.isPlaced = false;
+			}
 			this.isDragging = true;
 			this.offsetX = mousePos.x - this.x;
 			this.offsetY = mousePos.y - this.y;
+			this.app.selectedPolyomino = this;
+
+			this.lastX = this.x;
+			this.lastY = this.y;
 		}
 		this.app.canvas.style.cursor = 'grabbing';
 	};
@@ -99,8 +114,36 @@ export class Polyomino {
 	};
 
 	onMouseUp() {
-		this.isDragging = false;
-		this.app.canvas.style.cursor = 'default';
+		if (this.isDragging) {
+			this.isDragging = false;
+			this.app.canvas.style.cursor = 'default';
+
+			const gridSize = this.app.gridSize;
+			const offsetX = this.app.gridBoard.gridOffsetX;
+			const offsetY = this.app.gridBoard.gridOffsetY;
+
+			const newX = Math.round((this.x - offsetX) / gridSize) * gridSize + offsetX;
+			const newY = Math.round((this.y - offsetY) / gridSize) * gridSize + offsetY;
+
+			this.x = newX;
+			this.y = newY;
+
+			if (this.app.gridBoard.isInBounds(this)) {
+				if (!this.app.gridBoard.isOverlapping(this)) {
+					this.app.placePolyomino(this);
+					this.isPlaced = true;
+				} else {
+					this.x = this.lastX;
+					this.y = this.lastY;
+				}
+			}
+			this.app.redraw();
+		}
+	};
+
+	resetPosition() {
+		this.x = this.originalX;
+		this.y = this.originalY;
 	};
 
 	rotate() {

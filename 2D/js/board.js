@@ -37,6 +37,16 @@ export class GridBoard {
 			this.ctx.lineTo(this.gridOffsetX + this.cols * this.gridSize, this.gridOffsetY + j * this.gridSize);
 			this.ctx.stroke();
 		}
+
+		for (let row = 0; row < this.rows; row++) {
+			for (let col = 0; col < this.cols; col++) {
+				if (this.grid[row][col] !== null) {
+					this.ctx.fillStyle = this.grid[row][col];
+					this.ctx.fillRect(this.gridOffsetX + col * this.gridSize, this.gridOffsetY + row * this.gridSize, this.gridSize, this.gridSize);
+					this.ctx.strokeRect(this.gridOffsetX + col * this.gridSize, this.gridOffsetY + row * this.gridSize, this.gridSize, this.gridSize);
+				}
+			}
+		}
 	};
 
 	getMousePos(e) {
@@ -44,6 +54,14 @@ export class GridBoard {
 		return {
 			x: e.clientX - rect.left,
 			y: e.clientY - rect.top
+		};
+	};
+
+	getTouchPos(e) {
+		const rect = this.canvas.getBoundingClientRect();
+		return {
+			x: e.touches[0].clientX - rect.left,
+			y: e.touches[0].clientY - rect.top
 		};
 	};
 
@@ -71,26 +89,6 @@ export class GridBoard {
 		return true;
 	};
 
-	isOverlapping(polyomino) {
-		const { x, y, shape } = polyomino;
-		const gridSize = this.gridSize;
-		const offsetX = this.gridOffsetX;
-		const offsetY = this.gridOffsetY;
-
-		for (let i = 0; i < shape.length; i++) {
-			for (let j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX + j * gridSize) / gridSize);
-					const posY = Math.floor((y - offsetY + i * gridSize) / gridSize);
-					if (this.grid[posY][posX] !== null) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	};
-
 	placePolyomino(polyomino) {
 		const { x, y, shape, color } = polyomino;
 		const gridSize = this.gridSize;
@@ -100,9 +98,46 @@ export class GridBoard {
 		for (let i = 0; i < shape.length; i++) {
 			for (let j = 0; j < shape[i].length; j++) {
 				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX + j * gridSize) / gridSize);
-					const posY = Math.floor((y - offsetY + i * gridSize) / gridSize);
+					const posX = Math.floor((x - offsetX) / gridSize) + j;
+					const posY = Math.floor((y - offsetY) / gridSize) + i;
 					this.grid[posY][posX] = color;
+				}
+			}
+		}
+	};
+
+	isOverlapping(polyomino) {
+		const { x, y, shape } = polyomino;
+		const gridSize = this.gridSize;
+		const offsetX = this.gridOffsetX;
+		const offsetY = this.gridOffsetY;
+
+		for (let i = 0; i < shape.length; i++) {
+			for (let j = 0; j < shape[i].length; j++) {
+				if (shape[i][j] === 1) {
+					const posX = Math.floor((x - offsetX) / gridSize) + j;
+					const posY = Math.floor((y - offsetY) / gridSize) + i;
+					if (this.grid[posY][posX] !== null) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	};
+
+	removePolyomino(polyomino) {
+		const { x, y, shape } = polyomino;
+		const gridSize = this.gridSize;
+		const offsetX = this.gridOffsetX;
+		const offsetY = this.gridOffsetY;
+
+		for (let i = 0; i < shape.length; i++) {
+			for (let j = 0; j < shape[i].length; j++) {
+				if (shape[i][j] === 1) {
+					const posX = Math.floor((x - offsetX) / gridSize) + j;
+					const posY = Math.floor((y - offsetY) / gridSize) + i;
+					this.grid[posY][posX] = null;
 				}
 			}
 		}

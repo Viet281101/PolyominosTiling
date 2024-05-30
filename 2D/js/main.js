@@ -43,35 +43,16 @@ class MainApp {
 	addEventListeners() {
 		this.canvas.addEventListener('mousedown', (e) => {
 			const mousePos = this.gridBoard.getMousePos(e);
-			let clickedOnIcon = false;
-			if (this.selectedPolyomino) {
-				clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
-			}
-			if (!clickedOnIcon) {
-				let selected = false;
-				this.polyominoes.forEach(polyomino => {
-					polyomino.onMouseDown(mousePos);
-					if (polyomino.isDragging) {
-						this.selectedPolyomino = polyomino;
-						selected = true;
-					}
-				});
-				if (!selected) {
-					this.selectedPolyomino = null;
-				}
-			}
-			this.redraw();
+			this.handleMouseDown(mousePos);
 		});
 
 		this.canvas.addEventListener('mousemove', (e) => {
 			const mousePos = this.gridBoard.getMousePos(e);
-			this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
-			this.redraw();
+			this.handleMouseMove(mousePos);
 		});
 
 		this.canvas.addEventListener('mouseup', (e) => {
-			this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
-			this.redraw();
+			this.handleMouseUp();
 		});
 
 		window.addEventListener('keydown', (e) => {
@@ -80,6 +61,58 @@ class MainApp {
 				this.redraw();
 			}
 		});
+
+		this.canvas.addEventListener('touchstart', (e) => {
+			e.preventDefault();
+			const touchPos = this.gridBoard.getTouchPos(e);
+			this.handleMouseDown(touchPos);
+		});
+
+		this.canvas.addEventListener('touchmove', (e) => {
+			e.preventDefault();
+			const touchPos = this.gridBoard.getTouchPos(e);
+			this.handleMouseMove(touchPos);
+		});
+
+		this.canvas.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			this.handleMouseUp();
+		});
+	};
+
+	handleMouseDown(mousePos) {
+		let clickedOnIcon = false;
+		if (this.selectedPolyomino) {
+			clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
+		}
+		if (!clickedOnIcon) {
+			let selected = false;
+			this.polyominoes.forEach(polyomino => {
+				if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
+					if (polyomino.isPlaced) {
+						this.gridBoard.removePolyomino(polyomino);
+						polyomino.isPlaced = false;
+					}
+					polyomino.onMouseDown(mousePos);
+					this.selectedPolyomino = polyomino;
+					selected = true;
+				}
+			});
+			if (!selected) {
+				this.selectedPolyomino = null;
+			}
+		}
+		this.redraw();
+	};
+
+	handleMouseMove(mousePos) {
+		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
+		this.redraw();
+	};
+
+	handleMouseUp() {
+		this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
+		this.redraw();
 	};
 
 	redraw() {
@@ -89,6 +122,13 @@ class MainApp {
 		if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
 			this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
 		}
+	};
+
+	placePolyomino(polyomino) {
+		this.gridBoard.placePolyomino(polyomino);
+		polyomino.isPlaced = true;
+		this.selectedPolyomino = null;
+		this.redraw();
 	};
 };
 
