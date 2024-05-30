@@ -12,12 +12,16 @@ class MainApp {
 		this.icons = {
 			flip: new Image(),
 			rotateLeft: new Image(),
-			rotateRight: new Image()
+			rotateRight: new Image(),
+			duplicate: new Image(),
+			trash: new Image()
 		};
 		const as = "../assets/";
-		this.icons.flip.src = as+'ic_flip.png';
-		this.icons.rotateLeft.src = as+'ic_rotate_left.png';
-		this.icons.rotateRight.src = as+'ic_rotate_right.png';
+		this.icons.flip.src = as + 'ic_flip.png';
+		this.icons.rotateLeft.src = as + 'ic_rotate_left.png';
+		this.icons.rotateRight.src = as + 'ic_rotate_right.png';
+		this.icons.duplicate.src = as + 'ic_duplicate.png';
+		this.icons.trash.src = as + 'ic_trash.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.init();
 	};
@@ -33,6 +37,7 @@ class MainApp {
 		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 300, 100, 'green', this));
 		this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 400, 100, 'purple', this));
 		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 500, 100, 'orange', this));
+		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_S, 600, 100, 'yellow', this));
 		this.drawPolyominoes();
 	};
 
@@ -123,6 +128,21 @@ class MainApp {
 		polyomino.isPlaced = true;
 		this.selectedPolyomino = null;
 		this.redraw();
+	};
+
+	duplicatePolyomino(polyomino) {
+		const newPolyomino = new Polyomino(polyomino.shape, polyomino.x, polyomino.y, polyomino.color, this);
+		this.polyominoes.push(newPolyomino);
+		this.redraw();
+	};
+
+	deletePolyomino(polyomino) {
+		const index = this.polyominoes.indexOf(polyomino);
+		if (index !== -1) {
+			this.polyominoes.splice(index, 1);
+			this.selectedPolyomino = null;
+			this.redraw();
+		}
 	};
 };
 
