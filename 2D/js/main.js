@@ -33,7 +33,6 @@ class MainApp {
 		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 300, 100, 'green', this));
 		this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 400, 100, 'purple', this));
 		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 500, 100, 'orange', this));
-		this.redraw();
 		this.drawPolyominoes();
 	};
 
