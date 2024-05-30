@@ -1,5 +1,5 @@
 import { GridBoard } from './board.js';
-import { Polyomino, SHAPES } from './polyomino.js';
+import { Polyomino, SHAPES, getRandomColor } from './polyomino.js';
 
 class MainApp {
 	constructor() {
@@ -35,8 +35,8 @@ class MainApp {
 		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_I, 100, 100, 'red', this));
 		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_O, 200, 100, 'blue', this));
 		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 300, 100, 'green', this));
-		this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 400, 100, 'purple', this));
-		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 500, 100, 'orange', this));
+		this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 100, 50, 'purple', this));
+		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 200, 50, 'orange', this));
 		this.drawPolyominoes();
 	};
 
@@ -132,7 +132,11 @@ class MainApp {
 	};
 
 	duplicatePolyomino(polyomino) {
-		const newPolyomino = new Polyomino(polyomino.shape, polyomino.x, polyomino.y, polyomino.color, this);
+		let newColor;
+		do {
+			newColor = getRandomColor();
+		} while (newColor === polyomino.color);
+		const newPolyomino = new Polyomino(polyomino.shape, polyomino.x, polyomino.y, newColor, this);
 		this.polyominoes.push(newPolyomino);
 		this.redraw();
 	};
