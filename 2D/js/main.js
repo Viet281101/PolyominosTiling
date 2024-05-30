@@ -45,35 +45,29 @@ class MainApp {
 			const mousePos = this.gridBoard.getMousePos(e);
 			this.handleMouseDown(mousePos);
 		});
-
 		this.canvas.addEventListener('mousemove', (e) => {
 			const mousePos = this.gridBoard.getMousePos(e);
 			this.handleMouseMove(mousePos);
 		});
-
 		this.canvas.addEventListener('mouseup', (e) => {
 			this.handleMouseUp();
 		});
-
 		window.addEventListener('keydown', (e) => {
 			if (e.key === 'r' && this.selectedPolyomino) {
 				this.selectedPolyomino.rotate();
 				this.redraw();
 			}
 		});
-
 		this.canvas.addEventListener('touchstart', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);
 			this.handleMouseDown(touchPos);
 		});
-
 		this.canvas.addEventListener('touchmove', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);
 			this.handleMouseMove(touchPos);
 		});
-
 		this.canvas.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			this.handleMouseUp();
