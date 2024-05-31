@@ -27,7 +27,7 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 - [Tiling with Pentominos](https://demonstrations.wolfram.com/TilingWithPentominos/)
 
 
-### Contributors (Contributeurs):
+### Authors (Auteurs):
 
 | Name (Nom) | N° student | GitHub  |
 | -------- | ------- | ---------------------------------------- |

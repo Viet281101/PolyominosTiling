@@ -14,6 +14,7 @@ export class GUIController {
 
 	init() {
 		const gui = new GUI();
+		// gui.hide();
 		gui.add(this.settings, 'gridSize', 10, 100).onChange((value) => {
 			this.mainApp.gridSize = value;
 			this.mainApp.gridBoard.gridSize = value;

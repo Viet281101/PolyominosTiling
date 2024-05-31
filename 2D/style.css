@@ -6,3 +6,4 @@
 	-ms-user-select: none;
 }
 body {overflow: hidden;}
+.dg {z-index: 100 !important;}

@@ -1,6 +1,7 @@
 import { GridBoard } from './board.js';
 import { Polyomino, SHAPES, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
+import { Toolbar } from './toolbar.js';
 
 class MainApp {
 	constructor() {
@@ -25,6 +26,7 @@ class MainApp {
 		this.icons.trash.src = as + 'ic_trash.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.guiController = new GUIController(this);
+		this.toolbar = new Toolbar(this);
 		this.init();
 	};
 
