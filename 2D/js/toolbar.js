@@ -13,10 +13,12 @@ export class Toolbar {
 		document.body.appendChild(this.canvas);
 
 		this.buttons = [
-			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.showPolyominoPopup() }
+			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.showPolyominoPopup() },
+			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.showGridPopup() }
 		];
 
 		this.popupOpen = false;
+		this.gridPopupCanvas = null;
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
@@ -64,9 +66,12 @@ export class Toolbar {
 		});
 		document.addEventListener('click', (e) => {
 			if (this.popupOpen) {
-				const popup = document.getElementById('polyominoPopup');
-				if (popup && !popup.contains(e.target) && !this.canvas.contains(e.target)) {
-					this.closePopup();
+				if (this.gridPopupCanvas && !this.gridPopupCanvas.contains(e.target) && !this.canvas.contains(e.target)) {
+					this.closeGridPopup();
+				}
+				const pPopup = document.getElementById('polyominoPopup');
+				if (pPopup && !pPopup.contains(e.target) && !this.canvas.contains(e.target)) {
+					this.closePolyominoPopup();
 				}
 			}
 		});
@@ -116,7 +121,7 @@ export class Toolbar {
 		closeIcon.style.transform = 'translateX(-50%)';
 		closeIcon.style.cursor = 'pointer';
 		closeIcon.style.zIndex = '1001';
-		closeIcon.addEventListener('click', () => this.closePopup());
+		closeIcon.addEventListener('click', () => this.closePolyominoPopup());
 		document.body.appendChild(closeIcon);
 
 		const shapes = Object.keys(SHAPES);
@@ -150,7 +155,7 @@ export class Toolbar {
 				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), mousePos.x, mousePos.y, getRandomColor(), this.mainApp);
 				this.mainApp.polyominoes.push(newPolyomino);
 				this.mainApp.redraw();
-				this.closePopup();
+				this.closePolyominoPopup();
 			};
 
 			popup.addEventListener('click', (e) => {
@@ -170,7 +175,44 @@ export class Toolbar {
 		});
 	};
 
-	closePopup() {
+	showGridPopup() {
+		if (this.popupOpen) return;
+		this.popupOpen = true;
+
+		this.gridPopupCanvas = document.createElement('canvas');
+		this.gridPopupCanvas.width = 370;
+		this.gridPopupCanvas.height = 600;
+		this.gridPopupCanvas.style.position = 'absolute';
+		this.gridPopupCanvas.style.top = '50px';
+		this.gridPopupCanvas.style.left = '50%';
+		this.gridPopupCanvas.style.transform = 'translateX(-50%)';
+		this.gridPopupCanvas.style.border = '3px solid #000';
+		this.gridPopupCanvas.style.zIndex = '1000';
+		document.body.appendChild(this.gridPopupCanvas);
+
+		const ctx = this.gridPopupCanvas.getContext('2d');
+		ctx.fillStyle = '#a0a0a0';
+		ctx.fillRect(0, 0, this.gridPopupCanvas.width, this.gridPopupCanvas.height);
+
+		const closeIcon = new Image();
+		closeIcon.src = '../assets/ic_close.png';
+		closeIcon.onload = () => {
+			ctx.drawImage(closeIcon, this.gridPopupCanvas.width - 35, 5, 30, 30);
+		};
+
+		this.gridPopupCanvas.addEventListener('click', (e) => {
+			const rect = this.gridPopupCanvas.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			if (mouseX >= this.gridPopupCanvas.width - 40 && mouseX <= this.gridPopupCanvas.width - 10 &&
+				mouseY >= 10 && mouseY <= 40) {
+				this.closeGridPopup();
+			}
+		});
+	};
+
+	closePolyominoPopup() {
 		const popup = document.getElementById('polyominoPopup');
 		if (popup) {
 			document.body.removeChild(popup);
@@ -178,6 +220,14 @@ export class Toolbar {
 		const closeIcon = document.querySelector('img[src="../assets/ic_close.png"]');
 		if (closeIcon) {
 			document.body.removeChild(closeIcon);
+		}
+		this.popupOpen = false;
+	};
+
+	closeGridPopup() {
+		if (this.gridPopupCanvas) {
+			document.body.removeChild(this.gridPopupCanvas);
+			this.gridPopupCanvas = null;
 		}
 		this.popupOpen = false;
 	};
