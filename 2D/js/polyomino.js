@@ -33,20 +33,9 @@ export class Polyomino {
 		if (!this.isPlaced) {
 			const centerX = this.x + (this.shape[0].length * gridSize) / 2;
 			const centerY = this.y + (this.shape.length * gridSize) / 2;
-			const radius = ((gridSize * Math.abs(this.shape[0].length > this.shape.length ? this.shape[0].length : this.shape.length)) / 2) + (this.iconSize * 1.75);
-			const iconPositions = [
-				{ icon: icons.flip, angle: -90 },
-				{ icon: icons.rotateLeft, angle: -162 },
-				{ icon: icons.rotateRight, angle: -18 },
-				{ icon: icons.duplicate, angle: 128 },
-				{ icon: icons.trash, angle: 52 },
-			];
-			iconPositions.forEach(({ icon, angle }) => {
-				const rad = (angle * Math.PI) / 180;
-				const iconX = centerX + radius * Math.cos(rad) - this.iconSize;
-				const iconY = centerY + radius * Math.sin(rad) - this.iconSize;
-				ctx.drawImage(icon, iconX, iconY, this.iconSize * 2, this.iconSize * 2);
-			});
+			ctx.drawImage(icons.flip, centerX - this.iconSize, centerY - gridSize - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+			ctx.drawImage(icons.rotateLeft, centerX - gridSize - this.iconSize * 2, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
+			ctx.drawImage(icons.rotateRight, centerX + gridSize, centerY - this.iconSize, this.iconSize * 2, this.iconSize * 2);
 		}
 	};
 
@@ -69,21 +58,16 @@ export class Polyomino {
 	checkIconsClick(mousePos) {
 		const centerX = this.x + (this.shape[0].length * this.app.gridSize) / 2;
 		const centerY = this.y + (this.shape.length * this.app.gridSize) / 2;
-		const radius = ((this.app.gridSize * Math.abs(this.shape[0].length > this.shape.length ? this.shape[0].length : this.shape.length)) / 2) + (this.iconSize * 1.75);
-		const iconPositions = [
-			{ type: 'flip', angle: -90 },
-			{ type: 'rotateLeft', angle: -162 },
-			{ type: 'rotateRight', angle: -18 },
-			{ type: 'duplicate', angle: 128 },
-			{ type: 'trash', angle: 52 },
+		const icons = [
+			{ type: 'flip', x: centerX - this.iconSize, y: centerY - this.app.gridSize - this.iconSize },
+			{ type: 'rotateLeft', x: centerX - this.app.gridSize - this.iconSize * 2, y: centerY - this.iconSize },
+			{ type: 'rotateRight', x: centerX + this.app.gridSize, y: centerY - this.iconSize }
 		];
-		for (let { type, angle } of iconPositions) {
-			const rad = (angle * Math.PI) / 180;
-			const iconX = centerX + radius * Math.cos(rad) - this.iconSize;
-			const iconY = centerY + radius * Math.sin(rad) - this.iconSize;
-			if (mousePos.x >= iconX && mousePos.x < iconX + this.iconSize * 2 &&
-				mousePos.y >= iconY && mousePos.y < iconY + this.iconSize * 2) {
-				this.handleIconClick(type);
+
+		for (let icon of icons) {
+			if (mousePos.x >= icon.x && mousePos.x < icon.x + this.iconSize * 2 &&
+				mousePos.y >= icon.y && mousePos.y < icon.y + this.iconSize * 2) {
+				this.handleIconClick(icon.type);
 				return true;
 			}
 		}
@@ -100,12 +84,6 @@ export class Polyomino {
 				break;
 			case 'rotateRight':
 				this.rotateRight();
-				break;
-			case 'duplicate':
-				this.app.duplicatePolyomino(this);
-				break;
-			case 'trash':
-				this.app.deletePolyomino(this);
 				break;
 		}
 		this.app.redraw();
@@ -196,22 +174,15 @@ export class Polyomino {
 	};
 };
 
-export function getRandomColor() {
-	const letters = '0123456789ABCDEF';
-	let color = '#';
-	for (let i = 0; i < 6; i++) {
-		color += letters[Math.floor(Math.random() * 16)];
-	}
-	return color;
-};
-
 export const SHAPES = {
 	MONOMINO: [[1]],
 	DOMINO: [[1, 1]],
 	TROMINO: [[1, 1, 1]],
 	TETROMINO_I: [[1, 1, 1, 1]],
 	TETROMINO_O: [[1, 1], [1, 1]],
-	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
 	TETROMINO_T: [[0, 1, 0], [1, 1, 1]],
 	TETROMINO_L: [[1, 0, 0], [1, 1, 1]],
+	TETROMINO_J: [ [1, 1, 1], [1, 0, 0]],
+	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
+	TETROMINO_Z: [[1, 1, 0], [0, 1, 1]],
 };

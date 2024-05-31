@@ -1,140 +1,120 @@
 export class GridBoard {
-	constructor(canvas, gridSize, rows, cols) {
-		this.canvas = canvas;
-		this.ctx = canvas.getContext('2d');
-		this.gridSize = gridSize;
-		this.rows = rows;
-		this.cols = cols;
-		this.grid = Array.from({ length: rows }, () => Array(cols).fill(null));
-		this.resizeCanvas();
-		this.drawGrid();
-	};
+    constructor(canvas, gridSize, rows, cols) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.gridSize = gridSize;
+        this.rows = rows;
+        this.cols = cols;
+        this.gridOffsetX = 50;
+        this.gridOffsetY = 50;
+        this.grid = this.createGrid(rows, cols);
+        this.updateCanvasSize();
+        this.clear();
+        this.drawGrid();
+    }
 
-	resizeCanvas() {
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
-		this.gridOffsetX = (this.canvas.width - this.cols * this.gridSize) / 2;
-		this.gridOffsetY = (this.canvas.height - this.rows * this.gridSize) / 2;
-	};
+    updateCanvasSize() {
+        this.canvas.width = this.cols * this.gridSize + this.gridOffsetX * 2;
+        this.canvas.height = this.rows * this.gridSize + this.gridOffsetY * 2;
+    }
 
-	drawGrid() {
-		this.ctx.strokeStyle = '#000';
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		for (let i = 0; i <= this.cols; i++) {
-			this.ctx.beginPath();
-			this.ctx.moveTo(this.gridOffsetX + i * this.gridSize, this.gridOffsetY);
-			this.ctx.lineTo(this.gridOffsetX + i * this.gridSize, this.gridOffsetY + this.rows * this.gridSize);
-			this.ctx.stroke();
-		}
-		for (let j = 0; j <= this.rows; j++) {
-			this.ctx.beginPath();
-			this.ctx.moveTo(this.gridOffsetX, this.gridOffsetY + j * this.gridSize);
-			this.ctx.lineTo(this.gridOffsetX + this.cols * this.gridSize, this.gridOffsetY + j * this.gridSize);
-			this.ctx.stroke();
-		}
+    createGrid(rows, cols) {
+        const grid = [];
+        for (let row = 0; row < rows; row++) {
+            const gridRow = [];
+            for (let col = 0; col < cols; col++) {
+                gridRow.push(0);
+            }
+            grid.push(gridRow);
+        }
+        return grid;
+    }
 
-		for (let row = 0; row < this.rows; row++) {
-			for (let col = 0; col < this.cols; col++) {
-				if (this.grid[row][col] !== null) {
-					this.ctx.fillStyle = this.grid[row][col];
-					this.ctx.fillRect(this.gridOffsetX + col * this.gridSize, this.gridOffsetY + row * this.gridSize, this.gridSize, this.gridSize);
-					this.ctx.strokeRect(this.gridOffsetX + col * this.gridSize, this.gridOffsetY + row * this.gridSize, this.gridSize, this.gridSize);
-				}
-			}
-		}
-	};
+    clear() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
-	getMousePos(e) {
-		const rect = this.canvas.getBoundingClientRect();
-		return {
-			x: e.clientX - rect.left,
-			y: e.clientY - rect.top
-		};
-	};
+    drawGrid() {
+        this.ctx.strokeStyle = '#ddd';
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.cols; col++) {
+                this.ctx.strokeRect(
+                    this.gridOffsetX + col * this.gridSize,
+                    this.gridOffsetY + row * this.gridSize,
+                    this.gridSize,
+                    this.gridSize
+                );
+            }
+        }
+    }
 
-	getTouchPos(e) {
-		const rect = this.canvas.getBoundingClientRect();
-		return {
-			x: e.touches[0].clientX - rect.left,
-			y: e.touches[0].clientY - rect.top
-		};
-	};
+    getMousePos(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
 
-	clear() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	};
+    getTouchPos(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+            x: event.touches[0].clientX - rect.left,
+            y: event.touches[0].clientY - rect.top
+        };
+    }
 
-	isInBounds(polyomino) {
-		const { x, y, shape } = polyomino;
-		const gridSize = this.gridSize;
-		const offsetX = this.gridOffsetX;
-		const offsetY = this.gridOffsetY;
+    placePolyomino(polyomino) {
+        const gridX = Math.floor((polyomino.x - this.gridOffsetX) / this.gridSize);
+        const gridY = Math.floor((polyomino.y - this.gridOffsetY) / this.gridSize);
+        for (let row = 0; row < polyomino.shape.length; row++) {
+            for (let col = 0; col < polyomino.shape[row].length; col++) {
+                if (polyomino.shape[row][col]) {
+                    this.grid[gridY + row][gridX + col] = 1;
+                }
+            }
+        }
+    }
 
-		for (let i = 0; i < shape.length; i++) {
-			for (let j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX + j * gridSize) / gridSize);
-					const posY = Math.floor((y - offsetY + i * gridSize) / gridSize);
-					if (posX < 0 || posX >= this.cols || posY < 0 || posY >= this.rows) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	};
+    removePolyomino(polyomino) {
+        const gridX = Math.floor((polyomino.x - this.gridOffsetX) / this.gridSize);
+        const gridY = Math.floor((polyomino.y - this.gridOffsetY) / this.gridSize);
+        for (let row = 0; row < polyomino.shape.length; row++) {
+            for (let col = 0; col < polyomino.shape[row].length; col++) {
+                if (polyomino.shape[row][col]) {
+                    this.grid[gridY + row][gridX + col] = 0;
+                }
+            }
+        }
+    }
 
-	placePolyomino(polyomino) {
-		const { x, y, shape, color } = polyomino;
-		const gridSize = this.gridSize;
-		const offsetX = this.gridOffsetX;
-		const offsetY = this.gridOffsetY;
+    isInBounds(polyomino) {
+        const gridX = Math.floor((polyomino.x - this.gridOffsetX) / this.gridSize);
+        const gridY = Math.floor((polyomino.y - this.gridOffsetY) / this.gridSize);
+        for (let row = 0; row < polyomino.shape.length; row++) {
+            for (let col = 0; col < polyomino.shape[row].length; col++) {
+                if (polyomino.shape[row][col]) {
+                    if (gridY + row < 0 || gridY + row >= this.rows || gridX + col < 0 || gridX + col >= this.cols) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
-		for (let i = 0; i < shape.length; i++) {
-			for (let j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX) / gridSize) + j;
-					const posY = Math.floor((y - offsetY) / gridSize) + i;
-					this.grid[posY][posX] = color;
-				}
-			}
-		}
-	};
-
-	isOverlapping(polyomino) {
-		const { x, y, shape } = polyomino;
-		const gridSize = this.gridSize;
-		const offsetX = this.gridOffsetX;
-		const offsetY = this.gridOffsetY;
-
-		for (let i = 0; i < shape.length; i++) {
-			for (let j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX) / gridSize) + j;
-					const posY = Math.floor((y - offsetY) / gridSize) + i;
-					if (this.grid[posY][posX] !== null) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	};
-
-	removePolyomino(polyomino) {
-		const { x, y, shape } = polyomino;
-		const gridSize = this.gridSize;
-		const offsetX = this.gridOffsetX;
-		const offsetY = this.gridOffsetY;
-
-		for (let i = 0; i < shape.length; i++) {
-			for (let j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] === 1) {
-					const posX = Math.floor((x - offsetX) / gridSize) + j;
-					const posY = Math.floor((y - offsetY) / gridSize) + i;
-					this.grid[posY][posX] = null;
-				}
-			}
-		}
-	};
-};
+    isOverlapping(polyomino) {
+        const gridX = Math.floor((polyomino.x - this.gridOffsetX) / this.gridSize);
+        const gridY = Math.floor((polyomino.y - this.gridOffsetY) / this.gridSize);
+        for (let row = 0; row < polyomino.shape.length; row++) {
+            for (let col = 0; col < polyomino.shape[row].length; col++) {
+                if (polyomino.shape[row][col]) {
+                    if (this.grid[gridY + row][gridX + col] === 1) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}
