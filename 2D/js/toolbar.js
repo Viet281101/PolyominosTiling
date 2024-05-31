@@ -13,11 +13,10 @@ export class Toolbar {
 		document.body.appendChild(this.canvas);
 
 		this.buttons = [
-			{ name: 'Create Polyomino', action: () => this.showPolyominoPopup() }
+			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.showPolyominoPopup() }
 		];
 
 		this.popupOpen = false;
-
 		this.drawToolbar();
 		this.addEventListeners();
 	};
@@ -26,23 +25,22 @@ export class Toolbar {
 		this.ctx.fillStyle = '#333';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-		this.ctx.font = '20px Helvetica';
-		this.ctx.fillStyle = '#fff';
-
-		const totalWidth = this.buttons.reduce((acc, button) => acc + this.ctx.measureText(button.name).width + 20, 0);
+		const totalWidth = this.buttons.reduce((acc, button) => acc + 40 + 20, 0);
 		let startX = (this.canvas.width - totalWidth) / 2;
 
 		this.buttons.forEach(button => {
-			const x = startX;
-			const y = 30;
-			this.ctx.fillText(button.name, x, y);
-			this.ctx.strokeStyle = '#fff';
-			this.ctx.strokeRect(x - 5, y - 20, this.ctx.measureText(button.name).width + 10, 30);
-			button.x = x - 5;
-			button.y = y - 20;
-			button.width = this.ctx.measureText(button.name).width + 10;
-			button.height = 30;
-			startX += button.width + 20;
+			const img = new Image();
+			img.src = button.icon;
+			img.onload = () => {
+				this.ctx.drawImage(img, startX, 10, 30, 30);
+				this.ctx.strokeStyle = '#fff';
+				this.ctx.strokeRect(startX - 5, 5, 40, 40);
+				button.x = startX - 5;
+				button.y = 5;
+				button.width = 40;
+				button.height = 40;
+				startX += button.width + 20;
+			};
 		});
 	};
 
@@ -59,7 +57,6 @@ export class Toolbar {
 				}
 			});
 		});
-
 		document.addEventListener('click', (e) => {
 			if (this.popupOpen) {
 				const popup = document.getElementById('polyominoPopup');
@@ -82,7 +79,7 @@ export class Toolbar {
 		popupContainer.style.transform = 'translateX(-50%)';
 		popupContainer.style.width = '360px';
 		popupContainer.style.height = '600px';
-		popupContainer.style.border = '1px solid #000';
+		popupContainer.style.border = '3px solid #000';
 		popupContainer.style.backgroundColor = '#fff';
 		popupContainer.style.overflowY = 'auto';
 		popupContainer.style.zIndex = '1000';
@@ -168,5 +165,10 @@ export class Toolbar {
 			document.body.removeChild(closeIcon);
 		}
 		this.popupOpen = false;
+	};
+
+	resizeToolbar() {
+		this.canvas.width = window.innerWidth;
+		this.drawToolbar();
 	};
 };

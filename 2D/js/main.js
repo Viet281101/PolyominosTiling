@@ -67,6 +67,12 @@ class MainApp {
 				this.redraw();
 			}
 		});
+		window.addEventListener('resize', () => {
+			this.gridBoard.resizeCanvas();
+			this.gridBoard.drawGrid();
+			this.guiController.checkWindowSize();
+			this.toolbar.resizeToolbar();
+		});
 		this.canvas.addEventListener('touchstart', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);

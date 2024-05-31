@@ -8,11 +8,6 @@ export class GridBoard {
 		this.grid = Array.from({ length: rows }, () => Array(cols).fill(null));
 		this.resizeCanvas();
 		this.drawGrid();
-
-		window.addEventListener('resize', () => {
-			this.resizeCanvas();
-			this.drawGrid();
-		});
 	};
 
 	resizeCanvas() {
