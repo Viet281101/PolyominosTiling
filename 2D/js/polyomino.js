@@ -211,9 +211,7 @@ export const SHAPES = {
 	TROMINO: [[1, 1, 1]],
 	TETROMINO_I: [[1, 1, 1, 1]],
 	TETROMINO_O: [[1, 1], [1, 1]],
+	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
 	TETROMINO_T: [[0, 1, 0], [1, 1, 1]],
 	TETROMINO_L: [[1, 0, 0], [1, 1, 1]],
-	TETROMINO_J: [ [1, 1, 1], [1, 0, 0]],
-	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
-	TETROMINO_Z: [[1, 1, 0], [0, 1, 1]],
 };

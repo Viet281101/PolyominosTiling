@@ -15,11 +15,6 @@ export class GUIController {
 
 	init() {
 		this.gui = new GUI();
-		this.gui.add(this.settings, 'gridSize', 10, 100).onChange((value) => {
-			this.mainApp.gridSize = value;
-			this.mainApp.gridBoard.gridSize = value;
-			this.mainApp.redraw();
-		});
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			document.body.style.backgroundColor = value;
 		});

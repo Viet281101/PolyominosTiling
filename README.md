@@ -32,4 +32,4 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 | Name (Nom) | N° student | GitHub  |
 | -------- | ------- | ---------------------------------------- |
 | Viet Nguyen | 20006303 | [Viet281101](https://github.com/Viet281101) |
-| GEOFFROY Damien | 21007431 | [GEOFFROY Damien](https://github.com/D-TheProgrammer) |
+| GEOFFROY Damien | 21007431 | [D-TheProgrammer](https://github.com/D-TheProgrammer) |
