@@ -1,9 +1,9 @@
 @charset "UTF-8";
 * {
-	overflow: hidden;
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
-	background: #c3c3c3;
 }
+body {overflow: hidden;}
+.dg {z-index: 100 !important;}

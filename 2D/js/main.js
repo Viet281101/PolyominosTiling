@@ -1,5 +1,7 @@
 import { GridBoard } from './board.js';
-import { Polyomino, SHAPES } from './polyomino.js';
+import { Polyomino, SHAPES, getRandomColor } from './polyomino.js';
+import { GUIController } from './gui.js';
+import { Toolbar } from './toolbar.js';
 
 class MainApp {
 	constructor() {
@@ -12,17 +14,24 @@ class MainApp {
 		this.icons = {
 			flip: new Image(),
 			rotateLeft: new Image(),
-			rotateRight: new Image()
+			rotateRight: new Image(),
+			duplicate: new Image(),
+			trash: new Image()
 		};
 		const as = "../assets/";
-		this.icons.flip.src = as+'ic_flip.png';
-		this.icons.rotateLeft.src = as+'ic_rotate_left.png';
-		this.icons.rotateRight.src = as+'ic_rotate_right.png';
+		this.icons.flip.src = as + 'ic_flip.png';
+		this.icons.rotateLeft.src = as + 'ic_rotate_left.png';
+		this.icons.rotateRight.src = as + 'ic_rotate_right.png';
+		this.icons.duplicate.src = as + 'ic_duplicate.png';
+		this.icons.trash.src = as + 'ic_trash.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
+		this.guiController = new GUIController(this);
+		this.toolbar = new Toolbar(this);
 		this.init();
 	};
 
 	init() {
+		document.body.style.backgroundColor = '#c3c3c3';
 		this.createPolyominoes();
 		this.addEventListeners();
 	};
@@ -50,35 +59,35 @@ class MainApp {
 			const mousePos = this.gridBoard.getMousePos(e);
 			this.handleMouseDown(mousePos);
 		});
-
 		this.canvas.addEventListener('mousemove', (e) => {
 			const mousePos = this.gridBoard.getMousePos(e);
 			this.handleMouseMove(mousePos);
 		});
-
 		this.canvas.addEventListener('mouseup', (e) => {
 			this.handleMouseUp();
 		});
-
 		window.addEventListener('keydown', (e) => {
 			if (e.key === 'r' && this.selectedPolyomino) {
 				this.selectedPolyomino.rotate();
 				this.redraw();
 			}
 		});
-
+		window.addEventListener('resize', () => {
+			this.gridBoard.resizeCanvas();
+			this.gridBoard.drawGrid();
+			this.guiController.checkWindowSize();
+			this.toolbar.resizeToolbar();
+		});
 		this.canvas.addEventListener('touchstart', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);
 			this.handleMouseDown(touchPos);
 		});
-
 		this.canvas.addEventListener('touchmove', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);
 			this.handleMouseMove(touchPos);
 		});
-
 		this.canvas.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			this.handleMouseUp();
@@ -92,7 +101,8 @@ class MainApp {
 		}
 		if (!clickedOnIcon) {
 			let selected = false;
-			this.polyominoes.forEach(polyomino => {
+			for (let i = this.polyominoes.length - 1; i >= 0; i--) {
+				const polyomino = this.polyominoes[i];
 				if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
 					if (polyomino.isPlaced) {
 						this.gridBoard.removePolyomino(polyomino);
@@ -100,9 +110,11 @@ class MainApp {
 					}
 					polyomino.onMouseDown(mousePos);
 					this.selectedPolyomino = polyomino;
+					this.guiController.settings.selectedColor = polyomino.color;
 					selected = true;
+					break;
 				}
-			});
+			}
 			if (!selected) {
 				this.selectedPolyomino = null;
 			}
@@ -134,6 +146,26 @@ class MainApp {
 		polyomino.isPlaced = true;
 		this.selectedPolyomino = null;
 		this.redraw();
+	};
+
+	duplicatePolyomino(polyomino) {
+		let newColor;
+		do {
+			newColor = getRandomColor();
+		} while (newColor === polyomino.color);
+		const newShape = polyomino.shape.map(row => row.slice());
+		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this);
+		this.polyominoes.push(newPolyomino);
+		this.redraw();
+	};
+
+	deletePolyomino(polyomino) {
+		const index = this.polyominoes.indexOf(polyomino);
+		if (index !== -1) {
+			this.polyominoes.splice(index, 1);
+			this.selectedPolyomino = null;
+			this.redraw();
+		}
 	};
 };
 
