@@ -59,6 +59,15 @@ export class Toolbar {
 				}
 			});
 		});
+
+		document.addEventListener('click', (e) => {
+			if (this.popupOpen) {
+				const popup = document.getElementById('polyominoPopup');
+				if (popup && !popup.contains(e.target) && !this.canvas.contains(e.target)) {
+					this.closePopup();
+				}
+			}
+		});
 	};
 
 	showPolyominoPopup() {
@@ -66,6 +75,7 @@ export class Toolbar {
 		this.popupOpen = true;
 
 		const popupContainer = document.createElement('div');
+		popupContainer.id = 'polyominoPopup';
 		popupContainer.style.position = 'absolute';
 		popupContainer.style.top = '50px';
 		popupContainer.style.left = '50%';
@@ -75,6 +85,7 @@ export class Toolbar {
 		popupContainer.style.border = '1px solid #000';
 		popupContainer.style.backgroundColor = '#fff';
 		popupContainer.style.overflowY = 'auto';
+		popupContainer.style.zIndex = '1000';
 		document.body.appendChild(popupContainer);
 
 		const popup = document.createElement('canvas');
@@ -87,9 +98,14 @@ export class Toolbar {
 
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
-		closeIcon.onload = () => {
-			ctx.drawImage(closeIcon, width - 36, 4, 32, 32);
-		};
+		closeIcon.style.position = 'fixed';
+		closeIcon.style.top = '54px';
+		closeIcon.style.left = 'calc(50% + 168px)';
+		closeIcon.style.transform = 'translateX(-50%)';
+		closeIcon.style.cursor = 'pointer';
+		closeIcon.style.zIndex = '1001';
+		closeIcon.addEventListener('click', () => this.closePopup());
+		document.body.appendChild(closeIcon);
 
 		const shapes = Object.keys(SHAPES);
 		const shapeSize = 30;
@@ -99,7 +115,7 @@ export class Toolbar {
 		ctx.fillRect(0, 0, width, height);
 
 		shapes.forEach((shape, index) => {
-			const y = 40 + index * (shapeSize + padding);
+			const y = 40 + index * (shapeSize + padding) + shapeSize / 2;
 
 			ctx.fillStyle = '#d1d1d1';
 			ctx.fillRect(10, y - shapeSize / 2, 180, shapeSize + 20);
@@ -110,7 +126,7 @@ export class Toolbar {
 			ctx.fillStyle = '#0000ff';
 			ctx.fillText(shape, 15, y + 7);
 
-			const polyomino = new Polyomino(SHAPES[shape], 200, y - shapeSize / 2, getRandomColor(), this.mainApp);
+			const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), this.mainApp);
 			polyomino.draw(ctx, shapeSize, false);
 
 			polyomino.x = 200;
@@ -119,11 +135,10 @@ export class Toolbar {
 			polyomino.height = shapeSize * polyomino.shape.length;
 
 			const onMouseDown = (mousePos) => {
-				const newPolyomino = new Polyomino(SHAPES[shape], mousePos.x, mousePos.y, getRandomColor(), this.mainApp);
+				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), mousePos.x, mousePos.y, getRandomColor(), this.mainApp);
 				this.mainApp.polyominoes.push(newPolyomino);
 				this.mainApp.redraw();
-				document.body.removeChild(popupContainer);
-				this.popupOpen = false;
+				this.closePopup();
 			};
 
 			popup.addEventListener('click', (e) => {
@@ -141,16 +156,17 @@ export class Toolbar {
 				}
 			});
 		});
+	};
 
-		popup.addEventListener('click', (e) => {
-			const rect = popup.getBoundingClientRect();
-			const mouseX = e.clientX - rect.left;
-			const mouseY = e.clientY - rect.top;
-
-			if (mouseX >= width - 36 && mouseX <= width - 4 && mouseY >= 4 && mouseY <= 36) {
-				document.body.removeChild(popupContainer);
-				this.popupOpen = false;
-			}
-		});
+	closePopup() {
+		const popup = document.getElementById('polyominoPopup');
+		if (popup) {
+			document.body.removeChild(popup);
+		}
+		const closeIcon = document.querySelector('img[src="../assets/ic_close.png"]');
+		if (closeIcon) {
+			document.body.removeChild(closeIcon);
+		}
+		this.popupOpen = false;
 	};
 };
