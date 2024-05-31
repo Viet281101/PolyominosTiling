@@ -13,11 +13,12 @@ export class Toolbar {
 		document.body.appendChild(this.canvas);
 
 		this.buttons = [
-			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.showPolyominoPopup() },
-			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.showGridPopup() }
+			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePolyominoPopup() },
+			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.toggleGridPopup() }
 		];
 
 		this.popupOpen = false;
+		this.currentPopup = null;
 		this.gridPopupCanvas = null;
 		this.drawToolbar();
 		this.addEventListeners();
@@ -87,8 +88,35 @@ export class Toolbar {
 		};
 	};
 
+	togglePolyominoPopup() {
+		if (this.currentPopup === 'polyomino') {
+			this.closePolyominoPopup();
+		} else {
+			this.closeCurrentPopup();
+			this.showPolyominoPopup();
+			this.currentPopup = 'polyomino';
+		}
+	};
+
+	toggleGridPopup() {
+		if (this.currentPopup === 'grid') {
+			this.closeGridPopup();
+		} else {
+			this.closeCurrentPopup();
+			this.showGridPopup();
+			this.currentPopup = 'grid';
+		}
+	};
+
+	closeCurrentPopup() {
+		if (this.currentPopup === 'polyomino') {
+			this.closePolyominoPopup();
+		} else if (this.currentPopup === 'grid') {
+			this.closeGridPopup();
+		}
+	}
+
 	showPolyominoPopup() {
-		if (this.popupOpen) return;
 		this.popupOpen = true;
 
 		const popupContainer = document.createElement('div');
@@ -176,7 +204,6 @@ export class Toolbar {
 	};
 
 	showGridPopup() {
-		if (this.popupOpen) return;
 		this.popupOpen = true;
 
 		this.gridPopupCanvas = document.createElement('canvas');
@@ -222,6 +249,7 @@ export class Toolbar {
 			document.body.removeChild(closeIcon);
 		}
 		this.popupOpen = false;
+		this.currentPopup = null;
 	};
 
 	closeGridPopup() {
@@ -230,6 +258,7 @@ export class Toolbar {
 			this.gridPopupCanvas = null;
 		}
 		this.popupOpen = false;
+		this.currentPopup = null;
 	};
 
 	resizeToolbar() {
