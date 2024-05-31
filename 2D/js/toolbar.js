@@ -19,6 +19,7 @@ export class Toolbar {
 		this.popupOpen = false;
 		this.drawToolbar();
 		this.addEventListeners();
+		this.addHomeButton();
 	};
 
 	drawToolbar() {
@@ -56,6 +57,10 @@ export class Toolbar {
 					button.action();
 				}
 			});
+
+			if (mouseX >= 10 && mouseX <= 50 && mouseY >= 10 && mouseY <= 50) {
+				window.location.href = '../index.html';
+			}
 		});
 		document.addEventListener('click', (e) => {
 			if (this.popupOpen) {
@@ -65,6 +70,16 @@ export class Toolbar {
 				}
 			}
 		});
+	};
+
+	addHomeButton() {
+		const img = new Image();
+		img.src = '../assets/ic_arrow_left.png';
+		img.onload = () => {
+			this.ctx.drawImage(img, 10, 10, 30, 30);
+			this.ctx.strokeStyle = '#fff';
+			this.ctx.strokeRect(5, 5, 40, 40);
+		};
 	};
 
 	showPolyominoPopup() {
@@ -97,7 +112,7 @@ export class Toolbar {
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
 		closeIcon.style.top = '54px';
-		closeIcon.style.left = 'calc(50% + 168px)';
+		closeIcon.style.left = 'calc(50% + 162px)';
 		closeIcon.style.transform = 'translateX(-50%)';
 		closeIcon.style.cursor = 'pointer';
 		closeIcon.style.zIndex = '1001';
@@ -106,7 +121,7 @@ export class Toolbar {
 
 		const shapes = Object.keys(SHAPES);
 		const shapeSize = 30;
-		const padding = 60;
+		const padding = 80;
 
 		ctx.fillStyle = '#a0a0a0';
 		ctx.fillRect(0, 0, width, height);
@@ -121,7 +136,7 @@ export class Toolbar {
 
 			ctx.font = '20px Helvetica';
 			ctx.fillStyle = '#0000ff';
-			ctx.fillText(shape, 15, y + 7);
+			ctx.fillText(shape.replace(/_/g, ' '), 15, y + 7);
 
 			const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), this.mainApp);
 			polyomino.draw(ctx, shapeSize, false);
@@ -170,5 +185,6 @@ export class Toolbar {
 	resizeToolbar() {
 		this.canvas.width = window.innerWidth;
 		this.drawToolbar();
+		this.addHomeButton();
 	};
 };
