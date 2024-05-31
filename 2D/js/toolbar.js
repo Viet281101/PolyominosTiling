@@ -80,7 +80,7 @@ export class Toolbar {
 
 	addHomeButton() {
 		const img = new Image();
-		img.src = '../assets/ic_arrow_left.png';
+		img.src = '../assets/ic_home.png';
 		img.onload = () => {
 			this.ctx.drawImage(img, 10, 10, 30, 30);
 			this.ctx.strokeStyle = '#fff';
@@ -125,7 +125,7 @@ export class Toolbar {
 		popupContainer.style.top = '50px';
 		popupContainer.style.left = '50%';
 		popupContainer.style.transform = 'translateX(-50%)';
-		popupContainer.style.width = '360px';
+		popupContainer.style.width = '370px';
 		popupContainer.style.height = '600px';
 		popupContainer.style.border = '3px solid #000';
 		popupContainer.style.backgroundColor = '#fff';
@@ -135,7 +135,7 @@ export class Toolbar {
 
 		const popup = document.createElement('canvas');
 		const ctx = popup.getContext('2d');
-		const width = 360;
+		const width = 370;
 		const height = 6000;
 		popup.width = width;
 		popup.height = height;
@@ -224,7 +224,7 @@ export class Toolbar {
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.onload = () => {
-			ctx.drawImage(closeIcon, this.gridPopupCanvas.width - 35, 5, 30, 30);
+			ctx.drawImage(closeIcon, this.gridPopupCanvas.width - 38, 1, 32, 32);
 		};
 
 		this.gridPopupCanvas.addEventListener('click', (e) => {
