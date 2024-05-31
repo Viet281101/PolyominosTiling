@@ -1,5 +1,6 @@
 import { GridBoard } from './board.js';
 import { Polyomino, SHAPES, getRandomColor } from './polyomino.js';
+import { GUIController } from './gui.js';
 
 class MainApp {
 	constructor() {
@@ -23,10 +24,12 @@ class MainApp {
 		this.icons.duplicate.src = as + 'ic_duplicate.png';
 		this.icons.trash.src = as + 'ic_trash.png';
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
+		this.guiController = new GUIController(this);
 		this.init();
 	};
 
 	init() {
+		document.body.style.backgroundColor = '#c3c3c3';
 		this.createPolyominoes();
 		this.addEventListeners();
 	};
@@ -94,6 +97,7 @@ class MainApp {
 					}
 					polyomino.onMouseDown(mousePos);
 					this.selectedPolyomino = polyomino;
+					this.guiController.settings.selectedColor = polyomino.color;
 					selected = true;
 					break;
 				}
