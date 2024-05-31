@@ -27,14 +27,18 @@ export class Toolbar {
 		this.ctx.font = '20px Arial';
 		this.ctx.fillStyle = '#fff';
 
-		this.buttons.forEach((button, index) => {
-			const x = 10 + index * 150;
+		const totalWidth = this.buttons.reduce((acc, button) => acc + this.ctx.measureText(button.name).width + 20, 0);
+		let startX = (this.canvas.width - totalWidth) / 2;
+
+		this.buttons.forEach(button => {
+			const x = startX;
 			const y = 30;
 			this.ctx.fillText(button.name, x, y);
 			button.x = x;
 			button.y = y - 20;
 			button.width = this.ctx.measureText(button.name).width;
 			button.height = 30;
+			startX += button.width + 20;
 		});
 	};
 
@@ -67,9 +71,15 @@ export class Toolbar {
 		popup.style.border = '1px solid #000';
 		document.body.appendChild(popup);
 
+		const closeIcon = new Image();
+		closeIcon.src = '../assets/ic_close.png';
+		closeIcon.onload = () => {
+			ctx.drawImage(closeIcon, width - 36, 4, 32, 32);
+		};
+
 		const shapes = Object.keys(SHAPES);
 		const shapeSize = 30;
-		const padding = 10;
+		const padding = 40;
 
 		ctx.fillStyle = '#fff';
 		ctx.fillRect(0, 0, width, height);
@@ -88,7 +98,7 @@ export class Toolbar {
 			polyomino.width = shapeSize * polyomino.shape[0].length;
 			polyomino.height = shapeSize * polyomino.shape.length;
 
-			polyomino.onMouseDown = (mousePos) => {
+			const onMouseDown = (mousePos) => {
 				const newPolyomino = new Polyomino(SHAPES[shape], mousePos.x, mousePos.y, getRandomColor(), this.mainApp);
 				this.mainApp.polyominoes.push(newPolyomino);
 				this.mainApp.redraw();
@@ -102,9 +112,35 @@ export class Toolbar {
 
 				if (mouseX >= polyomino.x && mouseX <= polyomino.x + polyomino.width &&
 					mouseY >= polyomino.y && mouseY <= polyomino.y + polyomino.height) {
-					polyomino.onMouseDown({ x: mouseX, y: mouseY });
+					onMouseDown({ x: mouseX, y: mouseY });
 				}
 			});
+
+			ctx.fillStyle = '#fff';
+			ctx.fillRect(10, y - 10, 180, shapeSize + 20);
+			ctx.strokeRect(10, y - 10, 180, shapeSize + 20);
+			ctx.fillStyle = '#000';
+			ctx.fillText(shape, 15, y + shapeSize / 2);
+
+			popup.addEventListener('click', (e) => {
+				const rect = popup.getBoundingClientRect();
+				const mouseX = e.clientX - rect.left;
+				const mouseY = e.clientY - rect.top;
+
+				if (mouseX >= 10 && mouseX <= 190 && mouseY >= y - 10 && mouseY <= y + shapeSize + 10) {
+					onMouseDown({ x: 250, y: y });
+				}
+			});
+		});
+
+		popup.addEventListener('click', (e) => {
+			const rect = popup.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			if (mouseX >= width - 36 && mouseX <= width - 4 && mouseY >= 4 && mouseY <= 36) {
+				document.body.removeChild(popup);
+			}
 		});
 	};
 };
