@@ -103,7 +103,7 @@ export class Toolbar {
 		const popup = document.createElement('canvas');
 		const ctx = popup.getContext('2d');
 		const width = 360;
-		const height = 1000;
+		const height = 6000;
 		popup.width = width;
 		popup.height = height;
 		popupContainer.appendChild(popup);
@@ -134,7 +134,7 @@ export class Toolbar {
 			ctx.strokeStyle = '#000';
 			ctx.strokeRect(10, y - shapeSize / 2, 180, shapeSize + 20);
 
-			ctx.font = '20px Helvetica';
+			ctx.font = '20px Pixellari';
 			ctx.fillStyle = '#0000ff';
 			ctx.fillText(shape.replace(/_/g, ' '), 15, y + 7);
 

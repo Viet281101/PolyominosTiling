@@ -15,6 +15,10 @@ export class GUIController {
 
 	init() {
 		this.gui = new GUI();
+		const guiContainer = document.querySelector('.dg');
+		if (guiContainer) {
+			guiContainer.classList.add('scaled-gui');
+		}
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			document.body.style.backgroundColor = value;
 		});

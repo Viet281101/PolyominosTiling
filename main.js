@@ -121,14 +121,14 @@ class MainApp {
 
 		this.polyominoes.forEach(polyomino => polyomino.draw());
 
-		this.ctx.font = '30px Helvetica';
-		this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+		this.ctx.font = '32px Pixellari';
+		this.ctx.fillStyle = 'rgba(0, 100, 255, 1)';
 		this.ctx.textBaseline = 'middle';
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText('Polyominoes Tiling', this.canvas.width / 2, 50);
 		this.ctx.fillText('(Pavages de Polyominos)', this.canvas.width / 2, 100);
 
-		this.ctx.font = '20px Helvetica';
+		this.ctx.font = '24px Pixellari';
 		this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
 		this.ctx.textBaseline = 'middle';
 		this.ctx.textAlign = 'center';
@@ -148,7 +148,7 @@ class MainApp {
 		this.ctx.fillRect(x - buttonWidth / 2, y - buttonHeight / 2, buttonWidth, buttonHeight);
 
 		this.ctx.fillStyle = '#fff';
-		this.ctx.font = '20px Helvetica';
+		this.ctx.font = '20px Pixellari';
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText(text, x, y);
 
@@ -186,6 +186,7 @@ class MainApp {
 			});
 			this.canvas.style.cursor = cursor;
 		});
+		window.addEventListener('resize', this.resizeCanvas.bind(this));
 	};
 
 	createPolyominoes() {
