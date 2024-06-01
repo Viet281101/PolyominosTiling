@@ -1,8 +1,9 @@
 
 # Polyominoes Tiling in JS (Pavages de Polyominos en JavaScript)
 
+In pure html, css and javascript with ES6 modules.
 
-### Description :
+### Description
 
 - **EN**:
 
@@ -13,15 +14,15 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec une ou plusieurs pièces fixées, en 2D avec l'API Canvas, en 3D avec la librairie three.js. 
 
 
-### Infos & documentation:
+### Infos research & documentation
 
-- [Polyomino Wiki](https://en.wikipedia.org/wiki/Polyomino)
+**JavaScript**:
 - [API Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 - [ThreeJS](https://threejs.org/)
+- [dat.gui](https://github.com/dataarts/dat.gui)
 
-
-### Orther links (Autres liens):
-
+**The polyominoes**:
+- [Polyomino Wiki](https://en.wikipedia.org/wiki/Polyomino)
 - [Les pentominos](https://www.monunivers.com/pento/)
 - [Tiling Polyominoes Game](https://demonstrations.wolfram.com/TilingPolyominoesGame/)
 - [Tiling with Pentominos](https://demonstrations.wolfram.com/TilingWithPentominos/)

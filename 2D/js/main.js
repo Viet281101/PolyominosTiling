@@ -2,6 +2,7 @@ import { GridBoard } from './board.js';
 import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
+import { autoTiling } from './ai.js';
 
 class MainApp {
 	constructor() {
@@ -153,62 +154,9 @@ class MainApp {
 		}
 	};
 
-	//IA POUR TILING 
-    autoTiling() {
-        const polyominoes = [...this.polyominoes]; // Clone des polyominos pour ne pas les modifier
-        polyominoes.sort((a, b) => b.shape.flat().reduce((acc, val) => acc + val) - a.shape.flat().reduce((acc, val) => acc + val)); // trie par taille
-        if (this.tryPlacePolyominoes(0, polyominoes)) {
-            console.log("Pavage Reussi!");
-        } else {
-            console.log("Pavage Echouer!");
-        }
-    };
-
-    tryPlacePolyominoes(index, polyominoes) {
-        if (index >= polyominoes.length) {
-            return true; // Tous les polyominos sont place
-        }
-
-        const polyomino = polyominoes[index];
-
-        for (let row = 0; row < this.gridBoard.rows; row++) {
-            for (let col = 0; col < this.gridBoard.cols; col++) {
-                const originalX = polyomino.x;
-                const originalY = polyomino.y;
-                polyomino.x = col * this.gridSize + this.gridBoard.gridOffsetX;
-                polyomino.y = row * this.gridSize + this.gridBoard.gridOffsetY;
-
-                if (this.gridBoard.isInBounds(polyomino) && !this.gridBoard.isOverlapping(polyomino)) {
-                    this.placePolyomino(polyomino);
-                    if (this.tryPlacePolyominoes(index + 1, polyominoes)) {
-                        return true;
-                    }
-                    this.gridBoard.removePolyomino(polyomino);
-                }
-
-                polyomino.x = originalX;
-                polyomino.y = originalY;
-            }
-        }
-
-		return false;
+	autoTiling() {
+		autoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this));
 	};
 };
 
 const main_app = new MainApp();
-window.onload = () => {
-    const iaButton = document.createElement('button');
-    iaButton.innerText = 'IA';
-    iaButton.id = 'ia-button';
-    iaButton.style.position = 'fixed';
-    iaButton.style.bottom = '10px';
-    iaButton.style.right = '10px';
-    iaButton.style.padding = '10px 20px';
-    iaButton.style.fontSize = '16px';
-    iaButton.style.backgroundColor = 'blue';
-    iaButton.style.color = 'white';
-    iaButton.style.border = 'none';
-    iaButton.style.borderRadius = '5px';
-    iaButton.addEventListener('click', () => main_app.autoTiling());
-    document.body.appendChild(iaButton);
-};
