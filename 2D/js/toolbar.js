@@ -213,7 +213,12 @@ export class Toolbar {
 	};
 
 	showTutorialPopup() {
-		// Implementation for tutorial popup
+		const popupContainer = this.createPopupContainer('tutorialPopup', this.buttons[3].name);
+		const popup = popupContainer.querySelector('canvas');
+		const ctx = popup.getContext('2d');
+
+		ctx.fillStyle = '#a0a0a0';
+		ctx.fillRect(0, 0, popup.width, popup.height);
 	};
 
 	createPopupContainer(id, title) {
@@ -289,7 +294,7 @@ export class Toolbar {
 		input.style.position = 'absolute';
 		input.style.left = 'calc(100% - 120px)';
 		input.style.top = `${y}px`;
-		input.style.width = '100px';
+		input.style.width = '80px';
 		input.style.height = '24px';
 		input.style.border = '1px solid #000';
 		input.style.backgroundColor = '#fff';
