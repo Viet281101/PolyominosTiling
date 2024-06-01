@@ -196,9 +196,7 @@ class MainApp {
 };
 
 const main_app = new MainApp();
-
 window.onload = () => {
-    const mainApp = new MainApp();
     const iaButton = document.createElement('button');
     iaButton.innerText = 'IA';
     iaButton.id = 'ia-button';
@@ -211,6 +209,6 @@ window.onload = () => {
     iaButton.style.color = 'white';
     iaButton.style.border = 'none';
     iaButton.style.borderRadius = '5px';
-    iaButton.addEventListener('click', () => mainApp.autoTiling());
+    iaButton.addEventListener('click', () => main_app.autoTiling());
     document.body.appendChild(iaButton);
 };
