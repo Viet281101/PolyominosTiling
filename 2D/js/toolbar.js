@@ -14,8 +14,9 @@ export class Toolbar {
 
 		this.buttons = [
 			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePolyominoPopup() },
-			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.toggleGridPopup() },
-			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.toggleSolvePopup() }
+			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.toggleGridPopup() },
+			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.toggleSolvePopup() },
+			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.toggleTutorialPopup() }
 		];
 
 		this.popupOpen = false;
@@ -123,6 +124,16 @@ export class Toolbar {
 		}
 	};
 
+	toggleTutorialPopup() {
+		if (this.currentPopup === 'tutorial') {
+			this.closeTutorialPopup();
+		} else {
+			this.closeCurrentPopup();
+			this.showTutorialPopup();
+			this.currentPopup = 'tutorial';
+		}
+	};
+
 	closeCurrentPopup() {
 		if (this.currentPopup === 'polyomino') {
 			this.closePolyominoPopup();
@@ -159,9 +170,9 @@ export class Toolbar {
 		popupContainer.appendChild(popup);
 
 		const title = document.createElement('h3');
-		Object.assign(title.style, { position: 'fixed', top: '-10px', left: '50%',
+		Object.assign(title.style, { position: 'fixed', top: '-12px', left: '50%',
 			transform: 'translateX(-50%)', zIndex: '1001', fontSize: '20px', color: '#00ffaa', });
-		title.textContent = 'Create Polyominoes';
+		title.textContent = this.buttons[0].name;
 		popupContainer.appendChild(title);
 
 		const closeIcon = new Image();
@@ -244,10 +255,10 @@ export class Toolbar {
 		ctx.fillStyle = '#a0a0a0';
 		ctx.fillRect(0, 0, this.gridPopupCanvas.width, this.gridPopupCanvas.height);
 
-		const title = 'Grid Settings';
+		const title = this.buttons[1].name;
 		ctx.font = '22px Pixellari';
 		ctx.fillStyle = '#00ffaa';
-		ctx.fillText(title, this.gridPopupCanvas.width / 2 - ctx.measureText(title).width / 2, 30);
+		ctx.fillText(title, this.gridPopupCanvas.width / 2 - ctx.measureText(title).width / 2, 28);
 
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
@@ -352,6 +363,10 @@ export class Toolbar {
 		});
 	};
 
+	showTutorialPopup() {
+		this.popupOpen = true;
+	};
+
 	closePolyominoPopup() {
 		const popup = document.getElementById('polyominoPopup');
 		if (popup) {
@@ -380,6 +395,19 @@ export class Toolbar {
 		if (this.solvePopupCanvas) {
 			document.body.removeChild(this.solvePopupCanvas);
 			this.solvePopupCanvas = null;
+		}
+		this.popupOpen = false;
+		this.currentPopup = null;
+	};
+
+	closeTutorialPopup() {
+		const popup = document.getElementById('tutorialPopup');
+		if (popup) {
+			document.body.removeChild(popup);
+		}
+		const closeIcon = document.querySelector('img[src="../assets/ic_close.png"]');
+		if (closeIcon) {
+			document.body.removeChild(closeIcon);
 		}
 		this.popupOpen = false;
 		this.currentPopup = null;
