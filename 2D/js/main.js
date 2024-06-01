@@ -37,11 +37,16 @@ class MainApp {
 	};
 
 	createPolyominoes() {
-		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_I, 100, 100, 'red', this));
-		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_O, 200, 100, 'blue', this));
-		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 300, 100, 'green', this));
-		this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 400, 100, 'purple', this));
-		this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 500, 100, 'orange', this));
+		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 100, 100, 'green', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 200, 100, 'purple', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_I, 300, 100, 'red', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_O, 450, 100, 'blue', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 550, 100, 'orange', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_J, 650, 100, 'Coral', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_T, 750, 100, 'cyan', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_S, 100, 170, 'DeepPink', this));
+        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_Z, 200, 170, 'MediumSlateBlue', this));
+     
 		this.drawPolyominoes();
 	};
 
@@ -162,6 +167,65 @@ class MainApp {
 			this.redraw();
 		}
 	};
+
+	//IA POUR TILING 
+    autoTiling() {
+        const polyominoes = [...this.polyominoes]; // Clone des polyominos pour ne pas les modifier
+        polyominoes.sort((a, b) => b.shape.flat().reduce((acc, val) => acc + val) - a.shape.flat().reduce((acc, val) => acc + val)); // trie par taille
+        if (this.tryPlacePolyominoes(0, polyominoes)) {
+            console.log("Pavage Reussi!");
+        } else {
+            console.log("Pavage Echouer!");
+        }
+    };
+
+    tryPlacePolyominoes(index, polyominoes) {
+        if (index >= polyominoes.length) {
+            return true; // Tous les polyominos sont place
+        }
+
+        const polyomino = polyominoes[index];
+
+        for (let row = 0; row < this.gridBoard.rows; row++) {
+            for (let col = 0; col < this.gridBoard.cols; col++) {
+                const originalX = polyomino.x;
+                const originalY = polyomino.y;
+                polyomino.x = col * this.gridSize + this.gridBoard.gridOffsetX;
+                polyomino.y = row * this.gridSize + this.gridBoard.gridOffsetY;
+
+                if (this.gridBoard.isInBounds(polyomino) && !this.gridBoard.isOverlapping(polyomino)) {
+                    this.placePolyomino(polyomino);
+                    if (this.tryPlacePolyominoes(index + 1, polyominoes)) {
+                        return true;
+                    }
+                    this.gridBoard.removePolyomino(polyomino);
+                }
+
+                polyomino.x = originalX;
+                polyomino.y = originalY;
+            }
+        }
+
+		return false;
+	};
 };
 
 const main_app = new MainApp();
+
+window.onload = () => {
+    const mainApp = new MainApp();
+    const iaButton = document.createElement('button');
+    iaButton.innerText = 'IA';
+    iaButton.id = 'ia-button';
+    iaButton.style.position = 'fixed';
+    iaButton.style.bottom = '10px';
+    iaButton.style.right = '10px';
+    iaButton.style.padding = '10px 20px';
+    iaButton.style.fontSize = '16px';
+    iaButton.style.backgroundColor = 'blue';
+    iaButton.style.color = 'white';
+    iaButton.style.border = 'none';
+    iaButton.style.borderRadius = '5px';
+    iaButton.addEventListener('click', () => mainApp.autoTiling());
+    document.body.appendChild(iaButton);
+};
