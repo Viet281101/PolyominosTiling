@@ -160,8 +160,8 @@ export class Toolbar {
 
 		const title = document.createElement('h3');
 		Object.assign(title.style, { position: 'fixed', top: '-10px', left: '50%',
-			transform: 'translateX(-50%)', zIndex: '1001', fontSize: '20px', color: '#fff', });
-		title.textContent = 'Create Polyomino';
+			transform: 'translateX(-50%)', zIndex: '1001', fontSize: '20px', color: '#00ffaa', });
+		title.textContent = 'Create Polyominoes';
 		popupContainer.appendChild(title);
 
 		const closeIcon = new Image();
@@ -244,6 +244,11 @@ export class Toolbar {
 		ctx.fillStyle = '#a0a0a0';
 		ctx.fillRect(0, 0, this.gridPopupCanvas.width, this.gridPopupCanvas.height);
 
+		const title = 'Grid Settings';
+		ctx.font = '22px Pixellari';
+		ctx.fillStyle = '#00ffaa';
+		ctx.fillText(title, this.gridPopupCanvas.width / 2 - ctx.measureText(title).width / 2, 30);
+
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.onload = () => {
@@ -251,35 +256,39 @@ export class Toolbar {
 		};
 
 		const rows = [
-			{ label: 'Delete current grid', icon: '../assets/ic_trash.png' },
-			{ label: 'Enter n° rows', type: 'input' },
-			{ label: 'Enter n° columns', type: 'input' },
-			{ label: 'Create new grid', icon: '../assets/ic_draw.png' },
-			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png' }
+			{ label: 'Delete current grid', icon: '../assets/ic_trash.png', box: true },
+			{ label: 'Enter n° rows', type: 'input', box: true },
+			{ label: 'Enter n° columns', type: 'input', box: true },
+			{ label: 'Create new grid', icon: '../assets/ic_draw.png', box: true },
+			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png', box: true }
 		];
 
-		const startY = 50;
+		const startY = 70;
 		const rowHeight = 70;
 		const colX = 30;
 
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight;
-			ctx.font = '20px Pixellari';
+			if (row.box) {
+				ctx.strokeStyle = '#fff';
+				ctx.strokeRect(10, y - 30, this.gridPopupCanvas.width - 20, rowHeight);
+			}
+			ctx.font = '20px Pixellari';;
 			ctx.fillStyle = '#000';
-			ctx.fillText(row.label, colX, y + 35);
+			ctx.fillText(row.label, colX, y + 20);
 
 			if (row.icon) {
 				const icon = new Image();
 				icon.src = row.icon;
 				icon.onload = () => {
-					ctx.drawImage(icon, this.gridPopupCanvas.width - 94, y, 64, 64);
+					ctx.drawImage(icon, this.gridPopupCanvas.width - 94, y - 30, 64, 64);
 				};
 			} else if (row.type === 'input') {
 				const input = document.createElement('input');
 				input.type = 'number';
 				input.style.position = 'absolute';
 				input.style.left = `${this.gridPopupCanvas.getBoundingClientRect().left + this.gridPopupCanvas.width - 120}px`;
-				input.style.top = `${this.gridPopupCanvas.getBoundingClientRect().top + y}px`;
+				input.style.top = `${this.gridPopupCanvas.getBoundingClientRect().top + y - 20}px`;
 				input.style.width = '60px';
 				document.body.appendChild(input);
 
