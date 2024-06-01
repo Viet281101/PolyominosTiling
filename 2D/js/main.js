@@ -2,7 +2,7 @@ import { GridBoard } from './board.js';
 import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
-import { autoTiling } from './ai.js';
+import { backtrackingAutoTiling } from './ai.js';
 
 class MainApp {
 	constructor() {
@@ -154,8 +154,8 @@ class MainApp {
 		}
 	};
 
-	autoTiling() {
-		autoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this));
+	backtrackingAutoTiling() {
+		backtrackingAutoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this));
 	};
 };
 

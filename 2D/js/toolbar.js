@@ -55,9 +55,7 @@ export class Toolbar {
 	};
 
 	addEventListeners() {
-		this.canvas.addEventListener('mousemove', (e) => {
-			let cursor = 'default';
-			this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } }); this.canvas.style.cursor = cursor;});
+		this.canvas.addEventListener('mousemove', (e) => { let cursor = 'default'; this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } }); this.canvas.style.cursor = cursor;});
 		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
 		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
 		document.addEventListener('click', (e) => this.handleDocumentClick(e));
@@ -169,23 +167,23 @@ export class Toolbar {
 		ctx.fillRect(0, 0, popup.width, popup.height);
 
 		const rows = [
-			{ label: 'Create new grid', box: true, title: true },
+			{ label: 'Create new grid board', box: true, title: true },
 			{ label: 'Enter n° rows', type: 'input' },
 			{ label: 'Enter n° columns', type: 'input' },
-			{ label: 'Draw grid', icon: '../assets/ic_draw.png' },
-			{ label: 'Delete current grid', icon: '../assets/ic_trash.png' },
-			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png' }
+			{ label: 'Draw grid by click to >>', icon: '../assets/ic_draw.png' },
+			{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
+			{ label: 'Blacken the cells :', icon: '../assets/ic_blackend_cell.png' }
 		];
 
-		const startY = 70;
-		const rowHeight = 70;
+		const startY = 72;
+		const rowHeight = 72;
 		const colX = 30;
 
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight;
 			if (row.box) {
 				ctx.strokeStyle = '#fff';
-				ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 4 : 1));
+				ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 4 : 1)) );
 			}
 			ctx.font = '22px Pixellari';
 			ctx.fillStyle = '#000';
@@ -194,9 +192,7 @@ export class Toolbar {
 			if (row.icon) {
 				const icon = new Image();
 				icon.src = row.icon;
-				icon.onload = () => {
-					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-				};
+				icon.onload = () => { ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50); };
 			} else if (row.type === 'input') {
 				this.createInputField(popupContainer, y);
 			}
@@ -210,6 +206,47 @@ export class Toolbar {
 
 		ctx.fillStyle = '#a0a0a0';
 		ctx.fillRect(0, 0, popup.width, popup.height);
+
+		const rows = [
+			{ label: 'Auto tiling the Polyominoes blocks', box: true, title: true },
+			{ label: '① Backtracking method =>', icon: '../assets/ic_solution.png' }
+		];
+
+		const startY = 60;
+		const rowHeight = 60;
+		const colX = 30;
+
+		rows.forEach((row, index) => {
+			const y = startY + index * rowHeight;
+			ctx.font = '20px Pixellari';
+			ctx.fillStyle = '#15159f';
+			ctx.fillText(row.label, colX, y + 20);
+
+			if (row.icon) {
+				const icon = new Image();
+				icon.src = row.icon;
+				icon.onload = () => {
+					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
+				};
+				this.attachSolveClickEvent(popup, row, y);
+			}
+		});
+	};
+
+	attachSolveClickEvent(popup, row, y) {
+		popup.addEventListener('click', (e) => {
+			const rect = popup.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			if (this.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
+				switch (row.label) {
+					case 'Backtracking method':
+						this.mainApp.backtrackingAutoTiling();
+						break;
+				}
+			}
+		});
 	};
 
 	showTutorialPopup() {
