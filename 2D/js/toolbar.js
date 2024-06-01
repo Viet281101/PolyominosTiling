@@ -158,6 +158,12 @@ export class Toolbar {
 		popup.height = height;
 		popupContainer.appendChild(popup);
 
+		const title = document.createElement('h3');
+		Object.assign(title.style, { position: 'fixed', top: '-10px', left: '50%',
+			transform: 'translateX(-50%)', zIndex: '1001', fontSize: '20px', color: '#fff', });
+		title.textContent = 'Create Polyomino';
+		popupContainer.appendChild(title);
+
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
@@ -244,6 +250,45 @@ export class Toolbar {
 			ctx.drawImage(closeIcon, this.gridPopupCanvas.width - 38, 1, 32, 32);
 		};
 
+		const rows = [
+			{ label: 'Delete current grid', icon: '../assets/ic_trash.png' },
+			{ label: 'Enter n° rows', type: 'input' },
+			{ label: 'Enter n° columns', type: 'input' },
+			{ label: 'Create new grid', icon: '../assets/ic_draw.png' },
+			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png' }
+		];
+
+		const startY = 50;
+		const rowHeight = 70;
+		const colX = 30;
+
+		rows.forEach((row, index) => {
+			const y = startY + index * rowHeight;
+			ctx.font = '20px Pixellari';
+			ctx.fillStyle = '#000';
+			ctx.fillText(row.label, colX, y + 35);
+
+			if (row.icon) {
+				const icon = new Image();
+				icon.src = row.icon;
+				icon.onload = () => {
+					ctx.drawImage(icon, this.gridPopupCanvas.width - 94, y, 64, 64);
+				};
+			} else if (row.type === 'input') {
+				const input = document.createElement('input');
+				input.type = 'number';
+				input.style.position = 'absolute';
+				input.style.left = `${this.gridPopupCanvas.getBoundingClientRect().left + this.gridPopupCanvas.width - 120}px`;
+				input.style.top = `${this.gridPopupCanvas.getBoundingClientRect().top + y}px`;
+				input.style.width = '60px';
+				document.body.appendChild(input);
+
+				this.gridPopupCanvas.addEventListener('remove', () => {
+					document.body.removeChild(input);
+				});
+			}
+		});
+
 		this.gridPopupCanvas.addEventListener('click', (e) => {
 			const rect = this.gridPopupCanvas.getBoundingClientRect();
 			const mouseX = e.clientX - rect.left;
@@ -307,6 +352,8 @@ export class Toolbar {
 
 	closeGridPopup() {
 		if (this.gridPopupCanvas) {
+			const inputs = document.querySelectorAll('input[type="number"]');
+			inputs.forEach(input => document.body.removeChild(input));
 			document.body.removeChild(this.gridPopupCanvas);
 			this.gridPopupCanvas = null;
 		}
