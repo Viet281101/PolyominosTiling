@@ -19,8 +19,7 @@ export class Toolbar {
 		this.canvas.width = window.innerWidth;
 		this.canvas.height = 50;
 		this.canvas.style.position = 'absolute';
-		this.canvas.style.top = '0';
-		this.canvas.style.left = '0';
+		this.canvas.style.top = this.canvas.style.left = '0';
 		document.body.appendChild(this.canvas);
 	};
 
@@ -49,16 +48,20 @@ export class Toolbar {
 				this.ctx.strokeRect(startX - 5, 5, 40, 40);
 				button.x = startX - 5;
 				button.y = 5;
-				button.width = 40;
-				button.height = 40;
+				button.width = button.height = 40;
 				startX += 60;
 			};
 		});
 	};
 
 	addEventListeners() {
-		this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+		this.canvas.addEventListener('mousemove', (e) => {
+			let cursor = 'default';
+			this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } }); this.canvas.style.cursor = cursor;});
+		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
+		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
 		document.addEventListener('click', (e) => this.handleDocumentClick(e));
+		document.addEventListener('touchstart', (e) => this.handleDocumentClick(e));
 	};
 
 	handleCanvasClick(e) {
@@ -68,10 +71,7 @@ export class Toolbar {
 				button.action();
 			}
 		});
-
-		if (mouseX >= 10 && mouseX <= 50 && mouseY >= 10 && mouseY <= 50) {
-			window.location.href = '../index.html';
-		}
+		if (mouseX >= 10 && mouseX <= 50 && mouseY >= 10 && mouseY <= 50) { window.location.href = '../index.html';}
 	};
 
 	handleDocumentClick(e) {
@@ -89,9 +89,9 @@ export class Toolbar {
 		}
 	};
 
-	isInside(x, y, rect) {
-		return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-	};
+	resizeToolbar() { this.canvas.width = window.innerWidth; this.drawToolbar(); this.addHomeButton(); };
+	isInside(x, y, rect) { return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;};
+	closeCurrentPopup() { if (this.currentPopup) { this.closePopup(this.currentPopup); } };
 
 	addHomeButton() {
 		const img = new Image();
@@ -113,27 +113,13 @@ export class Toolbar {
 		}
 	};
 
-	closeCurrentPopup() {
-		if (this.currentPopup) {
-			this.closePopup(this.currentPopup);
-		}
-	};
-
 	showPopup(type) {
 		this.popupOpen = true;
 		switch (type) {
-			case 'polyomino':
-				this.showPolyominoPopup();
-				break;
-			case 'grid':
-				this.showGridPopup();
-				break;
-			case 'solve':
-				this.showSolvePopup();
-				break;
-			case 'tutorial':
-				this.showTutorialPopup();
-				break;
+			case 'polyomino': this.showPolyominoPopup(); break;
+			case 'grid': this.showGridPopup(); break;
+			case 'solve': this.showSolvePopup(); break;
+			case 'tutorial': this.showTutorialPopup(); break;
 		}
 	};
 
@@ -201,7 +187,7 @@ export class Toolbar {
 				ctx.strokeStyle = '#fff';
 				ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 4 : 1));
 			}
-			ctx.font = '20px Pixellari';
+			ctx.font = '22px Pixellari';
 			ctx.fillStyle = '#000';
 			ctx.fillText(row.label, colX, y + 20);
 
@@ -262,14 +248,12 @@ export class Toolbar {
 		popupContainer.appendChild(titleElement);
 
 		this.addCloseIcon();
-
+		this.currentPopup = popupContainer;
 		return popupContainer;
 	};
 
 	addCloseIcon() {
-		if (this.currentCloseIcon) {
-			document.body.removeChild(this.currentCloseIcon);
-		}
+		if (this.currentCloseIcon) { document.body.removeChild(this.currentCloseIcon); }
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
@@ -295,10 +279,7 @@ export class Toolbar {
 				this.mainApp.redraw();
 				this.closePopup('polyomino');
 			};
-
-			if (this.isInside(mouseX, mouseY, polyomino) || this.isInside(mouseX, mouseY, { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 })) {
-				onMouseDown({ x: mouseX, y: mouseY });
-			}
+			if (this.isInside(mouseX, mouseY, polyomino) || this.isInside(mouseX, mouseY, { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 })) { onMouseDown({ x: mouseX, y: mouseY }); }
 		});
 	};
 
@@ -322,9 +303,7 @@ export class Toolbar {
 
 	closePopup(type) {
 		const popup = document.getElementById(`${type}Popup`);
-		if (popup) {
-			document.body.removeChild(popup);
-		}
+		if (popup) { document.body.removeChild(popup); }
 		if (this.currentCloseIcon) {
 			document.body.removeChild(this.currentCloseIcon);
 			this.currentCloseIcon = null;
@@ -333,11 +312,5 @@ export class Toolbar {
 		inputs.forEach(input => input.parentElement.removeChild(input));
 		this.popupOpen = false;
 		this.currentPopup = null;
-	};
-
-	resizeToolbar() {
-		this.canvas.width = window.innerWidth;
-		this.drawToolbar();
-		this.addHomeButton();
 	};
 };
