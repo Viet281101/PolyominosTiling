@@ -55,7 +55,7 @@ export class Toolbar {
 	};
 
 	addEventListeners() {
-		this.canvas.addEventListener('mousemove', (e) => { let cursor = 'default'; this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } }); this.canvas.style.cursor = cursor;});
+		this.canvas.addEventListener('mousemove', (e) => { let cursor = 'default'; this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } }); this.canvas.style.cursor = cursor; });
 		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
 		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
 		document.addEventListener('click', (e) => this.handleDocumentClick(e));
@@ -88,7 +88,7 @@ export class Toolbar {
 	};
 
 	resizeToolbar() { this.canvas.width = window.innerWidth; this.drawToolbar(); this.addHomeButton(); };
-	isInside(x, y, rect) { return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;};
+	isInside(x, y, rect) { return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height; };
 	closeCurrentPopup() { if (this.currentPopup) { this.closePopup(this.currentPopup); } };
 
 	addHomeButton() {
@@ -167,10 +167,10 @@ export class Toolbar {
 		ctx.fillRect(0, 0, popup.width, popup.height);
 
 		const rows = [
-			{ label: 'Create new grid board', box: true, title: true },
+			{ label: 'Create new grid board here', box: true, title: true },
 			{ label: 'Enter n° rows', type: 'input' },
 			{ label: 'Enter n° columns', type: 'input' },
-			{ label: 'Draw grid by click to >>', icon: '../assets/ic_draw.png' },
+			{ label: 'Draw grid by click to 👉', icon: '../assets/ic_draw.png' },
 			{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
 			{ label: 'Blacken the cells :', icon: '../assets/ic_blackend_cell.png' }
 		];
@@ -209,7 +209,7 @@ export class Toolbar {
 
 		const rows = [
 			{ label: 'Auto tiling the Polyominoes blocks', box: true, title: true },
-			{ label: '① Backtracking method =>', icon: '../assets/ic_solution.png' }
+			{ label: '1) Backtracking method :', icon: '../assets/ic_solution.png' }
 		];
 
 		const startY = 60;
@@ -225,9 +225,7 @@ export class Toolbar {
 			if (row.icon) {
 				const icon = new Image();
 				icon.src = row.icon;
-				icon.onload = () => {
-					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-				};
+				icon.onload = () => { ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50); };
 				this.attachSolveClickEvent(popup, row, y);
 			}
 		});
