@@ -15,12 +15,13 @@ export class Toolbar {
 		this.buttons = [
 			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePolyominoPopup() },
 			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.toggleGridPopup() },
-			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.solvingPuzzle() }
+			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.toggleSolvePopup() }
 		];
 
 		this.popupOpen = false;
 		this.currentPopup = null;
 		this.gridPopupCanvas = null;
+		this.solvePopupCanvas = null;
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
@@ -75,6 +76,9 @@ export class Toolbar {
 				if (pPopup && !pPopup.contains(e.target) && !this.canvas.contains(e.target)) {
 					this.closePolyominoPopup();
 				}
+				if (this.solvePopupCanvas && !this.solvePopupCanvas.contains(e.target) && !this.canvas.contains(e.target)) {
+					this.closeSolvePopup();
+				}
 			}
 		});
 	};
@@ -109,11 +113,23 @@ export class Toolbar {
 		}
 	};
 
+	toggleSolvePopup() {
+		if (this.currentPopup === 'solve') {
+			this.closeSolvePopup();
+		} else {
+			this.closeCurrentPopup();
+			this.showSolvePopup();
+			this.currentPopup = 'solve';
+		}
+	};
+
 	closeCurrentPopup() {
 		if (this.currentPopup === 'polyomino') {
 			this.closePolyominoPopup();
 		} else if (this.currentPopup === 'grid') {
 			this.closeGridPopup();
+		} else if (this.currentPopup === 'solve') {
+			this.closeSolvePopup();
 		}
 	}
 
@@ -240,6 +256,42 @@ export class Toolbar {
 		});
 	};
 
+	showSolvePopup() {
+		this.popupOpen = true;
+
+		this.solvePopupCanvas = document.createElement('canvas');
+		this.solvePopupCanvas.width = 370;
+		this.solvePopupCanvas.height = 600;
+		this.solvePopupCanvas.style.position = 'absolute';
+		this.solvePopupCanvas.style.top = '50px';
+		this.solvePopupCanvas.style.left = '50%';
+		this.solvePopupCanvas.style.transform = 'translateX(-50%)';
+		this.solvePopupCanvas.style.border = '3px solid #000';
+		this.solvePopupCanvas.style.zIndex = '1000';
+		document.body.appendChild(this.solvePopupCanvas);
+
+		const ctx = this.solvePopupCanvas.getContext('2d');
+		ctx.fillStyle = '#a0a0a0';
+		ctx.fillRect(0, 0, this.solvePopupCanvas.width, this.solvePopupCanvas.height);
+
+		const closeIcon = new Image();
+		closeIcon.src = '../assets/ic_close.png';
+		closeIcon.onload = () => {
+			ctx.drawImage(closeIcon, this.solvePopupCanvas.width - 38, 1, 32, 32);
+		};
+
+		this.solvePopupCanvas.addEventListener('click', (e) => {
+			const rect = this.solvePopupCanvas.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+
+			if (mouseX >= this.solvePopupCanvas.width - 40 && mouseX <= this.solvePopupCanvas.width - 10 &&
+				mouseY >= 10 && mouseY <= 40) {
+				this.closeSolvePopup();
+			}
+		});
+	};
+
 	closePolyominoPopup() {
 		const popup = document.getElementById('polyominoPopup');
 		if (popup) {
@@ -257,6 +309,15 @@ export class Toolbar {
 		if (this.gridPopupCanvas) {
 			document.body.removeChild(this.gridPopupCanvas);
 			this.gridPopupCanvas = null;
+		}
+		this.popupOpen = false;
+		this.currentPopup = null;
+	};
+
+	closeSolvePopup() {
+		if (this.solvePopupCanvas) {
+			document.body.removeChild(this.solvePopupCanvas);
+			this.solvePopupCanvas = null;
 		}
 		this.popupOpen = false;
 		this.currentPopup = null;
