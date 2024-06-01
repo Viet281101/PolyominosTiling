@@ -15,7 +15,7 @@ export class Toolbar {
 		this.buttons = [
 			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePolyominoPopup() },
 			{ name: 'Draw Grid', icon: '../assets/ic_table.png', action: () => this.toggleGridPopup() },
-			{ name: 'Solve', icon: '../assets/ic_solution.png', action: () => this.solvingPuzzle() }
+			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.solvingPuzzle() }
 		];
 
 		this.popupOpen = false;
