@@ -1,5 +1,5 @@
 import { GridBoard } from './board.js';
-import { Polyomino, SHAPES, getRandomColor } from './polyomino.js';
+import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
 
@@ -32,22 +32,7 @@ class MainApp {
 
 	init() {
 		document.body.style.backgroundColor = '#c3c3c3';
-		this.createPolyominoes();
 		this.addEventListeners();
-	};
-
-	createPolyominoes() {
-		this.polyominoes.push(new Polyomino(SHAPES.MONOMINO, 100, 100, 'green', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TROMINO, 200, 100, 'purple', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_I, 300, 100, 'red', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_O, 450, 100, 'blue', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_L, 550, 100, 'orange', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_J, 650, 100, 'Coral', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_T, 750, 100, 'cyan', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_S, 100, 170, 'DeepPink', this));
-        this.polyominoes.push(new Polyomino(SHAPES.TETROMINO_Z, 200, 170, 'MediumSlateBlue', this));
-     
-		this.drawPolyominoes();
 	};
 
 	drawPolyominoes() {
