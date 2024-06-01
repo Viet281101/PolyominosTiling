@@ -256,11 +256,12 @@ export class Toolbar {
 		};
 
 		const rows = [
-			{ label: 'Delete current grid', icon: '../assets/ic_trash.png', box: true },
-			{ label: 'Enter n° rows', type: 'input', box: true },
-			{ label: 'Enter n° columns', type: 'input', box: true },
-			{ label: 'Create new grid', icon: '../assets/ic_draw.png', box: true },
-			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png', box: true }
+			{ label: 'Create new grid', box: true, title: true },
+			{ label: 'Enter n° rows', type: 'input' },
+			{ label: 'Enter n° columns', type: 'input' },
+			{ label: 'Draw grid', icon: '../assets/ic_draw.png' },
+			{ label: 'Delete current grid', icon: '../assets/ic_trash.png' },
+			{ label: 'Blacken the cells', icon: '../assets/ic_blackend_cell.png' }
 		];
 
 		const startY = 70;
@@ -270,10 +271,15 @@ export class Toolbar {
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight;
 			if (row.box) {
-				ctx.strokeStyle = '#fff';
-				ctx.strokeRect(10, y - 30, this.gridPopupCanvas.width - 20, rowHeight);
+				if (row.title) {
+					ctx.strokeStyle = '#fff';
+					ctx.strokeRect(10, y - 30, this.gridPopupCanvas.width - 20, rowHeight * 4);
+				} else {
+					ctx.strokeStyle = '#fff';
+					ctx.strokeRect(10, y - 30, this.gridPopupCanvas.width - 20, rowHeight);
+				}
 			}
-			ctx.font = '20px Pixellari';;
+			ctx.font = '20px Pixellari';
 			ctx.fillStyle = '#000';
 			ctx.fillText(row.label, colX, y + 20);
 
