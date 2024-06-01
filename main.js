@@ -85,6 +85,8 @@ class MainApp {
 		this.polyominoes = [];
 		this.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#3498DB', '#E74C3C', '#2ECC71'];
 		this.usedColors = [];
+		this.iconImage = new Image();
+		this.iconImage.src = './assets/ic_arrow_right.png';
 
 		this.initialize();
 		this.addEventListeners();
@@ -136,8 +138,8 @@ class MainApp {
 		this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
 
 		this.buttons = [];
-		this.drawButton('2D Version', this.canvas.width / 2, 350, () => { window.location.href = './2D/index.html'; });
-		this.drawButton('3D Version', this.canvas.width / 2, 450, () => { window.location.href = './3D/index.html'; });
+		this.drawButton('2D Version', (this.canvas.width / 2), 350, () => { window.location.href = './2D/index.html'; });
+		this.drawButton('3D Version', (this.canvas.width / 2), 450, () => { window.location.href = './3D/index.html'; });
 	};
 
 	drawButton(text, x, y, onClick) {
@@ -151,6 +153,13 @@ class MainApp {
 		this.ctx.font = '20px Pixellari';
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText(text, x, y);
+
+		const iconSize = 32;
+		const textWidth = this.ctx.measureText(text).width;
+		const iconX = x + textWidth / 2 + 10;
+		const iconY = y - iconSize / 2;
+
+		this.ctx.drawImage(this.iconImage, iconX, iconY, iconSize, iconSize);
 
 		this.buttons.push({ text, x, y, width: buttonWidth, height: buttonHeight, onClick });
 	};
