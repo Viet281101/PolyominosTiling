@@ -61,12 +61,17 @@ export function showPolyominoPopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
+		const getRandomPosition = (max) => Math.floor(Math.random() * max);
+
+		const canvasPaddingX = getRandomPosition(window.innerWidth < 600 ? 300 : 900);
+		const canvasPaddingY = getRandomPosition(170) + 40;
+
 		polyominoes.forEach(({ polyomino, shape, shapeSize, y }) => {
 			const leftColumnRect = { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 };
 			const rightColumnRect = { x: polyomino.x, y: polyomino.y, width: polyomino.width, height: polyomino.height };
 
 			if (toolbar.isInside(mouseX, mouseY, leftColumnRect) || toolbar.isInside(mouseX, mouseY, rightColumnRect)) {
-				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), mouseX, mouseY, getRandomColor(), toolbar.mainApp);
+				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), canvasPaddingX, canvasPaddingY, getRandomColor(), toolbar.mainApp);
 				toolbar.mainApp.polyominoes.push(newPolyomino);
 				toolbar.mainApp.redraw();
 				toolbar.closePopup('polyomino');
