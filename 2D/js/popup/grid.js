@@ -10,9 +10,9 @@ export function showGridPopup(toolbar) {
 		{ label: 'Create new grid board here', box: true, title: true },
 		{ label: 'Enter n° rows', type: 'input' },
 		{ label: 'Enter n° columns', type: 'input' },
-		{ label: 'Draw grid by click to 👉', icon: '../assets/ic_draw.png' },
-		{ label: 'Delete current grid	👉', icon: '../assets/ic_trash.png' },
-		{ label: 'Blacken the grid cells 👉', icon: '../assets/ic_blackend_cell.png' }
+		{ label: 'Draw grid by click to =>', icon: '../assets/ic_draw.png' },
+		{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
+		{ label: 'Blacken the grid cells :', icon: '../assets/ic_blackend_cell.png' }
 	];
 
 	const startY = 72;

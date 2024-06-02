@@ -8,7 +8,7 @@ export function showSolvePopup(toolbar) {
 
 	const rows = [
 		{ label: 'Auto tiling the Polyominoes blocks', box: true, title: true },
-		{ label: '1) Backtracking method 👉 ', icon: '../assets/ic_solution.png' }
+		{ label: '1) Backtracking method :', icon: '../assets/ic_solution.png' }
 	];
 
 	const startY = 60;
