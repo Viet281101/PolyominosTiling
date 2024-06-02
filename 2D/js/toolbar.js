@@ -14,6 +14,7 @@ export class Toolbar {
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
+		this.homeButtonRect = { x: 10, y: 10, width: 40, height: 40 };
 	};
 
 	setupCanvas() {
@@ -30,7 +31,7 @@ export class Toolbar {
 		return [
 			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePopup('polyomino') },
 			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid') },
-			{ name: 'Solve', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve') },
+			{ name: 'Solving Polyomino', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve') },
 			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial') }
 		];
 	};
@@ -63,9 +64,12 @@ export class Toolbar {
 			this.buttons.forEach(button => {
 				if (this.isInside(e.clientX, e.clientY, button)) {
 					cursor = 'pointer';
-					this.canvas.style.cursor = cursor;
 				}
 			});
+			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
+				cursor = 'pointer';
+			}
+			this.canvas.style.cursor = cursor;
 		});
 		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
 		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
@@ -80,7 +84,7 @@ export class Toolbar {
 				button.action();
 			}
 		});
-		if (mouseX >= 10 && mouseX <= 50 && mouseY >= 10 && mouseY <= 50) {
+		if (this.isInside(mouseX, mouseY, this.homeButtonRect)) {
 			window.location.href = '../index.html';
 		}
 	};
@@ -90,10 +94,12 @@ export class Toolbar {
 			const polyominoPopup = document.getElementById('polyominoPopup');
 			const gridPopup = document.getElementById('gridPopup');
 			const solvePopup = document.getElementById('solvePopup');
+			const tutorialPopup = document.getElementById('tutorialPopup');
 			if (
 				(polyominoPopup && !polyominoPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target))
+				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
+				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target))
 			) {
 				this.closeCurrentPopup();
 			}
