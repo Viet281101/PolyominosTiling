@@ -8,7 +8,7 @@ export function showSolvePopup(toolbar) {
 
 	const rows = [
 		{ label: 'Auto tiling the Polyominoes blocks', box: true, title: true },
-		{ label: '1) Backtracking method :', icon: '../assets/ic_solution.png' }
+		{ label: '1) Backtracking method 👉 ', icon: '../assets/ic_solution.png' }
 	];
 
 	const startY = 60;
@@ -29,6 +29,22 @@ export function showSolvePopup(toolbar) {
 			};
 			attachSolveClickEvent(toolbar, popup, row, y);
 		}
+	});
+
+	popup.addEventListener('mousemove', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+		let cursor = 'default';
+
+		rows.forEach((row, index) => {
+			const y = startY + index * rowHeight;
+			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
+				cursor = 'pointer';
+			}
+		});
+
+		popup.style.cursor = cursor;
 	});
 };
 

@@ -197,24 +197,6 @@ export class Toolbar {
 		this.currentCloseIcon = closeIcon;
 	};
 
-	createInputField(popupContainer, y) {
-		const input = document.createElement('input');
-		input.type = 'number';
-		input.style.position = 'absolute';
-		input.style.left = 'calc(100% - 120px)';
-		input.style.top = `${y}px`;
-		input.style.width = '80px';
-		input.style.height = '24px';
-		input.style.border = '1px solid #000';
-		input.style.backgroundColor = '#fff';
-		input.style.fontSize = '16px';
-		input.style.fontFamily = 'Pixellari';
-		input.style.color = '#000';
-		input.style.zIndex = '1001';
-		input.classList.add('popup-input');
-		popupContainer.appendChild(input);
-	};
-
 	closePopup(type) {
 		const popup = document.getElementById(`${type}Popup`);
 		if (popup) { document.body.removeChild(popup); }
