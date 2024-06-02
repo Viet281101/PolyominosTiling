@@ -6,6 +6,7 @@ import { showTutorialPopup } from './popup/tutorial.js';
 export class Toolbar {
 	constructor(mainApp) {
 		this.mainApp = mainApp;
+		this.isMobile = this.checkIfMobile();
 		this.setupCanvas();
 		this.buttons = this.createButtons();
 		this.popupOpen = false;
@@ -14,16 +15,28 @@ export class Toolbar {
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
-		this.homeButtonRect = { x: 10, y: 10, width: 40, height: 40 };
+		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
+	};
+
+	checkIfMobile() {
+		return window.innerWidth <= 800;
 	};
 
 	setupCanvas() {
 		this.canvas = document.createElement('canvas');
 		this.ctx = this.canvas.getContext('2d');
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = 50;
-		this.canvas.style.position = 'absolute';
-		this.canvas.style.top = this.canvas.style.left = '0';
+		if (this.isMobile) {
+			this.canvas.width = window.innerWidth;
+			this.canvas.height = 50;
+			this.canvas.style.position = 'absolute';
+			this.canvas.style.top = this.canvas.style.left = '0';
+		} else {
+			this.canvas.width = 50;
+			this.canvas.height = window.innerHeight;
+			this.canvas.style.position = 'absolute';
+			this.canvas.style.left = '0';
+			this.canvas.style.top = '0';
+		}
 		document.body.appendChild(this.canvas);
 	};
 
@@ -40,22 +53,41 @@ export class Toolbar {
 		this.ctx.fillStyle = '#333';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-		const totalWidth = this.buttons.length * 60;
-		let startX = (this.canvas.width - totalWidth) / 2;
+		if (this.isMobile) {
+			const totalWidth = this.buttons.length * 60;
+			let startX = (this.canvas.width - totalWidth) / 2;
 
-		this.buttons.forEach(button => {
-			const img = new Image();
-			img.src = button.icon;
-			img.onload = () => {
-				this.ctx.drawImage(img, startX, 10, 30, 30);
-				this.ctx.strokeStyle = '#fff';
-				this.ctx.strokeRect(startX - 5, 5, 40, 40);
-				button.x = startX - 5;
-				button.y = 5;
-				button.width = button.height = 40;
-				startX += 60;
-			};
-		});
+			this.buttons.forEach(button => {
+				const img = new Image();
+				img.src = button.icon;
+				img.onload = () => {
+					this.ctx.drawImage(img, startX, 10, 30, 30);
+					this.ctx.strokeStyle = '#fff';
+					this.ctx.strokeRect(startX - 5, 5, 40, 40);
+					button.x = startX - 5;
+					button.y = 5;
+					button.width = button.height = 40;
+					startX += 60;
+				};
+			});
+		} else {
+			const totalHeight = this.buttons.length * 60;
+			let startY = (this.canvas.height - totalHeight) / 2;
+
+			this.buttons.forEach(button => {
+				const img = new Image();
+				img.src = button.icon;
+				img.onload = () => {
+					this.ctx.drawImage(img, 10, startY, 30, 30);
+					this.ctx.strokeStyle = '#fff';
+					this.ctx.strokeRect(5, startY - 5, 40, 40);
+					button.x = 5;
+					button.y = startY - 5;
+					button.width = button.height = 40;
+					startY += 60;
+				};
+			});
+		}
 	};
 
 	addEventListeners() {
@@ -107,7 +139,13 @@ export class Toolbar {
 	};
 
 	resizeToolbar() {
-		this.canvas.width = window.innerWidth;
+		if (this.isMobile) {
+			this.canvas.width = window.innerWidth;
+			this.canvas.height = 50;
+		} else {
+			this.canvas.width = 50;
+			this.canvas.height = window.innerHeight;
+		}
 		this.drawToolbar();
 		this.addHomeButton();
 	};
@@ -126,9 +164,15 @@ export class Toolbar {
 		const img = new Image();
 		img.src = '../assets/ic_home.png';
 		img.onload = () => {
-			this.ctx.drawImage(img, 10, 10, 30, 30);
-			this.ctx.strokeStyle = '#fff';
-			this.ctx.strokeRect(5, 5, 40, 40);
+			if (this.isMobile) {
+				this.ctx.drawImage(img, 10, 10, 30, 30);
+				this.ctx.strokeStyle = '#fff';
+				this.ctx.strokeRect(5, 5, 40, 40);
+			} else {
+				this.ctx.drawImage(img, 10, 10, 30, 30);
+				this.ctx.strokeStyle = '#fff';
+				this.ctx.strokeRect(5, 5, 40, 40);
+			}
 		};
 	};
 
@@ -156,8 +200,8 @@ export class Toolbar {
 		const popupContainer = document.createElement('div');
 		popupContainer.id = id;
 		popupContainer.style.position = 'absolute';
-		popupContainer.style.top = '50px';
-		popupContainer.style.left = '50%';
+		popupContainer.style.top = this.checkIfMobile() ? '50px' : '160px';
+		popupContainer.style.left = this.checkIfMobile() ? '50%' : '238px';
 		popupContainer.style.transform = 'translateX(-50%)';
 		popupContainer.style.width = '370px';
 		popupContainer.style.height = '600px';
@@ -193,8 +237,8 @@ export class Toolbar {
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
-		closeIcon.style.top = '56px';
-		closeIcon.style.left = 'calc(50% + 162px)';
+		closeIcon.style.top = this.checkIfMobile() ? '56px' : '166px';
+		closeIcon.style.left = this.checkIfMobile() ? 'calc(50% + 162px)' : '400px';
 		closeIcon.style.transform = 'translateX(-50%)';
 		closeIcon.style.cursor = 'pointer';
 		closeIcon.style.zIndex = '1001';

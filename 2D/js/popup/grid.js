@@ -36,8 +36,18 @@ export function showGridPopup(toolbar) {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
 		} else if (row.type === 'input') {
-			createInputField(popupContainer, y);
+			createInputField(popupContainer, y, 10);
 		}
+	});
+
+	let newRows = 10;
+	let newCols = 10;
+
+	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
+		input.addEventListener('change', (e) => {
+			if (index === 0) newRows = parseInt(e.target.value);
+			if (index === 1) newCols = parseInt(e.target.value);
+		});
 	});
 
 	popup.addEventListener('mousemove', (e) => {
@@ -55,11 +65,37 @@ export function showGridPopup(toolbar) {
 
 		popup.style.cursor = cursor;
 	});
+
+	popup.addEventListener('click', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+
+		rows.forEach((row, index) => {
+			const y = startY + index * rowHeight;
+			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
+				switch (index) {
+					case 3:
+						toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize);
+						toolbar.closePopup('grid');
+						break;
+					case 4:
+						toolbar.mainApp.clearBoard();
+						toolbar.closePopup('grid');
+						break;
+					case 5:
+						toolbar.closePopup('grid');
+						break;
+				}
+			}
+		});
+	});
 };
 
-function createInputField(popupContainer, y) {
+function createInputField(popupContainer, y, defaultValue) {
 	const input = document.createElement('input');
 	input.type = 'number';
+	input.value = defaultValue;
 	input.style.position = 'absolute';
 	input.style.left = 'calc(100% - 120px)';
 	input.style.top = `${y}px`;

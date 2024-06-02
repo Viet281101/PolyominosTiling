@@ -64,6 +64,13 @@ export class GridBoard {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	};
 
+	clearGrid() {
+		this.grid = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
+		this.clear();
+		this.drawGrid();
+		console.log("Delete Board");
+	};
+
 	isInBounds(polyomino) {
 		const { x, y, shape } = polyomino;
 		const gridSize = this.gridSize;

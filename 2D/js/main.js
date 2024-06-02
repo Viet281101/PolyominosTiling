@@ -28,6 +28,7 @@ class MainApp {
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
+		this.needsRedraw = true;
 		this.init();
 	};
 
@@ -119,6 +120,7 @@ class MainApp {
 	};
 
 	redraw() {
+		if (!this.needsRedraw) return;
 		this.gridBoard.clear();
 		this.gridBoard.drawGrid();
 		this.drawPolyominoes();
@@ -152,6 +154,23 @@ class MainApp {
 			this.selectedPolyomino = null;
 			this.redraw();
 		}
+	};
+
+	clearBoard() {
+		this.needsRedraw = false;
+		this.gridBoard.clearGrid();
+		this.polyominoes = [];
+		this.selectedPolyomino = null;
+		this.gridBoard.clear();
+	};
+
+	createNewBoard(rows, cols, gridSize) {
+		this.rows = rows;
+		this.cols = cols;
+		this.gridSize = gridSize;
+		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
+		this.needsRedraw = true;
+		this.redraw();
 	};
 
 	backtrackingAutoTiling() {
