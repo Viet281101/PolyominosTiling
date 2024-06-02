@@ -15,11 +15,6 @@ export class Toolbar {
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
-		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
-	};
-
-	checkIfMobile() {
-		return window.innerWidth <= 800;
 	};
 
 	setupCanvas() {
@@ -138,27 +133,9 @@ export class Toolbar {
 		}
 	};
 
-	resizeToolbar() {
-		if (this.isMobile) {
-			this.canvas.width = window.innerWidth;
-			this.canvas.height = 50;
-		} else {
-			this.canvas.width = 50;
-			this.canvas.height = window.innerHeight;
-		}
-		this.drawToolbar();
-		this.addHomeButton();
-	};
-
-	isInside(x, y, rect) {
-		return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-	};
-
-	closeCurrentPopup() {
-		if (this.currentPopup) {
-			this.closePopup(this.currentPopup);
-		}
-	};
+	resizeToolbar() { this.canvas.width = window.innerWidth; this.drawToolbar(); this.addHomeButton(); };
+	isInside(x, y, rect) { return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;};
+	closeCurrentPopup() { if (this.currentPopup) { this.closePopup(this.currentPopup); } };
 
 	addHomeButton() {
 		const img = new Image();

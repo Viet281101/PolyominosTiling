@@ -156,25 +156,8 @@ class MainApp {
 		}
 	};
 
-	clearBoard() {
-		this.needsRedraw = false;
-		this.gridBoard.clearGrid();
-		this.polyominoes = [];
-		this.selectedPolyomino = null;
-		this.gridBoard.clear();
-	};
-
-	createNewBoard(rows, cols, gridSize) {
-		this.rows = rows;
-		this.cols = cols;
-		this.gridSize = gridSize;
-		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
-		this.needsRedraw = true;
-		this.redraw();
-	};
-
-	backtrackingAutoTiling() {
-		backtrackingAutoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this));
+	autoTiling() {
+		autoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this));
 	};
 };
 
