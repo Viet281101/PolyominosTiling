@@ -84,6 +84,11 @@ export function showGridPopup(toolbar) {
 						toolbar.closePopup('grid');
 						break;
 					case 5:
+						if (toolbar.mainApp.isBlackening) {
+							toolbar.mainApp.disableBlackening();
+						} else {
+							toolbar.mainApp.enableBlackening();
+						}
 						toolbar.closePopup('grid');
 						break;
 				}

@@ -29,6 +29,8 @@ class MainApp {
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
 		this.needsRedraw = true;
+		this.isBlackening = false;
+		this.blackenedCells = new Set();
 		this.init();
 	};
 
@@ -65,6 +67,10 @@ class MainApp {
 			this.guiController.checkWindowSize();
 			this.toolbar.resizeToolbar();
 		});
+		this.canvas.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+			this.disableBlackening();
+		});
 		this.canvas.addEventListener('touchstart', (e) => {
 			e.preventDefault();
 			const touchPos = this.gridBoard.getTouchPos(e);
@@ -82,31 +88,47 @@ class MainApp {
 	};
 
 	handleMouseDown(mousePos) {
-		let clickedOnIcon = false;
-		if (this.selectedPolyomino) {
-			clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
-		}
-		if (!clickedOnIcon) {
-			let selected = false;
-			for (let i = this.polyominoes.length - 1; i >= 0; i--) {
-				const polyomino = this.polyominoes[i];
-				if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
-					if (polyomino.isPlaced) {
-						this.gridBoard.removePolyomino(polyomino);
-						polyomino.isPlaced = false;
+		if (this.isBlackening) {
+			const col = Math.floor((mousePos.x - this.gridBoard.gridOffsetX) / this.gridSize);
+			const row = Math.floor((mousePos.y - this.gridBoard.gridOffsetY) / this.gridSize);
+			if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+				const cellKey = `${row}-${col}`;
+				if (this.blackenedCells.has(cellKey)) {
+					this.blackenedCells.delete(cellKey);
+					this.gridBoard.grid[row][col] = null;
+				} else {
+					this.blackenedCells.add(cellKey);
+					this.gridBoard.grid[row][col] = '#000000';
+				}
+				this.redraw();
+			}
+		} else {
+			let clickedOnIcon = false;
+			if (this.selectedPolyomino) {
+				clickedOnIcon = this.selectedPolyomino.checkIconsClick(mousePos);
+			}
+			if (!clickedOnIcon) {
+				let selected = false;
+				for (let i = this.polyominoes.length - 1; i >= 0; i--) {
+					const polyomino = this.polyominoes[i];
+					if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
+						if (polyomino.isPlaced) {
+							this.gridBoard.removePolyomino(polyomino);
+							polyomino.isPlaced = false;
+						}
+						polyomino.onMouseDown(mousePos);
+						this.selectedPolyomino = polyomino;
+						this.guiController.settings.selectedColor = polyomino.color;
+						selected = true;
+						break;
 					}
-					polyomino.onMouseDown(mousePos);
-					this.selectedPolyomino = polyomino;
-					this.guiController.settings.selectedColor = polyomino.color;
-					selected = true;
-					break;
+				}
+				if (!selected) {
+					this.selectedPolyomino = null;
 				}
 			}
-			if (!selected) {
-				this.selectedPolyomino = null;
-			}
+			this.redraw();
 		}
-		this.redraw();
 	};
 
 	handleMouseMove(mousePos) {
@@ -117,6 +139,16 @@ class MainApp {
 	handleMouseUp() {
 		this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
 		this.redraw();
+	};
+
+	enableBlackening() {
+		this.isBlackening = true;
+		document.body.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
+	};
+
+	disableBlackening() {
+		this.isBlackening = false;
+		document.body.style.cursor = 'default';
 	};
 
 	redraw() {

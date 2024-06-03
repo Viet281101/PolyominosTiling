@@ -1,5 +1,5 @@
 export function showSettingsPopup(toolbar) {
-	const popupContainer = toolbar.createPopupContainer('settingPopup', toolbar.buttons[4].name);
+	const popupContainer = toolbar.createPopupContainer('settingsPopup', toolbar.buttons[4].name);
 	const popup = popupContainer.querySelector('canvas');
 	const ctx = popup.getContext('2d');
 
