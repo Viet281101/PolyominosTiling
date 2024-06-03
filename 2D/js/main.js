@@ -101,7 +101,7 @@ class MainApp {
 					this.gridBoard.grid[row][col] = '#000000';
 				}
 				this.redraw();
-			}
+			} else { this.isBlackening = false; this.canvas.style.cursor = 'default'; }
 		} else {
 			let clickedOnIcon = false;
 			if (this.selectedPolyomino) {
@@ -123,9 +123,7 @@ class MainApp {
 						break;
 					}
 				}
-				if (!selected) {
-					this.selectedPolyomino = null;
-				}
+				if (!selected) { this.selectedPolyomino = null; }
 			}
 			this.redraw();
 		}
@@ -140,9 +138,6 @@ class MainApp {
 		this.polyominoes.forEach(polyomino => polyomino.onMouseUp());
 		this.redraw();
 	};
-
-	enableBlackening() { this.isBlackening = true; document.body.style.cursor = 'url("../assets/cursor_blackend.png"), auto'; };
-	disableBlackening() { this.isBlackening = false; document.body.style.cursor = 'default'; };
 
 	redraw() {
 		if (!this.needsRedraw) return;

@@ -63,8 +63,8 @@ export function showPolyominoPopup(toolbar) {
 
 		const getRandomPosition = (max) => Math.floor(Math.random() * max);
 
-		const canvasPaddingX = getRandomPosition(window.innerWidth < 600 ? 300 : 1200) + (window.innerWidth < 600 ? 40 : 0);
-		const canvasPaddingY = getRandomPosition(170) + (window.innerHeight < 600 ? 0 : 40);
+		const canvasPaddingX = getRandomPosition(window.innerWidth < 600 ? 300 : 1200) + (window.innerWidth < 600 ? 0 : 40);
+		const canvasPaddingY = getRandomPosition(170) + (window.innerHeight < 600 ? 40 : 0);
 
 		polyominoes.forEach(({ polyomino, shape, shapeSize, y }) => {
 			const leftColumnRect = { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 };

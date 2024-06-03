@@ -92,21 +92,11 @@ export class Polyomino {
 
 	handleIconClick(type) {
 		switch (type) {
-			case 'flip':
-				this.flip();
-				break;
-			case 'rotateLeft':
-				this.rotateLeft();
-				break;
-			case 'rotateRight':
-				this.rotateRight();
-				break;
-			case 'duplicate':
-				this.app.duplicatePolyomino(this);
-				break;
-			case 'trash':
-				this.app.deletePolyomino(this);
-				break;
+			case 'flip': this.flip(); break;
+			case 'rotateLeft': this.rotateLeft(); break;
+			case 'rotateRight': this.rotateRight(); break;
+			case 'duplicate': this.app.duplicatePolyomino(this); break;
+			case 'trash': this.app.deletePolyomino(this); break;
 		}
 		this.app.redraw();
 	};
