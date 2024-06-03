@@ -141,15 +141,8 @@ class MainApp {
 		this.redraw();
 	};
 
-	enableBlackening() {
-		this.isBlackening = true;
-		document.body.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
-	};
-
-	disableBlackening() {
-		this.isBlackening = false;
-		document.body.style.cursor = 'default';
-	};
+	enableBlackening() { this.isBlackening = true; document.body.style.cursor = 'url("../assets/cursor_blackend.png"), auto'; };
+	disableBlackening() { this.isBlackening = false; document.body.style.cursor = 'default'; };
 
 	redraw() {
 		if (!this.needsRedraw) return;

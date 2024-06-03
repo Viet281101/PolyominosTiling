@@ -205,8 +205,8 @@ export class Toolbar {
 		const popupContainer = document.createElement('div');
 		popupContainer.id = id;
 		popupContainer.style.position = 'absolute';
-		popupContainer.style.top = this.checkIfMobile() ? '50px' : '160px';
-		popupContainer.style.left = this.checkIfMobile() ? '50%' : '238px';
+		popupContainer.style.top = this.isMobile ? '50px' : '160px';
+		popupContainer.style.left = this.isMobile ? '50%' : '238px';
 		popupContainer.style.transform = 'translateX(-50%)';
 		popupContainer.style.width = '370px';
 		popupContainer.style.height = '600px';
@@ -242,8 +242,8 @@ export class Toolbar {
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
-		closeIcon.style.top = this.checkIfMobile() ? '56px' : '166px';
-		closeIcon.style.left = this.checkIfMobile() ? 'calc(50% + 162px)' : '400px';
+		closeIcon.style.top = this.isMobile ? '56px' : '166px';
+		closeIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
 		closeIcon.style.transform = 'translateX(-50%)';
 		closeIcon.style.cursor = 'pointer';
 		closeIcon.style.zIndex = '1001';

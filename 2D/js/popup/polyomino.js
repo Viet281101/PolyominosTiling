@@ -4,8 +4,8 @@ export function showPolyominoPopup(toolbar) {
 	const popupContainer = toolbar.createPopupContainer('polyominoPopup', toolbar.buttons[0].name);
 
 	const shapes = Object.keys(SHAPES);
-	const shapeSize = 30;
-	const padding = 80;
+	const shapeSize = 25;
+	const padding = 90;
 
 	const popup = popupContainer.querySelector('canvas');
 	const ctx = popup.getContext('2d');

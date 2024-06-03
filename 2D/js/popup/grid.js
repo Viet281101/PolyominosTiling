@@ -15,8 +15,8 @@ export function showGridPopup(toolbar) {
 		{ label: 'Blacken the grid cells :', icon: '../assets/ic_blackend_cell.png' }
 	];
 
-	const startY = 72;
-	const rowHeight = 72;
+	const startY = 76;
+	const rowHeight = 76;
 	const colX = 30;
 
 	rows.forEach((row, index) => {
