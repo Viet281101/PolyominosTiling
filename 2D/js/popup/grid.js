@@ -85,7 +85,6 @@ export function showGridPopup(toolbar) {
 						break;
 					case 5:
 						toolbar.mainApp.isBlackening = true;
-						toolbar.mainApp.canvas.style.cursor = 'url("../../assets/cursor_blackend.png"), auto';
 						toolbar.closePopup('grid');
 						break;
 				}

@@ -35,7 +35,8 @@ class MainApp {
 	};
 
 	init() {
-		document.body.style.backgroundColor = '#c3c3c3';
+		document.body.style.backgroundColor = '#000';
+		this.canvas.style.backgroundColor = '#c3c3c3';
 		this.addEventListeners();
 	};
 
@@ -56,20 +57,13 @@ class MainApp {
 			this.handleMouseUp();
 		});
 		window.addEventListener('keydown', (e) => {
-			if (e.key === 'r' && this.selectedPolyomino) {
-				this.selectedPolyomino.rotate();
-				this.redraw();
-			}
+			if (e.key === 'r' && this.selectedPolyomino) { this.selectedPolyomino.rotate(); this.redraw(); }
 		});
 		window.addEventListener('resize', () => {
 			this.gridBoard.resizeCanvas();
 			this.gridBoard.drawGrid();
 			this.guiController.checkWindowSize();
 			this.toolbar.resizeToolbar();
-		});
-		this.canvas.addEventListener('contextmenu', (e) => {
-			e.preventDefault();
-			this.disableBlackening();
 		});
 		this.canvas.addEventListener('touchstart', (e) => {
 			e.preventDefault();
@@ -130,6 +124,7 @@ class MainApp {
 	};
 
 	handleMouseMove(mousePos) {
+		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
 		this.redraw();
 	};
@@ -158,8 +153,7 @@ class MainApp {
 
 	duplicatePolyomino(polyomino) {
 		let newColor;
-		do {
-			newColor = getRandomColor();
+		do { newColor = getRandomColor();
 		} while (newColor === polyomino.color);
 		const newShape = polyomino.shape.map(row => row.slice());
 		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this);

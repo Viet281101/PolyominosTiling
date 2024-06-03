@@ -20,7 +20,7 @@ export class GUIController {
 			guiContainer.classList.add('scaled-gui');
 		}
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
-			document.body.style.backgroundColor = value;
+			this.mainApp.canvas.style.backgroundColor = value;
 		});
 		this.gui.addColor(this.settings, 'selectedColor').onChange((value) => {
 			if (this.mainApp.selectedPolyomino) {
