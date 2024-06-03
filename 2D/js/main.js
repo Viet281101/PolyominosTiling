@@ -35,7 +35,7 @@ class MainApp {
 	};
 
 	init() {
-		document.body.style.backgroundColor = '#000';
+		Object.assign(document.body.style, { margin: '0', padding: '0', overflow: 'hidden' });
 		this.canvas.style.backgroundColor = '#c3c3c3';
 		this.addEventListeners();
 	};

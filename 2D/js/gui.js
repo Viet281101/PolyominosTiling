@@ -31,6 +31,6 @@ export class GUIController {
 	};
 
 	checkWindowSize() {
-		this.gui.domElement.style.display = window.innerWidth < 768 ? 'none' : 'block';
+		this.gui.domElement.style.display = window.innerWidth <= 800 ? 'none' : 'block';
 	};
 };

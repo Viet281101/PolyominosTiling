@@ -54,42 +54,45 @@ export class Toolbar {
 	drawToolbar() {
 		this.ctx.fillStyle = '#333';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		this.isMobile ? this.drawToolbarVertical() : this.drawToolbarHorizontal();
+	};
 
-		if (this.isMobile) {
-			const totalWidth = this.buttons.length * 60;
-			let startX = (this.canvas.width - totalWidth) / 2;
+	drawToolbarVertical() {
+		const totalWidth = this.buttons.length * 60;
+		let startX = (this.canvas.width - totalWidth) / 2;
 
-			this.buttons.forEach(button => {
-				const img = new Image();
-				img.src = button.icon;
-				img.onload = () => {
-					this.ctx.drawImage(img, startX, 10, 30, 30);
-					this.ctx.strokeStyle = '#fff';
-					this.ctx.strokeRect(startX - 5, 5, 40, 40);
-					button.x = startX - 5;
-					button.y = 5;
-					button.width = button.height = 40;
-					startX += 60;
-				};
-			});
-		} else {
-			const totalHeight = this.buttons.length * 60;
-			let startY = (this.canvas.height - totalHeight) / 2;
+		this.buttons.forEach(button => {
+			const img = new Image();
+			img.src = button.icon;
+			img.onload = () => {
+				this.ctx.drawImage(img, startX, 10, 30, 30);
+				this.ctx.strokeStyle = '#fff';
+				this.ctx.strokeRect(startX - 5, 5, 40, 40);
+				button.x = startX - 5;
+				button.y = 5;
+				button.width = button.height = 40;
+				startX += 60;
+			};
+		});
+	};
 
-			this.buttons.forEach(button => {
-				const img = new Image();
-				img.src = button.icon;
-				img.onload = () => {
-					this.ctx.drawImage(img, 10, startY, 30, 30);
-					this.ctx.strokeStyle = '#fff';
-					this.ctx.strokeRect(5, startY - 5, 40, 40);
-					button.x = 5;
-					button.y = startY - 5;
-					button.width = button.height = 40;
-					startY += 60;
-				};
-			});
-		}
+	drawToolbarHorizontal() {
+		const totalHeight = this.buttons.length * 60;
+		let startY = (this.canvas.height - totalHeight) / 2;
+
+		this.buttons.forEach(button => {
+			const img = new Image();
+			img.src = button.icon;
+			img.onload = () => {
+				this.ctx.drawImage(img, 10, startY, 30, 30);
+				this.ctx.strokeStyle = '#fff';
+				this.ctx.strokeRect(5, startY - 5, 40, 40);
+				button.x = 5;
+				button.y = startY - 5;
+				button.width = button.height = 40;
+				startY += 60;
+			};
+		});
 	};
 
 	addEventListeners() {
@@ -143,15 +146,21 @@ export class Toolbar {
 	};
 
 	resizeToolbar() {
-		if (this.isMobile) {
-			this.canvas.width = window.innerWidth;
-			this.canvas.height = 50;
-		} else {
-			this.canvas.width = 50;
-			this.canvas.height = window.innerHeight;
-		}
+		this.updateToolbarLayout();
+		this.canvas.width = this.isMobile ? window.innerWidth : 50;
+		this.canvas.height = this.isMobile ? 50 : window.innerHeight;
 		this.drawToolbar();
 		this.addHomeButton();
+		this.addEventListeners();
+	};
+	updateToolbarLayout() {
+		const wasMobile = this.isMobile; this.isMobile = this.checkIfMobile();
+		if (wasMobile !== this.isMobile) { this.removeCanvas(); this.setupCanvas(); this.drawToolbar(); this.addHomeButton(); this.addEventListeners(); }
+	};
+	removeCanvas() {
+		if (this.canvas && this.canvas.parentNode) {
+			this.canvas.parentNode.removeChild(this.canvas);
+		}
 	};
 
 	isInside(x, y, rect) {
@@ -168,15 +177,9 @@ export class Toolbar {
 		const img = new Image();
 		img.src = '../assets/ic_home.png';
 		img.onload = () => {
-			if (this.isMobile) {
-				this.ctx.drawImage(img, 10, 10, 30, 30);
-				this.ctx.strokeStyle = '#fff';
-				this.ctx.strokeRect(5, 5, 40, 40);
-			} else {
-				this.ctx.drawImage(img, 10, 10, 30, 30);
-				this.ctx.strokeStyle = '#fff';
-				this.ctx.strokeRect(5, 5, 40, 40);
-			}
+			this.ctx.drawImage(img, 10, 10, 30, 30);
+			this.ctx.strokeStyle = '#fff';
+			this.ctx.strokeRect(5, 5, 40, 40);
 		};
 	};
 
@@ -244,9 +247,7 @@ export class Toolbar {
 		closeIcon.style.position = 'fixed';
 		closeIcon.style.top = this.isMobile ? '56px' : '166px';
 		closeIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
-		closeIcon.style.transform = 'translateX(-50%)';
-		closeIcon.style.cursor = 'pointer';
-		closeIcon.style.zIndex = '1001';
+		Object.assign(closeIcon.style, { cursor: 'pointer', zIndex: '1001', transform: 'translateX(-50%)' });
 		closeIcon.addEventListener('click', () => this.closeCurrentPopup());
 		document.body.appendChild(closeIcon);
 		this.currentCloseIcon = closeIcon;

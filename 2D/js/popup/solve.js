@@ -7,8 +7,11 @@ export function showSolvePopup(toolbar) {
 	ctx.fillRect(0, 0, popup.width, popup.height);
 
 	const rows = [
-		{ label: 'Auto tiling the Polyominoes blocks', box: true, title: true },
-		{ label: '1) Backtracking method :', icon: '../assets/ic_solution.png' }
+		{ label: 'Auto tiling the Polyominoes blocks', title: true },
+		{ label: '1) Backtracking method :', icon: '../assets/ic_solution.png' },
+		{ label: '2) Brute force method :', icon: '../assets/ic_solution.png' },
+		{ label: '3) Random method :', icon: '../assets/ic_solution.png' },
+		{ label: '4) Random backtracking :', icon: '../assets/ic_solution.png' }
 	];
 
 	const startY = 60;

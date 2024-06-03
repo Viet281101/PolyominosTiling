@@ -4,7 +4,7 @@ export function showPolyominoPopup(toolbar) {
 	const popupContainer = toolbar.createPopupContainer('polyominoPopup', toolbar.buttons[0].name);
 
 	const shapes = Object.keys(SHAPES);
-	const shapeSize = 25;
+	const shapeSize = 24;
 	const padding = 90;
 
 	const popup = popupContainer.querySelector('canvas');
@@ -18,7 +18,7 @@ export function showPolyominoPopup(toolbar) {
 	const polyominoes = [];
 
 	shapes.forEach((shape, index) => {
-		const y = 40 + index * (shapeSize + padding) + shapeSize / 2;
+		const y = 50 + index * (shapeSize + padding) + shapeSize / 2;
 		ctx.fillStyle = '#d1d1d1';
 		ctx.fillRect(10, y - shapeSize / 2, 180, shapeSize + 20);
 		ctx.strokeStyle = '#000';
