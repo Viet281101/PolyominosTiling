@@ -2,6 +2,7 @@ import { showPolyominoPopup } from './popup/polyomino.js';
 import { showGridPopup } from './popup/grid.js';
 import { showSolvePopup } from './popup/solve.js';
 import { showTutorialPopup } from './popup/tutorial.js';
+import { showSettingsPopup } from './popup/setting.js';
 
 export class Toolbar {
 	constructor(mainApp) {
@@ -45,7 +46,8 @@ export class Toolbar {
 			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePopup('polyomino') },
 			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid') },
 			{ name: 'Solving Polyomino', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve') },
-			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial') }
+			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial') },
+			{ name: 'Settings', icon: '../assets/ic_setting.png', action: () => this.togglePopup('settings') },
 		];
 	};
 
@@ -127,11 +129,13 @@ export class Toolbar {
 			const gridPopup = document.getElementById('gridPopup');
 			const solvePopup = document.getElementById('solvePopup');
 			const tutorialPopup = document.getElementById('tutorialPopup');
+			const settingsPopup = document.getElementById('settingsPopup');
 			if (
 				(polyominoPopup && !polyominoPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target))
+				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
+				(settingsPopup && !settingsPopup.contains(e.target) && !this.canvas.contains(e.target))
 			) {
 				this.closeCurrentPopup();
 			}
@@ -193,6 +197,7 @@ export class Toolbar {
 			case 'grid': showGridPopup(this); break;
 			case 'solve': showSolvePopup(this); break;
 			case 'tutorial': showTutorialPopup(this); break;
+			case 'settings': showSettingsPopup(this); break;
 		}
 	};
 
