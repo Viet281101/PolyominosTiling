@@ -19,25 +19,16 @@ export class Toolbar {
 		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
 	};
 
-	checkIfMobile() {
-		return window.innerWidth <= 800;
-	};
+	checkIfMobile() { return window.innerWidth <= 800; };
 
 	setupCanvas() {
 		this.canvas = document.createElement('canvas');
 		this.ctx = this.canvas.getContext('2d');
-		if (this.isMobile) {
-			this.canvas.width = window.innerWidth;
-			this.canvas.height = 50;
-			this.canvas.style.position = 'absolute';
-			this.canvas.style.top = this.canvas.style.left = '0';
-		} else {
-			this.canvas.width = 50;
-			this.canvas.height = window.innerHeight;
-			this.canvas.style.position = 'absolute';
-			this.canvas.style.left = '0';
-			this.canvas.style.top = '0';
-		}
+		this.canvas.width = this.isMobile ? window.innerWidth : 50;
+		this.canvas.height = this.isMobile ? 50 : window.innerHeight;
+		this.canvas.style.position = 'absolute';
+		this.canvas.style.left = this.canvas.style.top = '0';
+		this.canvas.style.zIndex = '999';
 		document.body.appendChild(this.canvas);
 	};
 
@@ -98,14 +89,8 @@ export class Toolbar {
 	addEventListeners() {
 		this.canvas.addEventListener('mousemove', (e) => {
 			let cursor = 'default';
-			this.buttons.forEach(button => {
-				if (this.isInside(e.clientX, e.clientY, button)) {
-					cursor = 'pointer';
-				}
-			});
-			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
-				cursor = 'pointer';
-			}
+			this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } });
+			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) { cursor = 'pointer'; }
 			this.canvas.style.cursor = cursor;
 		});
 		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
@@ -149,9 +134,7 @@ export class Toolbar {
 		this.updateToolbarLayout();
 		this.canvas.width = this.isMobile ? window.innerWidth : 50;
 		this.canvas.height = this.isMobile ? 50 : window.innerHeight;
-		this.drawToolbar();
-		this.addHomeButton();
-		this.addEventListeners();
+		this.drawToolbar(); this.addHomeButton(); this.addEventListeners();
 	};
 	updateToolbarLayout() {
 		const wasMobile = this.isMobile; this.isMobile = this.checkIfMobile();

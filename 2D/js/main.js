@@ -187,20 +187,28 @@ class MainApp {
 		this.redraw();
 	};
 
+	updateGridSize(newGridSize) {
+		this.resetBoard();
+		this.gridSize = newGridSize;
+		this.gridBoard.gridSize = newGridSize;
+		this.gridBoard.resizeCanvas();
+		this.redraw();
+	};
+
 	resetBoard() {
-        this.polyominoes.forEach(polyomino => {
-            if (polyomino.isPlaced) {
-                this.gridBoard.removePolyomino(polyomino);
-                polyomino.isPlaced = false;
-            }
-        });
-        this.redraw();
-    }
+		this.polyominoes.forEach(polyomino => {
+			if (polyomino.isPlaced) {
+				this.gridBoard.removePolyomino(polyomino);
+				polyomino.isPlaced = false;
+			}
+		});
+		this.redraw();
+	};
 
 	backtrackingAutoTiling() {
-        this.resetBoard(); // Reinitialiser le plateau avant de commencer le pavage
-        backtrackingAutoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this), this.redraw.bind(this));
-    }
+		this.resetBoard();
+		backtrackingAutoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this), this.redraw.bind(this));
+	};
 };
 
 const main_app = new MainApp();

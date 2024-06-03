@@ -19,6 +19,9 @@ export class GUIController {
 		if (guiContainer) {
 			guiContainer.classList.add('scaled-gui');
 		}
+		this.gui.add(this.settings, 'gridSize', 10, 100).step(1).onChange((value) => {
+			this.mainApp.updateGridSize(value);
+		});
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			this.mainApp.canvas.style.backgroundColor = value;
 		});
