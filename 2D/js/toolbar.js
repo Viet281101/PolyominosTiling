@@ -13,6 +13,7 @@ export class Toolbar {
 		this.popupOpen = false;
 		this.currentPopup = null;
 		this.currentCloseIcon = null;
+		this.createTooltip();
 		this.drawToolbar();
 		this.addEventListeners();
 		this.addHomeButton();
@@ -34,12 +35,24 @@ export class Toolbar {
 
 	createButtons() {
 		return [
-			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePopup('polyomino') },
-			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid') },
-			{ name: 'Solving Polyomino', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve') },
-			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial') },
-			{ name: 'Settings', icon: '../assets/ic_setting.png', action: () => this.togglePopup('settings') },
+			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePopup('polyomino'), description: 'To select available Polyomino blocks.\nAdd directly to canvas.' },
+			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.\nAdjust rows, columns, and size.' },
+			{ name: 'Solving Polyomino', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve'), description: 'To solve the polyomino puzzle.\nUse different algorithms to solve.' },
+			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial'), description: 'To view the tutorial.\nLearn how to use the application.' },
+			{ name: 'Settings', icon: '../assets/ic_setting.png', action: () => this.togglePopup('settings'), description: 'To adjust application settings.\nChange colors, tooltips, and more.' },
 		];
+	};
+
+	createTooltip() {
+		this.tooltip = document.createElement('div');
+		this.tooltip.style.position = 'absolute';
+		this.tooltip.style.backgroundColor = '#fff';
+		this.tooltip.style.border = '1px solid #000';
+		this.tooltip.style.padding = '5px';
+		this.tooltip.style.display = 'none';
+		this.tooltip.style.whiteSpace = 'pre';
+		this.tooltip.style.zIndex = '1001';
+		document.body.appendChild(this.tooltip);
 	};
 
 	drawToolbar() {
@@ -89,10 +102,22 @@ export class Toolbar {
 	addEventListeners() {
 		this.canvas.addEventListener('mousemove', (e) => {
 			let cursor = 'default';
-			this.buttons.forEach(button => { if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; } });
-			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) { cursor = 'pointer'; }
+			let foundButton = null;
+			this.buttons.forEach(button => {
+				if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; foundButton = button; }
+			});
+			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
+				cursor = 'pointer'; foundButton = { name: 'Home', description: 'Return to the home menu.' };
+			}
 			this.canvas.style.cursor = cursor;
+			if (this.mainApp.tooltipToolbar && foundButton) {
+				this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
+				this.tooltip.style.left = `${e.clientX + 10}px`;
+				this.tooltip.style.top = `${e.clientY + 10}px`;
+				this.tooltip.style.display = 'block';
+			} else { this.tooltip.style.display = 'none'; }
 		});
+		this.canvas.addEventListener('mouseleave', () => { this.tooltip.style.display = 'none'; });
 		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
 		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
 		document.addEventListener('click', (e) => this.handleDocumentClick(e));
@@ -126,6 +151,7 @@ export class Toolbar {
 				(settingsPopup && !settingsPopup.contains(e.target) && !this.canvas.contains(e.target))
 			) {
 				this.closeCurrentPopup();
+				this.tooltip.style.display = 'none';
 			}
 		}
 	};
@@ -148,12 +174,6 @@ export class Toolbar {
 
 	isInside(x, y, rect) {
 		return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-	};
-
-	closeCurrentPopup() {
-		if (this.currentPopup) {
-			this.closePopup(this.currentPopup);
-		}
 	};
 
 	addHomeButton() {
@@ -248,4 +268,5 @@ export class Toolbar {
 		this.popupOpen = false;
 		this.currentPopup = null;
 	};
+	closeCurrentPopup() { if (this.currentPopup) { this.closePopup(this.currentPopup); } };
 };

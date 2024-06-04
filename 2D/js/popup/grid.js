@@ -77,15 +77,15 @@ export function showGridPopup(toolbar) {
 				switch (index) {
 					case 3:
 						toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize);
-						toolbar.closePopup('grid');
+						if (toolbar.isMobile) {toolbar.closePopup('grid');}
 						break;
 					case 4:
 						toolbar.mainApp.clearBoard();
-						toolbar.closePopup('grid');
+						if (toolbar.isMobile) {toolbar.closePopup('grid');}
 						break;
 					case 5:
 						toolbar.mainApp.isBlackening = true;
-						toolbar.closePopup('grid');
+						if (toolbar.isMobile) {toolbar.closePopup('grid');}
 						break;
 				}
 			}

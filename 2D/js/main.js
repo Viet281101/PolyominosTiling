@@ -31,7 +31,8 @@ class MainApp {
 		this.needsRedraw = true;
 		this.isBlackening = false;
 		this.blackenedCells = new Set();
-		this.tooltipPolyominoBlocks()
+		this.tooltipPolyominoBlocks();
+		this.tooltipToolbar = true;
 		this.init();
 	};
 
@@ -228,6 +229,7 @@ class MainApp {
 			if (polyomino.isPlaced) {
 				this.gridBoard.removePolyomino(polyomino);
 				polyomino.isPlaced = false;
+				polyomino.resetPosition();
 			}
 		});
 		this.redraw();

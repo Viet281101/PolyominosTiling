@@ -9,6 +9,7 @@ export class GUIController {
 			iconSize: mainApp.icons.flip.width / 2,
 			selectedColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff',
 			tooltipPolyomino: false,
+			tooltipToolbar: true
 		};
 		this.init();
 		this.checkWindowSize();
@@ -38,6 +39,9 @@ export class GUIController {
 		});
 		this.gui.add(this.settings, 'tooltipPolyomino').onChange((value) => {
 			this.mainApp.tooltipPolyomino = value;
+		});
+		this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
+			this.mainApp.tooltipToolbar = value;
 		});
 	};
 
