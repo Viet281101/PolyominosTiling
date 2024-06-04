@@ -68,7 +68,6 @@ export class GridBoard {
 		this.grid = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
 		this.clear();
 		this.drawGrid();
-		console.log("Delete Board");
 	};
 
 	isInBounds(polyomino) {

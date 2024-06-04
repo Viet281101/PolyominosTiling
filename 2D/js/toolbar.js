@@ -44,6 +44,7 @@ export class Toolbar {
 	};
 
 	createTooltip() {
+		this.tooltipToolbar = this.isMobile ? false : true;
 		this.tooltip = document.createElement('div');
 		this.tooltip.style.position = 'absolute';
 		this.tooltip.style.backgroundColor = '#fff';
@@ -110,7 +111,7 @@ export class Toolbar {
 				cursor = 'pointer'; foundButton = { name: 'Home', description: 'Return to the home menu.' };
 			}
 			this.canvas.style.cursor = cursor;
-			if (this.mainApp.tooltipToolbar && foundButton) {
+			if (this.tooltipToolbar && foundButton) {
 				this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
 				this.tooltip.style.left = `${e.clientX + 10}px`;
 				this.tooltip.style.top = `${e.clientY + 10}px`;

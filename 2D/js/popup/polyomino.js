@@ -74,7 +74,7 @@ export function showPolyominoPopup(toolbar) {
 				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), canvasPaddingX, canvasPaddingY, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));
 				toolbar.mainApp.polyominoes.push(newPolyomino);
 				toolbar.mainApp.redraw();
-				toolbar.closePopup('polyomino');
+				if (toolbar.isMobile) {toolbar.closePopup('polyomino');}
 			}
 		});
 	});

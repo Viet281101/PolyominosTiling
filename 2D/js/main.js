@@ -28,11 +28,9 @@ class MainApp {
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
-		this.needsRedraw = true;
 		this.isBlackening = false;
 		this.blackenedCells = new Set();
 		this.tooltipPolyominoBlocks();
-		this.tooltipToolbar = true;
 		this.init();
 	};
 
@@ -164,13 +162,13 @@ class MainApp {
 	};
 
 	redraw() {
-		if (!this.needsRedraw) return;
 		this.gridBoard.clear();
 		this.gridBoard.drawGrid();
 		this.drawPolyominoes();
 		if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
 			this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
 		}
+		if (this.clearedBoard) this.clearBoard();
 	};
 
 	placePolyomino(polyomino) {
@@ -199,20 +197,38 @@ class MainApp {
 		}
 	};
 
-	clearBoard() {
-		this.needsRedraw = false;
-		this.gridBoard.clearGrid();
+	deleteAllPolyominos() {
 		this.polyominoes = [];
 		this.selectedPolyomino = null;
+		this.redraw();
+	};
+
+	clearBoard() {
+		const polyominoStates = this.polyominoes.map(polyomino => ({
+			shape: polyomino.shape.map(row => [...row]),
+			x: polyomino.x,
+			y: polyomino.y,
+			color: polyomino.color,
+			name: polyomino.name
+		}));
 		this.gridBoard.clear();
+		this.polyominoes = [];
+		this.selectedPolyomino = null;
+		this.clearedBoard = true;
+		polyominoStates.forEach(state => {
+			const newPolyomino = new Polyomino(state.shape, state.x, state.y, state.color, this, state.name);
+			this.polyominoes.push(newPolyomino);
+		});
+		this.gridBoard.clear();
+		this.drawPolyominoes();
 	};
 
 	createNewBoard(rows, cols, gridSize) {
+		this.clearedBoard = false;
 		this.rows = rows;
 		this.cols = cols;
 		this.gridSize = gridSize;
 		this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
-		this.needsRedraw = true;
 		this.redraw();
 	};
 

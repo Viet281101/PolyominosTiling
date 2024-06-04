@@ -60,19 +60,19 @@ function attachSolveClickEvent(toolbar, popup, row, y) {
 			switch (row.label) {
 				case '1) Backtracking method :':
 					toolbar.mainApp.backtrackingAutoTiling();
-					toolbar.closePopup('solve');
+					if (toolbar.isMobile) {toolbar.closePopup('solve');}
 					break;
 
 				case '2) Brute force method :':
-					toolbar.closePopup('solve');
+					if (toolbar.isMobile) {toolbar.closePopup('solve');}
 					break;
 
 				case '3) Random method :':
-					toolbar.closePopup('solve');
+					if (toolbar.isMobile) {toolbar.closePopup('solve');}
 					break;
 
 				case '4) Random backtracking :':
-					toolbar.closePopup('solve');
+					if (toolbar.isMobile) {toolbar.closePopup('solve');}
 					break;
 			}
 		}

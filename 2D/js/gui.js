@@ -41,7 +41,7 @@ export class GUIController {
 			this.mainApp.tooltipPolyomino = value;
 		});
 		this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
-			this.mainApp.tooltipToolbar = value;
+			this.mainApp.toolbar.tooltipToolbar = value;
 		});
 	};
 

@@ -7,16 +7,21 @@ export function showSettingsPopup(toolbar) {
 	ctx.fillRect(0, 0, popup.width, popup.height);
 
 	const rows = [
-		{ label: 'Quick settings', title: true },
+		{ label: 'Quick settings', box: true, title: true },
 		{ label: 'Reset Polyominoes Position', icon: '../assets/ic_reset.png' },
+		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' },
 	];
 
-	const startY = 60;
-	const rowHeight = 60;
+	const startY = 76;
+	const rowHeight = 76;
 	const colX = 30;
 
 	rows.forEach((row, index) => {
 		const y = startY + index * rowHeight;
+		if (row.box) {
+			ctx.strokeStyle = '#fff';
+			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 3 : 1)));
+		}
 		ctx.font = '20px Pixellari';
 		ctx.fillStyle = '#000';
 		ctx.fillText(row.label, colX, y + 20);
@@ -59,7 +64,11 @@ function attachSettingClickEvent(toolbar, popup, row, y) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					toolbar.closePopup('settings');
+					if (toolbar.isMobile) {toolbar.closePopup('settings');}
+					break;
+				case 'Delete All Polyominoes':
+					toolbar.mainApp.deleteAllPolyominos();
+					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
 		}
@@ -77,7 +86,11 @@ function handleTouchClick(e, toolbar, rows, popup, startY, rowHeight) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					toolbar.closePopup('settings');
+					if (toolbar.isMobile) {toolbar.closePopup('settings');}
+					break;
+				case 'Delete All Polyominoes':
+					toolbar.mainApp.deleteAllPolyominos();
+					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
 		}
