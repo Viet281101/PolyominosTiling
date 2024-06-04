@@ -28,7 +28,7 @@ export function showPolyominoPopup(toolbar) {
 		ctx.fillStyle = '#0000c4';
 		ctx.fillText(shape.replace(/_/g, ' '), 15, y + 7);
 
-		const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), toolbar.mainApp);
+		const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));
 		polyomino.draw(ctx, shapeSize, false);
 		polyomino.x = 200;
 		polyomino.y = y - shapeSize / 2;
@@ -71,7 +71,7 @@ export function showPolyominoPopup(toolbar) {
 			const rightColumnRect = { x: polyomino.x, y: polyomino.y, width: polyomino.width, height: polyomino.height };
 
 			if (toolbar.isInside(mouseX, mouseY, leftColumnRect) || toolbar.isInside(mouseX, mouseY, rightColumnRect)) {
-				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), canvasPaddingX, canvasPaddingY, getRandomColor(), toolbar.mainApp);
+				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), canvasPaddingX, canvasPaddingY, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));
 				toolbar.mainApp.polyominoes.push(newPolyomino);
 				toolbar.mainApp.redraw();
 				toolbar.closePopup('polyomino');

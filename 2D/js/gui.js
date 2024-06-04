@@ -7,7 +7,8 @@ export class GUIController {
 			gridSize: mainApp.gridSize,
 			backgroundColor: '#c3c3c3',
 			iconSize: mainApp.icons.flip.width / 2,
-			selectedColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff'
+			selectedColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff',
+			tooltipPolyomino: false,
 		};
 		this.init();
 		this.checkWindowSize();
@@ -18,6 +19,10 @@ export class GUIController {
 		const guiContainer = document.querySelector('.dg');
 		if (guiContainer) {
 			guiContainer.classList.add('scaled-gui');
+			guiContainer.style.zIndex = '1000 !important';
+			guiContainer.style.right = '-22px';
+			guiContainer.style.transformOrigin = 'top right';
+			guiContainer.style.transform = 'scale(1.5)';
 		}
 		this.gui.add(this.settings, 'gridSize', 10, 100).step(1).onChange((value) => {
 			this.mainApp.updateGridSize(value);
@@ -30,6 +35,9 @@ export class GUIController {
 				this.mainApp.selectedPolyomino.color = value;
 				this.mainApp.redraw();
 			}
+		});
+		this.gui.add(this.settings, 'tooltipPolyomino').onChange((value) => {
+			this.mainApp.tooltipPolyomino = value;
 		});
 	};
 

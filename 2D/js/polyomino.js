@@ -1,5 +1,5 @@
 export class Polyomino {
-	constructor(shape, x, y, color, app) {
+	constructor(shape, x, y, color, app, name = "Polyomino") {
 		this.shape = shape;
 		this.x = x;
 		this.y = y;
@@ -14,6 +14,7 @@ export class Polyomino {
 		this.offsetX = 0;
 		this.offsetY = 0;
 		this.iconSize = 16;
+		this.name = name;
 	};
 
 	draw(ctx, gridSize, isSelected) {

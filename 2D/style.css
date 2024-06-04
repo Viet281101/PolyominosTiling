@@ -1,4 +1,3 @@
 @charset "UTF-8";
 @font-face {font-family:'Pixellari';src: url("../assets/Pixellari.ttf") format("truetype");}
 * {font-family: 'Pixellari', sans-serif;user-select: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;}
-.dg {z-index: 100 !important; position: fixed;top: 0;right: -15px;transform-origin: top right;transform: scale(1.3);}

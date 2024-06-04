@@ -31,6 +31,7 @@ class MainApp {
 		this.needsRedraw = true;
 		this.isBlackening = false;
 		this.blackenedCells = new Set();
+		this.tooltipPolyominoBlocks()
 		this.init();
 	};
 
@@ -38,6 +39,17 @@ class MainApp {
 		Object.assign(document.body.style, { margin: '0', padding: '0', overflow: 'hidden' });
 		this.canvas.style.backgroundColor = '#c3c3c3';
 		this.addEventListeners();
+	};
+
+	tooltipPolyominoBlocks() {
+		this.tooltipPolyomino = false;
+		this.tooltip = document.createElement('div');
+		this.tooltip.style.position = 'absolute';
+		this.tooltip.style.backgroundColor = '#fff';
+		this.tooltip.style.border = '1px solid #000';
+		this.tooltip.style.padding = '5px';
+		this.tooltip.style.display = 'none';
+		document.body.appendChild(this.tooltip);
 	};
 
 	drawPolyominoes() {
@@ -119,6 +131,7 @@ class MainApp {
 				}
 				if (!selected) { this.selectedPolyomino = null; }
 			}
+			this.tooltip.style.display = 'none';
 			this.redraw();
 		}
 	};
@@ -126,6 +139,21 @@ class MainApp {
 	handleMouseMove(mousePos) {
 		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
+		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) { // Kiểm tra xem có đang kéo không
+			let found = false;
+			for (let i = this.polyominoes.length - 1; i >= 0; i--) {
+				const polyomino = this.polyominoes[i];
+				if (polyomino.contains(mousePos.x, mousePos.y, this.gridSize)) {
+					this.tooltip.innerHTML = `${polyomino.name} (#${i + 1})`;
+					this.tooltip.style.left = `${mousePos.x + 10}px`;
+					this.tooltip.style.top = `${mousePos.y + 10}px`;
+					this.tooltip.style.display = 'block';
+					found = true;
+					break;
+				}
+			}
+			if (!found) { this.tooltip.style.display = 'none'; }
+		} else { this.tooltip.style.display = 'none'; }
 		this.redraw();
 	};
 
