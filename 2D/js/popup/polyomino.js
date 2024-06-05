@@ -25,7 +25,7 @@ export function showPolyominoPopup(toolbar) {
 		ctx.strokeRect(10, y - shapeSize / 2, 180, shapeSize + 20);
 
 		ctx.font = '20px Pixellari';
-		ctx.fillStyle = '#0000c4';
+		ctx.fillStyle = '#000';
 		ctx.fillText(shape.replace(/_/g, ' '), 15, y + 7);
 
 		const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));

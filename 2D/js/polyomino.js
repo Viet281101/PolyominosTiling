@@ -199,7 +199,8 @@ export function getRandomColor() {
 export const SHAPES = {
 	MONOMINO: [[1]],
 	DOMINO: [[1, 1]],
-	TROMINO: [[1, 1, 1]],
+	TROMINO_I: [[1, 1, 1]],
+	TROMINO_L: [[1, 0], [1, 1]],
 	TETROMINO_I: [[1, 1, 1, 1]],
 	TETROMINO_O: [[1, 1], [1, 1]],
 	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
