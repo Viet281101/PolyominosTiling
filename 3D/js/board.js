@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-class Board {
+export class Board {
 	constructor(scene, size = 10) {
 		this.scene = scene;
 		this.size = size;
@@ -21,4 +21,3 @@ class Board {
 	};
 };
 
-export { Board };

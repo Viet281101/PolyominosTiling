@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-class Polycube {
+export class Polycube {
 	constructor(position = { x: 0, y: 0, z: 0 }, color = 0xff0000) {
 		this.geometry = new THREE.BoxGeometry();
 		this.material = new THREE.MeshBasicMaterial({ color: color });
@@ -9,5 +9,3 @@ class Polycube {
 		this.mesh.position.set(position.x, position.y, position.z);
 	};
 };
-
-export { Polycube };
