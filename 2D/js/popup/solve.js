@@ -20,10 +20,11 @@ export function showSolvePopup(toolbar) {
 	const maxWidth = 300;
 
 	const dropdowns = {};
+	let clickAreas = [];
 
 	rows.forEach((row, index) => {
 		const y = startY + index * rowHeight;
-		ctx.font = '20px Pixellari';
+		ctx.font = '21px Pixellari';
 		ctx.fillStyle = '#000';
 		ctx.fillText(row.label, colX, y + 20);
 
@@ -47,9 +48,8 @@ export function showSolvePopup(toolbar) {
 		const mouseY = e.clientY - rect.top;
 		let cursor = 'default';
 
-		rows.forEach((row, index) => {
-			const y = startY + index * rowHeight;
-			if (toolbar.isInside(mouseX, mouseY, { x: colX, y: y, width: popup.width - colX - 100, height: rowHeight })) {
+		clickAreas.forEach(area => {
+			if (toolbar.isInside(mouseX, mouseY, area.rect) && !rows[area.index].title) {
 				cursor = 'pointer';
 			}
 		});
@@ -61,11 +61,10 @@ export function showSolvePopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
-		rows.forEach((row, index) => {
-			const y = startY + index * rowHeight;
-			if (toolbar.isInside(mouseX, mouseY, { x: colX, y: y, width: popup.width - colX - 100, height: rowHeight })) {
-				if (dropdowns[index]) {
-					dropdowns[index].expanded = !dropdowns[index].expanded;
+		clickAreas.forEach(area => {
+			if (toolbar.isInside(mouseX, mouseY, area.rect) && !rows[area.index].title) {
+				if (dropdowns[area.index]) {
+					dropdowns[area.index].expanded = !dropdowns[area.index].expanded;
 					redrawPopup();
 				}
 			}
@@ -93,7 +92,7 @@ export function showSolvePopup(toolbar) {
 			ctx.fillText(line, x, y + index * lineHeight);
 		});
 		return lines.length;
-	}
+	};
 
 	function redrawPopup() {
 		ctx.clearRect(0, 0, popup.width, popup.height);
@@ -101,9 +100,10 @@ export function showSolvePopup(toolbar) {
 		ctx.fillRect(0, 0, popup.width, popup.height);
 
 		let yOffset = 0;
+		clickAreas = [];
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight + yOffset;
-			ctx.font = '20px Pixellari';
+			ctx.font = '21px Pixellari';
 			ctx.fillStyle = '#000';
 			ctx.fillText(row.label, colX, y + 20);
 
@@ -113,16 +113,19 @@ export function showSolvePopup(toolbar) {
 				icon.onload = () => {
 					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 				};
+				clickAreas.push({ index, rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 }, type: 'icon' });
 			}
+
+			clickAreas.push({ index, rect: { x: colX, y, width: popup.width - colX - 100, height: rowHeight }, type: 'label' });
 
 			if (dropdowns[index] && dropdowns[index].expanded) {
 				ctx.font = '16px Pixellari';
 				ctx.fillStyle = '#000';
-				const linesCount = wrapText(ctx, dropdowns[index].description, colX + 20, y + 50, maxWidth, 20);
+				const linesCount = wrapText(ctx, dropdowns[index].description, colX + 20, y + 55, maxWidth, 20);
 				yOffset += linesCount * 20;
 			}
 		});
-	}
+	};
 
 	redrawPopup();
 };
