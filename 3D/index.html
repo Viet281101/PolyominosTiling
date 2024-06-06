@@ -10,13 +10,7 @@
 </head>
 <body>
 	<canvas id="myCanvas"></canvas>
-	<script type="importmap">
-		{"imports": {
-			"three": "https://unpkg.com/three@0.153.0/build/three.module.js",
-			"three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
-		}}
-	</script>
-	<script type="text/javascript" src="./js/libs/dat.gui.js" defer></script>
-	<script type="text/javascript" src="./js/main.js"></script>
+	<script type="importmap">{"imports": {"three": "./libs/three/three.module.min.js", "three/addons/": "./libs/three/jsm/"}}</script>
+	<script type="module" src="./js/main.js"></script>
 </body>
 </html>
