@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Board } from './board.js';
 import { GUIController } from './gui.js';
+import { Toolbar } from './toolbar.js';
 
 class MainApp {
 	constructor() {
@@ -24,6 +25,7 @@ class MainApp {
 
 		this.board = new Board(this.scene);
 		this.guiController = new GUIController(this);
+		this.toolbar = new Toolbar(this);
 
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 	};
