@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Board } from './board.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
+import { Polycube } from './polycube.js';
 
 class MainApp {
 	constructor() {
@@ -23,9 +24,12 @@ class MainApp {
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-		this.board = new Board(this.scene);
+		this.board = new Board(this.scene, 10);
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
+
+		const testPolycube = new Polycube({ x: 0, y: 0, z: 0 }, 0x00ff00);
+		this.board.addPolycube(testPolycube);
 
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 	};

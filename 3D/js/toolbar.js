@@ -17,9 +17,7 @@ export class Toolbar {
 		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
 	};
 
-	checkIfMobile() { 
-		return window.innerWidth <= 800; 
-	};
+	checkIfMobile() { return window.innerWidth <= 800; };
 
 	setupCanvas() {
 		this.canvas = document.createElement('canvas');
@@ -34,18 +32,8 @@ export class Toolbar {
 
 	createButtons() {
 		return [
-			{ 
-				name: 'Create Cube', 
-				icon: '../assets/ic_plus.png', 
-				action: () => this.togglePopup('cube'), 
-				description: 'To create a new cube and add it to the scene.' 
-			},
-			{ 
-				name: 'Grid Settings', 
-				icon: '../assets/ic_table.png', 
-				action: () => this.togglePopup('grid'), 
-				description: 'To change the grid settings.' 
-			}
+			{ name: 'Create Cube', icon: '../assets/ic_plus.png', action: () => this.togglePopup('cube'), description: 'To create a new cube and add it to the scene.' },
+			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.' }
 		];
 	};
 
@@ -147,10 +135,8 @@ export class Toolbar {
 		if (this.popupOpen) {
 			const cubePopup = document.getElementById('cubePopup');
 			const gridPopup = document.getElementById('gridPopup');
-			if (
-				(cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target))
-			) {
+			if ((cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
+				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target))) {
 				this.closeCurrentPopup();
 				this.tooltip.style.display = 'none';
 			}

@@ -6,6 +6,8 @@ export class GUIController {
 		this.settings = {
 			backgroundColor: '#c3c3c3',
 			selectedColor: '#0000ff',
+			tooltipToolbar: true,
+			showInnerGrid: false
 		};
 		this.init();
 		this.checkWindowSize();
@@ -27,6 +29,12 @@ export class GUIController {
 		});
 		this.gui.addColor(this.settings, 'selectedColor').onChange((value) => {
 			this.settings.selectedColor = value;
+		});
+		this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
+			this.mainApp.toolbar.tooltipToolbar = value;
+		});
+		this.gui.add(this.settings, 'showInnerGrid').onChange((value) => {
+			this.mainApp.board.toggleInnerGrid(value);
 		});
 	};
 
