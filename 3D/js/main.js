@@ -28,8 +28,11 @@ class MainApp {
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
 
-		const testPolycube = new Polycube({ x: 0, y: 0, z: 0 }, 0x00ff00);
-		this.board.addPolycube(testPolycube);
+		const testPolycube1 = new Polycube({ cubes: [[0, 3, 0]], color: 0x00ff00 });
+		this.board.addPolycube(testPolycube1);
+
+		const testPolycube2 = new Polycube({ cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000 });
+		this.board.addPolycube(testPolycube2);
 
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 	};

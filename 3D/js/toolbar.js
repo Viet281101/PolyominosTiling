@@ -206,11 +206,11 @@ export class Toolbar {
 		const popupContainer = document.createElement('div');
 		popupContainer.id = id;
 		popupContainer.style.position = 'absolute';
-		popupContainer.style.top = this.isMobile ? '50px' : '160px';
+		popupContainer.style.top = this.isMobile ? '50px' : '0';
 		popupContainer.style.left = this.isMobile ? '50%' : '238px';
 		popupContainer.style.transform = 'translateX(-50%)';
 		popupContainer.style.width = '370px';
-		popupContainer.style.height = '600px';
+		popupContainer.style.height = '100%';
 		popupContainer.style.border = '3px solid #000';
 		popupContainer.style.backgroundColor = '#fff';
 		popupContainer.style.overflowY = 'auto';
@@ -224,11 +224,11 @@ export class Toolbar {
 
 		const titleElement = document.createElement('h3');
 		titleElement.style.position = 'absolute';
-		titleElement.style.top = '-12px';
+		titleElement.style.top = '-10px';
 		titleElement.style.left = '50%';
 		titleElement.style.transform = 'translateX(-50%)';
 		titleElement.style.zIndex = '1001';
-		titleElement.style.fontSize = '20px';
+		titleElement.style.fontSize = '22px';
 		titleElement.style.color = '#00ffaa';
 		titleElement.textContent = title;
 		popupContainer.appendChild(titleElement);
@@ -243,7 +243,7 @@ export class Toolbar {
 		const closeIcon = new Image();
 		closeIcon.src = '../assets/ic_close.png';
 		closeIcon.style.position = 'fixed';
-		closeIcon.style.top = this.isMobile ? '56px' : '166px';
+		closeIcon.style.top = this.isMobile ? '56px' : '10px';
 		closeIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
 		Object.assign(closeIcon.style, { cursor: 'pointer', zIndex: '1001', transform: 'translateX(-50%)' });
 		closeIcon.addEventListener('click', () => this.closeCurrentPopup());

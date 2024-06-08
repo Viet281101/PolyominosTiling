@@ -4,7 +4,7 @@ export class GUIController {
 	constructor(mainApp) {
 		this.mainApp = mainApp;
 		this.settings = {
-			backgroundColor: '#c3c3c3',
+			backgroundColor: '#999999',
 			selectedColor: '#0000ff',
 			tooltipToolbar: true,
 			showInnerGrid: false

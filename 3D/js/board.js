@@ -58,11 +58,11 @@ export class Board {
 	};
 
 	addPolycube(polycube) {
-		this.grid.add(polycube.mesh);
+		this.grid.add(polycube.group);
 	};
 
 	removePolycube(polycube) {
-		this.grid.remove(polycube.mesh);
+		this.grid.remove(polycube.group);
 	};
 
 	toggleInnerGrid(show) {
