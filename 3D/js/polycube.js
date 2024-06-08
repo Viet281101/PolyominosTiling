@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 
 export class Polycube {
-	constructor(cubeData = { cubes: [[0, 0, 0]], color: 0xff0000 }) {
+	constructor(cubeData = { n: 1, cubes: [[0, 0, 0]], color: 0xff0000, position: { x: 0, y: 0, z: 0 } }) {
 		this.cubeData = cubeData;
 		this.group = new THREE.Group();
+
+		this.group.position.set(cubeData.position.x, cubeData.position.y, cubeData.position.z);
 
 		this.createPolycube();
 	};

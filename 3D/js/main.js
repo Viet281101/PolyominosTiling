@@ -7,6 +7,9 @@ import { Polycube } from './polycube.js';
 
 class MainApp {
 	constructor() {
+		this.selectedPolycube = null;
+		this.isDragging = false;
+		this.isRightClick = false;
 		this.init();
 		this.animate();
 	};
@@ -28,13 +31,21 @@ class MainApp {
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
 
-		const testPolycube1 = new Polycube({ cubes: [[0, 3, 0]], color: 0x00ff00 });
-		this.board.addPolycube(testPolycube1);
-
-		const testPolycube2 = new Polycube({ cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000 });
-		this.board.addPolycube(testPolycube2);
+		this.polys = [];
+		this.addPolycube({ n: 1, cubes: [[0, 0, 0]], color: 0x00ff00, position: { x: 0, y: 3, z: 0 } });
+		this.addPolycube({ n: 3, cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000, position: { x: 2, y: 2, z: 2 } });
 
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
+		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
+		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+		this.renderer.domElement.addEventListener('contextmenu', this.onContextMenu.bind(this), false); // Ngăn chặn menu ngữ cảnh
+	};
+
+	addPolycube(cubeData) {
+		const polycube = new Polycube(cubeData);
+		this.board.addPolycube(polycube);
+		this.polys.push(polycube);
 	};
 
 	onWindowResize() {
@@ -50,6 +61,91 @@ class MainApp {
 	animate() {
 		requestAnimationFrame(this.animate.bind(this));
 		this.renderer.render(this.scene, this.camera);
+	};
+
+	onMouseDown(event) {
+		event.preventDefault();
+		const mouse = new THREE.Vector2(
+			(event.clientX / window.innerWidth) * 2 - 1,
+			-(event.clientY / window.innerHeight) * 2 + 1
+		);
+		const raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera(mouse, this.camera);
+
+		const intersects = raycaster.intersectObjects(this.polys.map(p => p.group.children).flat());
+
+		if (intersects.length > 0) {
+			const intersectedObject = intersects[0].object;
+
+			const intersectedPolycube = this.polys.find(p => p.group.children.includes(intersectedObject));
+			if (intersectedPolycube !== this.selectedPolycube) {
+				this.deselectPolycube();
+				this.selectPolycube(intersectedPolycube);
+			}
+
+			this.isDragging = true;
+			this.controls.enabled = false;
+
+			if (event.button === 2) {
+				this.isRightClick = true;
+			}
+
+			this.lastMousePosition = { x: event.clientX, y: event.clientY };
+		} else {
+			this.deselectPolycube();
+			this.controls.enabled = true;
+		}
+	};
+
+	onMouseMove(event) {
+		if (!this.isDragging || !this.selectedPolycube) return;
+
+		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+		const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+		if (this.isRightClick) {
+			const deltaX = event.clientX - this.lastMousePosition.x;
+			const deltaY = event.clientY - this.lastMousePosition.y;
+
+			const moveVector = new THREE.Vector3(deltaX * 0.01, -deltaY * 0.01, 0);
+			moveVector.applyQuaternion(this.camera.quaternion);
+			this.selectedPolycube.group.position.add(moveVector);
+
+			this.lastMousePosition = { x: event.clientX, y: event.clientY };
+		} else {
+			this.selectedPolycube.group.rotation.y += movementX * 0.01;
+			this.selectedPolycube.group.rotation.x += movementY * 0.01;
+		}
+	};
+
+	onMouseUp(event) {
+		this.isDragging = false;
+		this.isRightClick = false;
+		this.controls.enabled = true;
+	};
+
+	onContextMenu(event) {
+		event.preventDefault();
+	};
+
+	selectPolycube(polycube) {
+		this.selectedPolycube = polycube;
+		this.selectedPolycube.group.children.forEach(child => {
+			if (child instanceof THREE.LineSegments) {
+				child.material.color.set(0xffffff);
+			}
+		});
+	};
+
+	deselectPolycube() {
+		if (this.selectedPolycube) {
+			this.selectedPolycube.group.children.forEach(child => {
+				if (child instanceof THREE.LineSegments) {
+					child.material.color.set(0x000000);
+				}
+			});
+			this.selectedPolycube = null;
+		}
 	};
 };
 
