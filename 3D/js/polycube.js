@@ -21,7 +21,7 @@ export class Polycube {
 			const mesh = new THREE.Mesh(geometry, material);
 
 			const wireframeGeometry = new THREE.EdgesGeometry(geometry);
-			const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+			const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
 			const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
 
 			mesh.position.set(x, y, z);

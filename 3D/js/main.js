@@ -39,7 +39,7 @@ class MainApp {
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-		this.renderer.domElement.addEventListener('contextmenu', this.onContextMenu.bind(this), false); // Ngăn chặn menu ngữ cảnh
+		this.renderer.domElement.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
 	};
 
 	addPolycube(cubeData) {
@@ -119,6 +119,9 @@ class MainApp {
 	};
 
 	onMouseUp(event) {
+		if (this.isRightClick) {
+			this.snapToGrid(this.selectedPolycube.group.position);
+		}
 		this.isDragging = false;
 		this.isRightClick = false;
 		this.controls.enabled = true;
@@ -146,6 +149,13 @@ class MainApp {
 			});
 			this.selectedPolycube = null;
 		}
+	};
+
+	snapToGrid(position) {
+		const gridSize = 1;
+		position.x = Math.round(position.x / gridSize) * gridSize;
+		position.y = Math.round(position.y / gridSize) * gridSize;
+		position.z = Math.round(position.z / gridSize) * gridSize;
 	};
 };
 
