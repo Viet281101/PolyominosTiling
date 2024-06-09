@@ -12,6 +12,7 @@ class MainApp {
 		this.isRightClick = false;
 		this.init();
 		this.animate();
+		this.eventListener();
 	};
 
 	init() {
@@ -34,7 +35,9 @@ class MainApp {
 		this.polys = [];
 		this.addPolycube({ n: 1, cubes: [[0, 0, 0]], color: 0x00ff00, position: { x: 0, y: 3, z: 0 } });
 		this.addPolycube({ n: 3, cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000, position: { x: 2, y: 2, z: 2 } });
+	};
 
+	eventListener() {
 		window.addEventListener('resize', this.onWindowResize.bind(this), false);
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
@@ -120,7 +123,7 @@ class MainApp {
 
 	onMouseUp(event) {
 		if (this.isRightClick) {
-			this.snapToGrid(this.selectedPolycube.group.position);
+			this.snapToGrid(this.selectedPolycube.group);
 		}
 		this.isDragging = false;
 		this.isRightClick = false;
@@ -151,11 +154,27 @@ class MainApp {
 		}
 	};
 
-	snapToGrid(position) {
+	snapToGrid(group) {
 		const gridSize = 1;
-		position.x = Math.round(position.x / gridSize) * gridSize;
-		position.y = Math.round(position.y / gridSize) * gridSize;
-		position.z = Math.round(position.z / gridSize) * gridSize;
+
+		group.position.x = Math.round(group.position.x / gridSize) * gridSize;
+		group.position.y = Math.round(group.position.y / gridSize) * gridSize;
+		group.position.z = Math.round(group.position.z / gridSize) * gridSize;
+
+		const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);
+		const decomposed = {
+			scale: new THREE.Vector3(),
+			position: new THREE.Vector3(),
+			rotation: new THREE.Quaternion(),
+		};
+		rotationMatrix.decompose(decomposed.position, decomposed.rotation, decomposed.scale);
+
+		const euler = new THREE.Euler().setFromQuaternion(decomposed.rotation, 'XYZ');
+		euler.x = Math.round(euler.x / (Math.PI / 2)) * (Math.PI / 2);
+		euler.y = Math.round(euler.y / (Math.PI / 2)) * (Math.PI / 2);
+		euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
+
+		group.setRotationFromEuler(euler);
 	};
 };
 
