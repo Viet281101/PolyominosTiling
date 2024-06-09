@@ -2,8 +2,8 @@ import { GridBoard } from './board.js';
 import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
-import { backtrackingAutoTiling } from './ai.js';
-
+import { backtrackingAutoTiling, bruteForceTiling,randomTiling , randomBacktrackingTiling} from './ai.js';
+ 
 class MainApp {
 	constructor() {
 		this.canvas = document.getElementById('myCanvas');
@@ -251,10 +251,176 @@ class MainApp {
 		this.redraw();
 	};
 
+
+	mixPosition() {
+        const margin = 70;
+        const gridLeft = this.gridBoard.gridOffsetX;
+        const gridTop = this.gridBoard.gridOffsetY;
+        const gridRight = this.gridBoard.gridOffsetX + this.gridSize * this.cols;
+        const gridBottom = this.gridBoard.gridOffsetY + this.gridSize * this.rows;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        this.gridBoard.clearGrid();
+
+        this.polyominoes.forEach((polyomino) => {
+            let attempts = 0;
+            let randomX, randomY, validPosition;
+            do {
+                // Genere des positions random dans des zones differente zones autour de la grid
+                const zone = Math.floor(Math.random() * 4);
+                switch (zone) {
+                    case 0: // gauche de la grid
+                        randomX = Math.floor(Math.random() * (gridLeft - margin));
+                        randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
+                        break;
+                    case 1: // droite de la grid
+                        randomX = Math.floor(Math.random() * (windowWidth - gridRight - margin)) + gridRight;
+                        randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
+                        break;
+                    case 2: // en haut de la grid
+                        randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
+                        randomY = Math.floor(Math.random() * (gridTop - margin));
+                        break;
+                    case 3: // en bas de la grid
+                        randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
+                        randomY = Math.floor(Math.random() * (windowHeight - gridBottom - margin)) + gridBottom;
+                        break;
+                }
+                validPosition = true; // si la position est bonne 
+                attempts++;
+            } while (!validPosition && attempts < 100);
+
+            polyomino.x = randomX;
+            polyomino.y = randomY;
+            polyomino.isPlaced = false;
+        });
+        this.redraw();
+    }
+
+
+	createMessageBox(type_tiling) {
+		const messageBox = document.createElement('div');
+		messageBox.id = 'messageBox';
+		if (type_tiling == 1) {
+			messageBox.textContent = 'BACKTRACKING TILING FINISHED';
+		} 
+		else if (type_tiling == 2) {
+			messageBox.textContent = 'BRUTE FORCE TILING FINISHED';
+		} 
+		else if (type_tiling == 3) {
+			messageBox.textContent = 'RANDOM TILING FINISHED';
+		} 
+		else if (type_tiling == 4) {
+			messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED';
+		} 
+		
+		else {
+			messageBox.textContent = 'TILING FINISHED';
+		}
+		Object.assign(messageBox.style, {
+			display: 'none',
+			position: 'absolute',
+			top: '50%',
+			left: '50%',
+			transform: 'translate(-50%, -50%)',
+			backgroundColor: 'red',
+			color: 'white',
+			padding: '10px',
+			borderRadius: '5px'
+		});
+		return messageBox;
+	}
+	
+	showMessageBox(messageBox) {
+		document.body.appendChild(messageBox);
+		messageBox.style.display = 'block'; // Affiche le message
+	
+		setTimeout(() => {
+			messageBox.style.display = 'none'; // Masque le message après 2 secondes
+		}, 2000);
+	}
+	
 	backtrackingAutoTiling() {
+		this.resetBoard();  // Réinitialisez la grille avant d'appeler la méthode de pavage
+		const messageBox = this.createMessageBox(1);
+		
+		// Appeler la fonction de pavage avec un délai pour afficher le message après le pavage
+		setTimeout(() => {
+			backtrackingAutoTiling(
+				this.polyominoes, 
+				this.gridBoard, 
+				this.placePolyomino.bind(this), 
+				this.gridBoard.removePolyomino.bind(this), 
+				this.redraw.bind(this),
+				() => {
+					//pourfficher le message après le pavage
+					this.showMessageBox(messageBox);
+				}
+			);
+		}, 1000); // Delai pour voir la reinitialisation du plateau
+	}
+	
+
+
+	bruteForceTiling() {
+		this.resetBoard(); 
+	
+		const messageBox = this.createMessageBox(2); // un autre type de message pour bruteForceTiling
+	
+
+		setTimeout(() => {
+			bruteForceTiling(
+				this.gridBoard, 
+				this.polyominoes, 
+				this.placePolyomino.bind(this), 
+				this.redraw.bind(this),
+				() => {
+					// Afficher le message après le pavage
+					this.showMessageBox(messageBox);
+				}
+			);
+		}, 1000); // Délai pour permettre de voir la réinitialisation du plateau
+	}
+	
+
+
+
+	randomTiling() {
 		this.resetBoard();
-		backtrackingAutoTiling(this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this), this.redraw.bind(this));
-	};
+		const messageBox = this.createMessageBox(3);
+	
+		setTimeout(() => {
+			randomTiling(
+				this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.redraw.bind(this), () => {
+					//pourfficher le message après le pavage
+					this.showMessageBox(messageBox);
+				}
+			);
+		}, 1000); // Delai pour permettre de voir la reinitialisation du plateau
+	}
+	
+	
+	
+	randomBacktrackingTiling() {
+		this.resetBoard();
+		const messageBox = this.createMessageBox(4);
+	
+		setTimeout(() => {
+			randomBacktrackingTiling(
+				this.polyominoes, 
+				this.gridBoard, 
+				this.placePolyomino.bind(this), 
+				this.gridBoard.removePolyomino.bind(this), 
+				this.redraw.bind(this),
+				() => {
+					this.showMessageBox(messageBox);
+				}
+			);
+		}, 1000); // Delai pour permettre de voir la reinitialisation du plateau
+	}
+	
+	
 };
 
 const main_app = new MainApp();

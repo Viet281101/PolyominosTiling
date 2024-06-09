@@ -139,7 +139,7 @@ export function showSolvePopup(toolbar) {
 
 	redrawPopup();
 };
-
+ 
 function attachSolveClickEvent(toolbar, popup, row, y) {
 	popup.addEventListener('click', (e) => {
 		const rect = popup.getBoundingClientRect();
@@ -154,14 +154,19 @@ function attachSolveClickEvent(toolbar, popup, row, y) {
 					break;
 
 				case '2) Brute force method :':
+
+					toolbar.mainApp.bruteForceTiling();
 					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
 					break;
 
 				case '3) Random method :':
+					toolbar.mainApp.randomTiling();
 					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
 					break;
 
 				case '4) Random backtracking :':
+
+					toolbar.mainApp.randomBacktrackingTiling();
 					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
 					break;
 
