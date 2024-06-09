@@ -11,16 +11,16 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 			 } // Appel du message de fin de fonction
 			return;
 		}
-	
+
 		const polyomino = polyominoesCopy[index];
 		const originalColor = polyomino.color; // Sauvegarde de la couleur d'origine
 		polyomino.color = '#FFFF99'; // Couleur jaune fade pour montrer la sélection
 		redraw();
-	
+
 		setTimeout(() => {
 			let placed = false;
 			let rotationAttempts = 0;
-	
+
 			while (!placed && rotationAttempts < 4) {
 				for (let row = 0; row < gridBoard.rows && !placed; row++) {
 					for (let col = 0; col < gridBoard.cols && !placed; col++) {
@@ -28,7 +28,7 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 						const originalY = polyomino.y;
 						polyomino.x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
 						polyomino.y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
-	
+
 						if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
 							placePolyomino(polyomino);
 							placed = true;
@@ -38,16 +38,16 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 						}
 					}
 				}
-	
+
 				if (!placed) {
 					polyomino.rotateRight();
 					rotationAttempts++;
 				}
 			}
-	
+
 			polyomino.color = originalColor; // Remet la couleur d'origine
 			redraw();
-	
+
 			if (placed) {
 				index++;
 				setTimeout(placeNextPolyomino, 1000); // Appel récursif avec un délai d'une seconde
@@ -57,7 +57,6 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 			}
 		}, 1000); // Délai d'une seconde pour montrer la sélection avant le placement
 	}
-	
 
 	placeNextPolyomino();
 }; 
@@ -102,14 +101,7 @@ export function randomTiling(gridBoard, polyominoes, placePolyomino, redraw , me
 
     redraw(); // mise à jour de l'affichage après le placement aléatoire des polyominos
 	if (message) message(); // Appel du message de fin de fonciton
-}
-
-
-
-
-
-
-
+};
 
 
 export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw, message) {
@@ -170,7 +162,7 @@ export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw,
         }
 
         return placeAllPolyominoes(index + 1); // prochain piece
-    }
+    };
 
     // on vide pas la grille pour eviter des obstacles 
     const originalStates = polyominoes.map(p => ({
@@ -196,16 +188,7 @@ export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw,
         console.log("rien trouve");
         redraw();
     }
-}
-
-
-
-
-
-
-
-
-
+};
 
 
 export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino, removePolyomino, redraw, message) {
@@ -282,4 +265,4 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
         }, 1000); // Délai d'une seconde pour montrer la sélection avant le placement
     }
     placeNextPolyomino();
-}
+};
