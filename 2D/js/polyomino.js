@@ -1,230 +1,81 @@
-export class Polyomino {
-	constructor(shape, x, y, color, app, name = "Polyomino") {
-		this.shape = shape;
-		this.x = x;
-		this.y = y;
-		this.originalX = x;
-		this.originalY = y;
-		this.lastX = x;
-		this.lastY = y;
-		this.color = color;
-		this.app = app;
-		this.isDragging = false;
-		this.isPlaced = false;
-		this.offsetX = 0;
-		this.offsetY = 0;
-		this.iconSize = 16;
-		this.name = name;
-	};
+import { Polyomino, SHAPES, getRandomColor } from '../polyomino.js';
 
-	draw(ctx, gridSize, isSelected) {
-		ctx.fillStyle = this.color;
-		for (let i = 0; i < this.shape.length; i++) {
-			for (let j = 0; j < this.shape[i].length; j++) {
-				if (this.shape[i][j] === 1) {
-					ctx.fillRect(this.x + j * gridSize, this.y + i * gridSize, gridSize, gridSize);
-					ctx.strokeStyle = isSelected ? 'white' : 'black';
-					ctx.strokeRect(this.x + j * gridSize, this.y + i * gridSize, gridSize, gridSize);
-				}
+export function showPolyominoPopup(toolbar) {
+	const popupContainer = toolbar.createPopupContainer('polyominoPopup', toolbar.buttons[0].name);
+
+	const shapes = Object.keys(SHAPES);
+	const shapeSize = 24;
+	const padding = 90;
+
+	const popup = popupContainer.querySelector('canvas');
+	const ctx = popup.getContext('2d');
+	const width = popup.width;
+	const height = popup.height;
+
+	ctx.fillStyle = '#a0a0a0';
+	ctx.fillRect(0, 0, width, height);
+
+	const polyominoes = [];
+
+	shapes.forEach((shape, index) => {
+		const y = 50 + index * (shapeSize + padding) + shapeSize / 2;
+		ctx.fillStyle = '#d1d1d1';
+		ctx.fillRect(10, y - shapeSize / 2, 180, shapeSize + 20);
+		ctx.strokeStyle = '#000';
+		ctx.strokeRect(10, y - shapeSize / 2, 180, shapeSize + 20);
+
+		ctx.font = '20px Pixellari';
+		ctx.fillStyle = '#000';
+		ctx.fillText(shape.replace(/_/g, ' '), 15, y + 7);
+
+		const polyomino = new Polyomino(SHAPES[shape].map(row => [...row]), 200, y - shapeSize / 2, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));
+		polyomino.draw(ctx, shapeSize, false);
+		polyomino.x = 200;
+		polyomino.y = y - shapeSize / 2;
+		polyomino.width = shapeSize * polyomino.shape[0].length;
+		polyomino.height = shapeSize * polyomino.shape.length;
+
+		polyominoes.push({ polyomino, shape, shapeSize, y });
+	});
+
+	popup.addEventListener('mousemove', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+		let cursor = 'default';
+
+		polyominoes.forEach(({ polyomino, y }) => {
+			const leftColumnRect = { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 };
+			const rightColumnRect = { x: polyomino.x, y: polyomino.y, width: polyomino.width, height: polyomino.height };
+
+			if (toolbar.isInside(mouseX, mouseY, leftColumnRect) || toolbar.isInside(mouseX, mouseY, rightColumnRect)) {
+				cursor = 'pointer';
 			}
-		}
-	};
+		});
 
-	drawIcons(ctx, gridSize, icons) {
-		if (!this.isPlaced) {
-			const centerX = this.x + (this.shape[0].length * gridSize) / 2;
-			const centerY = this.y + (this.shape.length * gridSize) / 2;
-			const radius = ((gridSize * Math.abs(this.shape[0].length > this.shape.length ? this.shape[0].length : this.shape.length)) / 2) + (this.iconSize * 1.75);
-			const iconPositions = [
-				{ icon: icons.flip, angle: -90 },
-				{ icon: icons.rotateLeft, angle: -162 },
-				{ icon: icons.rotateRight, angle: -18 },
-				{ icon: icons.duplicate, angle: 128 },
-				{ icon: icons.trash, angle: 52 },
-			];
-			iconPositions.forEach(({ icon, angle }) => {
-				const rad = (angle * Math.PI) / 180;
-				const iconX = centerX + radius * Math.cos(rad) - this.iconSize;
-				const iconY = centerY + radius * Math.sin(rad) - this.iconSize;
-				ctx.drawImage(icon, iconX, iconY, this.iconSize * 2, this.iconSize * 2);
-			});
-		}
-	};
+		popup.style.cursor = cursor;
+	});
 
-	contains(mouseX, mouseY, gridSize) {
-		for (let i = 0; i < this.shape.length; i++) {
-			for (let j = 0; j < this.shape[i].length; j++) {
-				if (this.shape[i][j] === 1) {
-					const rectX = this.x + j * gridSize;
-					const rectY = this.y + i * gridSize;
-					if (mouseX >= rectX && mouseX < rectX + gridSize &&
-						mouseY >= rectY && mouseY < rectY + gridSize) {
-						return true;
-					}
-				}
+	popup.addEventListener('click', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+
+		const getRandomPosition = (max) => Math.floor(Math.random() * max);
+
+		const canvasPaddingX = getRandomPosition(window.innerWidth < 600 ? 300 : 1200) + ((window.innerWidth < 600) ? 0 : 45);
+		const canvasPaddingY = getRandomPosition(170) + ((window.innerHeight < 600) ? 45 : 0);
+
+		polyominoes.forEach(({ polyomino, shape, shapeSize, y }) => {
+			const leftColumnRect = { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 };
+			const rightColumnRect = { x: polyomino.x, y: polyomino.y, width: polyomino.width, height: polyomino.height };
+
+			if (toolbar.isInside(mouseX, mouseY, leftColumnRect) || toolbar.isInside(mouseX, mouseY, rightColumnRect)) {
+				const newPolyomino = new Polyomino(SHAPES[shape].map(row => [...row]), canvasPaddingX, canvasPaddingY, getRandomColor(), toolbar.mainApp, shape.replace(/_/g, ' '));
+				toolbar.mainApp.polyominoes.push(newPolyomino);
+				toolbar.mainApp.redraw();
+				if (toolbar.isMobile) {toolbar.closePopup('polyomino');}
 			}
-		}
-		return false;
-	};
-
-	checkIconsClick(mousePos) {
-		const centerX = this.x + (this.shape[0].length * this.app.gridSize) / 2;
-		const centerY = this.y + (this.shape.length * this.app.gridSize) / 2;
-		const radius = ((this.app.gridSize * Math.abs(this.shape[0].length > this.shape.length ? this.shape[0].length : this.shape.length)) / 2) + (this.iconSize * 1.75);
-		const iconPositions = [
-			{ type: 'flip', angle: -90 },
-			{ type: 'rotateLeft', angle: -162 },
-			{ type: 'rotateRight', angle: -18 },
-			{ type: 'duplicate', angle: 128 },
-			{ type: 'trash', angle: 52 },
-		];
-		for (let { type, angle } of iconPositions) {
-			const rad = (angle * Math.PI) / 180;
-			const iconX = centerX + radius * Math.cos(rad) - this.iconSize;
-			const iconY = centerY + radius * Math.sin(rad) - this.iconSize;
-			if (mousePos.x >= iconX && mousePos.x < iconX + this.iconSize * 2 &&
-				mousePos.y >= iconY && mousePos.y < iconY + this.iconSize * 2) {
-				this.handleIconClick(type);
-				return true;
-			}
-		}
-		return false;
-	};
-
-	handleIconClick(type) {
-		switch (type) {
-			case 'flip': this.flip(); break;
-			case 'rotateLeft': this.rotateLeft(); break;
-			case 'rotateRight': this.rotateRight(); break;
-			case 'duplicate': this.app.duplicatePolyomino(this); break;
-			case 'trash': this.app.deletePolyomino(this); break;
-		}
-		this.app.redraw();
-	};
-
-	onMouseDown(mousePos) {
-		if (this.contains(mousePos.x, mousePos.y, this.app.gridSize)) {
-			if (this.isPlaced) {
-				this.app.gridBoard.removePolyomino(this);
-				this.isPlaced = false;
-			}
-			this.isDragging = true;
-			this.offsetX = mousePos.x - this.x;
-			this.offsetY = mousePos.y - this.y;
-			this.app.selectedPolyomino = this;
-
-			this.lastX = this.x;
-			this.lastY = this.y;
-		}
-		this.app.canvas.style.cursor = 'grabbing';
-	};
-
-	onMouseMove(mousePos) {
-		if (this.isDragging) {
-			this.x = mousePos.x - this.offsetX;
-			this.y = mousePos.y - this.offsetY;
-		}
-	};
-
-	onMouseUp() {
-		if (this.isDragging) {
-			this.isDragging = false;
-			this.app.canvas.style.cursor = 'default';
-
-			const gridSize = this.app.gridSize;
-			const offsetX = this.app.gridBoard.gridOffsetX;
-			const offsetY = this.app.gridBoard.gridOffsetY;
-
-			const newX = Math.round((this.x - offsetX) / gridSize) * gridSize + offsetX;
-			const newY = Math.round((this.y - offsetY) / gridSize) * gridSize + offsetY;
-
-			this.x = newX;
-			this.y = newY;
-
-			if (this.app.gridBoard.isInBounds(this)) {
-				if (!this.app.gridBoard.isOverlapping(this)) {
-					this.app.placePolyomino(this);
-					this.isPlaced = true;
-				} else {
-					this.x = this.lastX;
-					this.y = this.lastY;
-				}
-			}
-			this.app.redraw();
-		}
-	};
-
-	resetPosition() {
-		this.x = this.originalX;
-		this.y = this.originalY;
-	};
-
-	rotate() {
-		const newShape = [];
-		for (let i = 0; i < this.shape[0].length; i++) {
-			newShape.push([]);
-			for (let j = 0; j < this.shape.length; j++) {
-				newShape[i].push(this.shape[this.shape.length - 1 - j][i]);
-			}
-		}
-		this.shape = newShape;
-	};
-
-	rotateLeft() {
-		this.rotate();
-		this.rotate();
-		this.rotate();
-	};
-
-	rotateRight() {
-		this.rotate();
-	};
-
-	flip() {
-		for (let row of this.shape) {
-			row.reverse();
-		}
-	};
-};
-
-export function getRandomColor() {
-	const letters = '0123456789ABCDEF';
-	let color = '#';
-	for (let i = 0; i < 6; i++) {
-		color += letters[Math.floor(Math.random() * 16)];
-	}
-	return color;
-};
-
-export const SHAPES = {
-	MONOMINO: [[1]],
-	DOMINO: [[1, 1]],
-	TROMINO_I: [[1, 1, 1]],
-	TROMINO_L: [[1, 0], [1, 1]],
-	TETROMINO_I: [[1, 1, 1, 1]],
-	TETROMINO_O: [[1, 1], [1, 1]],
-	TETROMINO_S: [[0, 1, 1], [1, 1, 0]],
-	TETROMINO_T: [[0, 1, 0], [1, 1, 1]],
-	TETROMINO_L: [[1, 0, 0], [1, 1, 1]],
-	PENTOMINO_F: [[0, 1, 1], [1, 1, 0], [0, 1, 0]],
-	PENTOMINO_I: [[1, 1, 1, 1, 1]],
-	PENTOMINO_L: [[1, 0, 0, 0, 0], [1, 1, 1, 1, 1]],
-	PENTOMINO_N: [[1, 1, 1, 0], [0, 0, 1, 1]],
-	PENTOMINO_P: [[1, 1, 1], [1, 1, 0]],
-	PENTOMINO_T: [[1, 1, 1], [0, 1, 0], [0, 1, 0]],
-	PENTOMINO_U: [[1, 0, 1], [1, 1, 1]],
-	PENTOMINO_V: [[1, 0, 0], [1, 0, 0], [1, 1, 1]],
-	PENTOMINO_W: [[1, 0, 0], [1, 1, 0], [0, 1, 1]],
-	PENTOMINO_X: [[0, 1, 0], [1, 1, 1], [0, 1, 0]],
-	PENTOMINO_Y: [[1, 1, 1, 1], [0, 1, 0, 0]],
-	PENTOMINO_Z: [[1, 1, 0], [0, 1, 0], [0, 1, 1]],
-	HEXOMINO_I: [[1, 1, 1, 1, 1, 1]],
-	HEXOMINO_L: [[1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1]],
-	HEXOMINO_T: [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]],
-	HEXOMINO_X: [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]],
-	HEXOMINO_U: [[1, 0, 0, 1], [1, 1, 1, 1]],
-	HEXOMINO_V: [[1, 0, 0, 0], [1, 0, 0, 0], [1, 1, 1, 1]],
-	HEXOMINO_W: [[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 1, 1]],
-	HEXOMINO_Y: [[1, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
-	HEXOMINO_Z: [[1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1]],
+		});
+	});
 };
