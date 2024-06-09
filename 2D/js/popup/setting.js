@@ -10,7 +10,7 @@ export function showSettingsPopup(toolbar) {
 		{ label: 'Quick settings', box: true, title: true },
 		{ label: 'Reset Polyominoes Position', icon: '../assets/ic_reset.png' },
 		{ label: 'Mix Position of Polyominoes', icon: '../assets/ic_split.png' },
-		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' },
+		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' }
 	];
 
 	const startY = 76;
@@ -65,17 +65,15 @@ function attachSettingClickEvent(toolbar, popup, row, y) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 				case 'Mix Position of Polyominoes':
 					toolbar.mainApp.mixPosition();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 				case 'Delete All Polyominoes':
 					toolbar.mainApp.deleteAllPolyominos();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
+			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
 	});
 };
@@ -91,17 +89,15 @@ function handleTouchClick(e, toolbar, rows, popup, startY, rowHeight) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 				case 'Mix Position of Polyominoes':
 					toolbar.mainApp.mixPosition();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 				case 'Delete All Polyominoes':
 					toolbar.mainApp.deleteAllPolyominos();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
+			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
 	});
 };
