@@ -15,6 +15,7 @@ export class Polyomino {
 		this.offsetY = 0;
 		this.iconSize = 16;
 		this.name = name;
+		this.nbRotations=0;
 	};
 
 	draw(ctx, gridSize, isSelected) {
@@ -174,10 +175,12 @@ export class Polyomino {
 		this.rotate();
 		this.rotate();
 		this.rotate();
+		this.nbRotations--;
 	};
 
 	rotateRight() {
 		this.rotate();
+		this.nbRotations++;
 	};
 
 	flip() {
@@ -219,7 +222,7 @@ export const SHAPES = {
 	PENTOMINO_Y: [[1, 1, 1, 1], [0, 1, 0, 0]],
 	PENTOMINO_Z: [[1, 1, 0], [0, 1, 0], [0, 1, 1]],
 	HEXOMINO_I: [[1, 1, 1, 1, 1, 1]],
-	HEXOMINO_L: [[1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1]],
+	HEXOMINO_L: [[1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 0]],
 	HEXOMINO_T: [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]],
 	HEXOMINO_X: [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]],
 	HEXOMINO_U: [[1, 0, 0, 1], [1, 1, 1, 1]],
@@ -227,4 +230,20 @@ export const SHAPES = {
 	HEXOMINO_W: [[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 1, 1]],
 	HEXOMINO_Y: [[1, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
 	HEXOMINO_Z: [[1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1]],
+	HEPTOMINO_I: [[1, 1, 1, 1, 1, 1, 1]],
+	HEPTOMINO_L: [[1, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 0]],
+	HEPTOMINO_P: [[1, 1, 1, 1], [1, 1, 0, 0], [1, 0, 0, 0]],
+	HEPTOMINO_T: [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0]],
+	HEPTOMINO_U: [[1, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 0]],
+	HEPTOMINO_V: [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 1, 1, 1]],
+	HEPTOMINO_W: [[1, 0, 0, 0], [1, 1, 0, 0], [1, 1, 1, 0], [0, 1, 1, 1]],
+	HEPTOMINO_Y: [[1, 1, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1]],
+	HEPTOMINO_Z: [[1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1], [0, 0, 1, 0]],
+	HEPTOMINO_F: [[0, 1, 1], [1, 1, 0], [0, 1, 0], [1, 1, 1]],
+	HEPTOMINO_H: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
+	HEPTOMINO_J: [[1, 1, 1], [0, 0, 1], [0, 0, 1], [0, 1, 1]],
+	HEPTOMINO_N: [[1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 0, 1]],
+	HEPTOMINO_R: [[1, 1, 1], [1, 0, 1], [0, 1, 1], [0, 0, 1]],
+	HEPTOMINO_S: [[0, 1, 1], [1, 1, 1], [1, 0, 0], [1, 1, 1]],
+	HEPTOMINO_X: [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0], [0, 0, 1, 0]],
 };
