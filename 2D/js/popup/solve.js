@@ -150,37 +150,18 @@ function attachSolveClickEvent(toolbar, popup, row, y) {
 			switch (row.label) {
 				case '1) Backtracking method :':
 					toolbar.mainApp.backtrackingAutoTiling();
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
 					break;
-
 				case '2) Brute force method :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
+					toolbar.mainApp.bruteForceTiling();
 					break;
-
 				case '3) Random method :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
+					toolbar.mainApp.randomTiling();
 					break;
-
 				case '4) Random backtracking :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
-					break;
-
-				case '5) Genetic Algorithm :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
-					break;
-
-				case '6) Simulated Annealing :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
-					break;
-
-				case '7) Ant Colony Optimization :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
-					break;
-
-				case '8) Greedy Algorithm :':
-					if (toolbar.isMobile) { toolbar.closePopup('solve'); }
+					toolbar.mainApp.randomBacktrackingTiling();
 					break;
 			}
+			if (toolbar.isMobile) toolbar.closePopup('solve');
 		}
 	});
 };

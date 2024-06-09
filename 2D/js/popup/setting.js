@@ -9,7 +9,8 @@ export function showSettingsPopup(toolbar) {
 	const rows = [
 		{ label: 'Quick settings', box: true, title: true },
 		{ label: 'Reset Polyominoes Position', icon: '../assets/ic_reset.png' },
-		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' },
+		{ label: 'Mix Position of Polyominoes', icon: '../assets/ic_split.png' },
+		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' }
 	];
 
 	const startY = 76;
@@ -20,7 +21,7 @@ export function showSettingsPopup(toolbar) {
 		const y = startY + index * rowHeight;
 		if (row.box) {
 			ctx.strokeStyle = '#fff';
-			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 3 : 1)));
+			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 4 : 1)));
 		}
 		ctx.font = '20px Pixellari';
 		ctx.fillStyle = '#000';
@@ -64,13 +65,15 @@ function attachSettingClickEvent(toolbar, popup, row, y) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
+					break;
+				case 'Mix Position of Polyominoes':
+					toolbar.mainApp.mixPosition();
 					break;
 				case 'Delete All Polyominoes':
 					toolbar.mainApp.deleteAllPolyominos();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
+			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
 	});
 };
@@ -86,13 +89,15 @@ function handleTouchClick(e, toolbar, rows, popup, startY, rowHeight) {
 			switch (row.label) {
 				case 'Reset Polyominoes Position':
 					toolbar.mainApp.resetBoard();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
+					break;
+				case 'Mix Position of Polyominoes':
+					toolbar.mainApp.mixPosition();
 					break;
 				case 'Delete All Polyominoes':
 					toolbar.mainApp.deleteAllPolyominos();
-					if (toolbar.isMobile) {toolbar.closePopup('settings');}
 					break;
 			}
+			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
 	});
 };
