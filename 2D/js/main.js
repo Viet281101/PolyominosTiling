@@ -263,10 +263,11 @@ class MainApp {
 		const gridBottom = this.gridBoard.gridOffsetY + this.gridSize * this.rows;
 		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
-		this.gridBoard.clearGrid();
 		this.polyominoes.forEach((polyomino) => {
 			let attempts = 0;
 			let randomX, randomY, validPosition;
+			this.gridBoard.removePolyomino(polyomino);
+			polyomino.isPlaced = false;
 			do {
 				const zone = Math.floor(Math.random() * 4);
 				switch (zone) {

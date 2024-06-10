@@ -94,6 +94,7 @@ class MainApp {
 			}
 
 			this.lastMousePosition = { x: event.clientX, y: event.clientY };
+			this.lastValidPosition = this.selectedPolycube.group.position.clone();
 		} else {
 			this.deselectPolycube();
 			this.controls.enabled = true;
@@ -123,7 +124,11 @@ class MainApp {
 
 	onMouseUp(event) {
 		if (this.isRightClick) {
-			this.snapToGrid(this.selectedPolycube.group);
+			if (this.snapToGrid(this.selectedPolycube)) {
+				this.lastValidPosition = this.selectedPolycube.group.position.clone();
+			} else {
+				this.selectedPolycube.group.position.copy(this.lastValidPosition);
+			}
 		}
 		this.isDragging = false;
 		this.isRightClick = false;
@@ -154,12 +159,16 @@ class MainApp {
 		}
 	};
 
-	snapToGrid(group) {
+	snapToGrid(polycube) {
 		const gridSize = 1;
+		const group = polycube.group;
 
-		group.position.x = Math.round(group.position.x / gridSize) * gridSize;
-		group.position.y = Math.round(group.position.y / gridSize) * gridSize;
-		group.position.z = Math.round(group.position.z / gridSize) * gridSize;
+		const offset = gridSize / 2;
+		const newPosition = new THREE.Vector3(
+			Math.round((group.position.x - offset) / gridSize) * gridSize + offset,
+			Math.round((group.position.y - offset) / gridSize) * gridSize + offset,
+			Math.round((group.position.z - offset) / gridSize) * gridSize + offset
+		);
 
 		const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);
 		const decomposed = {
@@ -175,6 +184,32 @@ class MainApp {
 		euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
 
 		group.setRotationFromEuler(euler);
+
+		const newCubesPositions = polycube.cubeData.cubes.map(coord => {
+			const [x, y, z] = coord;
+			const position = new THREE.Vector3(x, y, z);
+			position.applyEuler(group.rotation);
+			position.add(newPosition);
+			return position;
+		});
+
+		const overlapping = this.polys.some(otherPolycube => {
+			if (otherPolycube === polycube) return false;
+			return otherPolycube.cubeData.cubes.some(coord => {
+				const [x, y, z] = coord;
+				const position = new THREE.Vector3(x, y, z);
+				position.applyEuler(otherPolycube.group.rotation);
+				position.add(otherPolycube.group.position);
+				return newCubesPositions.some(newPos => newPos.equals(position));
+			});
+		});
+
+		if (overlapping) {
+			return false;
+		} else {
+			group.position.copy(newPosition);
+			return true;
+		}
 	};
 };
 
