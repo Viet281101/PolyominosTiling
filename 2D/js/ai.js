@@ -1,32 +1,26 @@
-/**
- * Performs backtracking auto tiling on a grid board using the given polyominoes.
- *
- * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
- * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
- * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
- * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
- * @param {Function} redraw - The function to redraw the grid board after placing or removing a polyomino.
- * @param {Function} message - An optional callback function to be called when the tiling is complete.
- * @return {void} This function does not return anything.
- */
 export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, removePolyomino, redraw, message) {
-	const polyominoesCopy = [...polyominoes];
-	polyominoesCopy.sort((a, b) => b.shape.flat().reduce((acc, val) => acc + val) - a.shape.flat().reduce((acc, val) => acc + val));
+	const polyominoesCopy = [...polyominoes]; // Clone des polyominos pour ne pas les modifier
+	polyominoesCopy.sort((a, b) => b.shape.flat().reduce((acc, val) => acc + val) - a.shape.flat().reduce((acc, val) => acc + val)); // trie par taille
 	let index = 0;
 
 	function placeNextPolyomino() {
 		if (index >= polyominoesCopy.length) {
 			console.log("Pavage Réussi!");
-			if (message) { message(); }
+			if (message) {
+				message();
+			 } // Appel du message de fin de fonction
 			return;
 		}
+	
 		const polyomino = polyominoesCopy[index];
-		const originalColor = polyomino.color;
-		polyomino.color = '#FFFF99';
+		const originalColor = polyomino.color; // Sauvegarde de la couleur d'origine
+		polyomino.color = '#FFFF99'; // Couleur jaune fade pour montrer la sélection
 		redraw();
+	
 		setTimeout(() => {
 			let placed = false;
 			let rotationAttempts = 0;
+	
 			while (!placed && rotationAttempts < 4) {
 				for (let row = 0; row < gridBoard.rows && !placed; row++) {
 					for (let col = 0; col < gridBoard.cols && !placed; col++) {
@@ -38,204 +32,254 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 						if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
 							placePolyomino(polyomino);
 							placed = true;
-						} else { polyomino.x = originalX; polyomino.y = originalY; }
+						} else {
+							polyomino.x = originalX;
+							polyomino.y = originalY;
+						}
 					}
 				}
-				if (!placed) { polyomino.rotateRight(); rotationAttempts++; }
+	
+				if (!placed) {
+					polyomino.rotateRight();
+					rotationAttempts++;
+				}
 			}
-			polyomino.color = originalColor;
+	
+			polyomino.color = originalColor; // Remet la couleur d'origine
 			redraw();
-			index++;
-			placeNextPolyomino();
-		}, 1000);
+	
+			if (placed) {
+				index++;
+				setTimeout(placeNextPolyomino, 1000); // Appel récursif avec un délai d'une seconde
+			} else {
+				index++;
+				placeNextPolyomino(); // Passer à la pièce suivante si aucune orientation ne fonctionne
+			}
+		}, 1000); // Délai d'une seconde pour montrer la sélection avant le placement
 	}
+	
+
 	placeNextPolyomino();
 }; 
 
-/**
- * Random tiling of polyominoes blocks to the grid board.
- *
- * @param {Object} gridBoard - The grid board object.
- * @param {Array} polyominoes - The array of polyominoes.
- * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
- * @param {Function} redraw - The function to redraw the grid board.
- * @param {Function} [message] - An optional function to display a message.
- * @return {void}
- */
+
 export function randomTiling(gridBoard, polyominoes, placePolyomino, redraw , message) {
-	const polyominoesCopy = [...polyominoes];
-	let consecutiveFails = 0;
+    const polyominoesCopy = [...polyominoes]; // Cloner les polyominos pour ne pas les modifier
+    let consecutiveFails = 0;
 
-	while (polyominoesCopy.length > 0 && consecutiveFails < 100) {
-		let polyomino = polyominoesCopy.pop();
-		let placed = false;
+    while (polyominoesCopy.length > 0 && consecutiveFails < 100) {
+        let polyomino = polyominoesCopy.pop();
+        let placed = false;
 
-		for (let attempt = 0; attempt < 100; attempt++) {
-			const originalX = polyomino.x;
-			const originalY = polyomino.y;
-			const randomX = Math.floor(Math.random() * gridBoard.cols);
-			const randomY = Math.floor(Math.random() * gridBoard.rows);
+        for (let attempt = 0; attempt < 100; attempt++) {
+            const originalX = polyomino.x;
+            const originalY = polyomino.y;
+            const randomX = Math.floor(Math.random() * gridBoard.cols);
+            const randomY = Math.floor(Math.random() * gridBoard.rows);
 
-			polyomino.x = randomX * gridBoard.gridSize + gridBoard.gridOffsetX;
-			polyomino.y = randomY * gridBoard.gridSize + gridBoard.gridOffsetY;
+            polyomino.x = randomX * gridBoard.gridSize + gridBoard.gridOffsetX;
+            polyomino.y = randomY * gridBoard.gridSize + gridBoard.gridOffsetY;
 
-			if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
-				placePolyomino(polyomino);
-				polyomino.isPlaced = true;
-				placed = true;
-				break;
-			} else { polyomino.x = originalX; polyomino.y = originalY; }
-		}
-		if (!placed) { consecutiveFails++; polyominoesCopy.push(polyomino); }
-		else {consecutiveFails = 0; }
-	}
-	redraw();
-	if (message) message();
+            if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
+                placePolyomino(polyomino);
+                polyomino.isPlaced = true;
+                placed = true;
+                break;
+            } else {
+                // Reinitialisation des coordonnees du polyomino pour la prochaine tentative
+                polyomino.x = originalX;
+                polyomino.y = originalY;
+            }
+        }
+
+        if (!placed) {
+            consecutiveFails++;
+            polyominoesCopy.push(polyomino); // Remise des polyominos non placés dans la liste
+        } else {
+            consecutiveFails = 0;
+        }
+    }
+
+    redraw(); // mise à jour de l'affichage après le placement aléatoire des polyominos
+	if (message) message(); // Appel du message de fin de fonciton
 }
 
-/**
- * Tries to tile the grid with polyominoes using brute force.
- *
- * @param {GridBoard} gridBoard - The grid to be tiled.
- * @param {Array<Polyomino>} polyominoes - The polyominoes to be placed on the grid.
- * @param {Function} placePolyomino - The function to place a polyomino on the grid.
- * @param {Function} redraw - The function to redraw the grid.
- * @param {Function} [message] - An optional function to be called when the tiling is successful.
- * @return {void}
- */
+
+
+
+
+
+
+
+
 export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw, message) {
-	function canPlace(polyomino, x, y) {
-		const originalX = polyomino.x;
-		const originalY = polyomino.y;
-		polyomino.x = x;
-		polyomino.y = y;
-		if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
-			polyomino.x = originalX;
-			polyomino.y = originalY;
-			return true;
-		}
-		polyomino.x = originalX;
-		polyomino.y = originalY;
-		return false;
-	};
+    function canPlace(polyomino, x, y) {
+        const originalX = polyomino.x;
+        const originalY = polyomino.y;
 
-	function placeAllPolyominoes(index) {
-		if (index >= polyominoes.length) { return true; }
-		const polyomino = polyominoes[index];
+        polyomino.x = x;
+        polyomino.y = y;
 
-		for (let row = 0; row < gridBoard.rows; row++) {
-			for (let col = 0; col < gridBoard.cols; col++) {
-				for (let rotation = 0; rotation < 4; rotation++) {
-					const x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
-					const y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
+        if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
+            polyomino.x = originalX;
+            polyomino.y = originalY;
+            return true;
+        }
 
-					if (canPlace(polyomino, x, y)) {
-						const originalX = polyomino.x;
-						const originalY = polyomino.y;
+        polyomino.x = originalX;
+        polyomino.y = originalY;
+        return false;
+    }
 
-						polyomino.x = x;
-						polyomino.y = y;
-						placePolyomino(polyomino);
-						polyomino.isPlaced = true;
+    function placeAllPolyominoes(index) {
+        if (index >= polyominoes.length) {
+            return true; // tous place 
+        }
 
-						if (placeAllPolyominoes(index + 1)) { return true; }
+        const polyomino = polyominoes[index];
+        let placed = false;
 
-						polyomino.x = originalX;
-						polyomino.y = originalY;
-						polyomino.isPlaced = false;
-						gridBoard.removePolyomino(polyomino); 
-					}
-					polyomino.rotateRight();
-				}
-			}
-		}
-		return placeAllPolyominoes(index + 1);
-	};
+        for (let row = 0; row < gridBoard.rows; row++) {
+            for (let col = 0; col < gridBoard.cols; col++) {
+                for (let rotation = 0; rotation < 4; rotation++) { //test avec rotation
+                    const x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
+                    const y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
 
-	const originalStates = polyominoes.map(p => ({ x: p.x, y: p.y, isPlaced: p.isPlaced }));
-	if (placeAllPolyominoes(0)) {
-		console.log("placement ok");
-		redraw();
-		if (message) { message(); }
-	} else {
-		polyominoes.forEach((p, i) => {
-			p.x = originalStates[i].x;
-			p.y = originalStates[i].y;
-			p.isPlaced = originalStates[i].isPlaced;
-		});
-		console.log("rien trouve");
-		redraw();
-	}
-};
+                    if (canPlace(polyomino, x, y)) {
+                        const originalX = polyomino.x;
+                        const originalY = polyomino.y;
 
-/**
- * Random backtracking tiling for a given set of polyominoes on a grid board.
- *
- * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
- * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
- * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
- * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
- * @param {Function} redraw - The function to redraw the grid board after placing or removing a polyomino.
- * @param {Function} message - An optional callback function to be called when the tiling is complete.
- * @return {void} This function does not return anything.
- */
+                        polyomino.x = x;
+                        polyomino.y = y;
+                        placePolyomino(polyomino);
+                        polyomino.isPlaced = true;
+
+                        if (placeAllPolyominoes(index + 1)) {
+                            return true;
+                        }
+
+                        // annuler placement 
+                        polyomino.x = originalX;
+                        polyomino.y = originalY;
+                        polyomino.isPlaced = false;
+                        gridBoard.removePolyomino(polyomino); 
+                    }
+                    polyomino.rotateRight(); // Rotation
+                }
+            }
+        }
+
+        return placeAllPolyominoes(index + 1); // prochain piece
+    }
+
+    // on vide pas la grille pour eviter des obstacles 
+    const originalStates = polyominoes.map(p => ({
+        x: p.x,
+        y: p.y,
+        isPlaced: p.isPlaced
+    }));
+
+    if (placeAllPolyominoes(0)) {
+        console.log("placement ok");
+        redraw();
+        if (message) 
+			{
+				message();
+			} 
+    } else {
+        // si pas de solution on remet a letat inital
+        polyominoes.forEach((p, i) => {
+            p.x = originalStates[i].x;
+            p.y = originalStates[i].y;
+            p.isPlaced = originalStates[i].isPlaced;
+        });
+        console.log("rien trouve");
+        redraw();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino, removePolyomino, redraw, message) {
-	const polyominoesCopy = [...polyominoes];
+    const polyominoesCopy = [...polyominoes]; // Cloner les polyominos pour ne pas les modifier
 
-	function shuffleArray(array) {
-		for (let i = array.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[array[i], array[j]] = [array[j], array[i]];
-		}
-	};
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
 
-	shuffleArray(polyominoesCopy);
-	let index = 0;
+    //On melange l'ordre des polyominos
+    shuffleArray(polyominoesCopy);
 
-	function placeNextPolyomino() {
-		if (index >= polyominoesCopy.length) {
-			console.log("Pavage Réussi!");
-			if (message) { message(); }
-			return;
-		}
+    let index = 0;
 
-		const polyomino = polyominoesCopy[index];
-		const originalColor = polyomino.color;
-		polyomino.color = '#FFFF99';
-		redraw();
+    function placeNextPolyomino() {
+        if (index >= polyominoesCopy.length) {
+            console.log("Pavage Réussi!");
+            if (message)
+				{
+					message();
+				} //message de fin
+            return;
+        }
 
-		setTimeout(() => {
-			let placed = false;
-			let rotationAttempts = 0;
+        const polyomino = polyominoesCopy[index];
+        const originalColor = polyomino.color; // Sauvegarde de la couleur d'origine
+        polyomino.color = '#FFFF99'; // Couleur jaune fade pour montrer la sélection
+        redraw();
 
-			while (!placed && rotationAttempts < 4) {
-				for (let row = 0; row < gridBoard.rows && !placed; row++) {
-					for (let col = 0; col < gridBoard.cols && !placed; col++) {
-						const originalX = polyomino.x;
-						const originalY = polyomino.y;
-						polyomino.x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
-						polyomino.y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
+        setTimeout(() => {
+            let placed = false;
+            let rotationAttempts = 0;
 
-						if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
-							placePolyomino(polyomino); placed = true;
-						} else { polyomino.x = originalX; polyomino.y = originalY; }
-					}
-				}
-				if (!placed) { polyomino.rotateRight(); rotationAttempts++; }
-			}
-			polyomino.color = originalColor;
-			redraw();
+            while (!placed && rotationAttempts < 4) {
+                for (let row = 0; row < gridBoard.rows && !placed; row++) {
+                    for (let col = 0; col < gridBoard.cols && !placed; col++) {
+                        const originalX = polyomino.x;
+                        const originalY = polyomino.y;
+                        polyomino.x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
+                        polyomino.y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
 
-			if (placed) {
-				index++;
-				setTimeout(placeNextPolyomino, 1000);
-			} else {
-				index--;
-				const lastPolyomino = polyominoesCopy[index];
-				removePolyomino(lastPolyomino);
-				setTimeout(placeNextPolyomino, 1000);
-			}
-		}, 1000);
-	};
-	placeNextPolyomino();
-};
+                        if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
+                            placePolyomino(polyomino);
+                            placed = true;
+                        } else {
+                            polyomino.x = originalX;
+                            polyomino.y = originalY;
+                        }
+                    }
+                }
+
+                if (!placed) {
+                    polyomino.rotateRight();
+                    rotationAttempts++;
+                }
+            }
+
+            polyomino.color = originalColor; // Remet la couleur d'origine
+            redraw();
+
+            if (placed) {
+                index++;
+                setTimeout(placeNextPolyomino, 1000); // Appel récursif avec un délai d'une seconde
+            } else {
+                // Backtrack
+                index--;
+                const lastPolyomino = polyominoesCopy[index];
+                removePolyomino(lastPolyomino);
+                setTimeout(placeNextPolyomino, 1000); // Reessaie de placer le polyomino précédent
+            }
+        }, 1000); // Délai d'une seconde pour montrer la sélection avant le placement
+    }
+    placeNextPolyomino();
+}
