@@ -2,14 +2,13 @@ import { GridBoard } from './board.js';
 import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
-import { backtrackingAutoTiling, bruteForceTiling,randomTiling , randomBacktrackingTiling} from './ai.js';
- 
+import { backtrackingAutoTiling, bruteForceTiling, randomTiling, randomBacktrackingTiling } from './ai.js';
+
 class MainApp {
 	constructor() {
 		this.canvas = document.getElementById('myCanvas');
 		this.gridSize = 30;
-		this.rows = 10;
-		this.cols = 10;
+		this.rows = this.cols = 10;
 		this.polyominoes = [];
 		this.selectedPolyomino = null;
 		this.icons = {
@@ -138,7 +137,7 @@ class MainApp {
 	handleMouseMove(mousePos) {
 		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
-		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) { // Kiểm tra xem có đang kéo không
+		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
 			let found = false;
 			for (let i = this.polyominoes.length - 1; i >= 0; i--) {
 				const polyomino = this.polyominoes[i];
@@ -204,13 +203,7 @@ class MainApp {
 	};
 
 	clearBoard() {
-		const polyominoStates = this.polyominoes.map(polyomino => ({
-			shape: polyomino.shape.map(row => [...row]),
-			x: polyomino.x,
-			y: polyomino.y,
-			color: polyomino.color,
-			name: polyomino.name
-		}));
+		const polyominoStates = this.polyominoes.map(polyomino => ({ shape: polyomino.shape.map(row => [...row]), x: polyomino.x, y: polyomino.y, color: polyomino.color, name: polyomino.name }));
 		this.gridBoard.clear();
 		this.polyominoes = [];
 		this.selectedPolyomino = null;
@@ -240,74 +233,62 @@ class MainApp {
 		this.redraw();
 	};
 
+	resetRotations() {
+		this.polyominoes.forEach(polyomino => {
+			const rotationCount = polyomino.nbRotations % 4;
+			if (rotationCount === 0) { return; }
+			else if (rotationCount > 0) { for (let i = 0; i < rotationCount; i++) { polyomino.rotateLeft(); } }
+			else { for (let i = 0; i < Math.abs(rotationCount); i++) { polyomino.rotateRight(); } }
+			polyomino.nbRotations = 0;
+		});
+	};
 
 	autoRandomBlackening() {
-        const totalCells = this.gridBoard.rows * this.gridBoard.cols;
-        const minBlackCells = Math.floor(totalCells * 0.20);
-        const maxBlackCells = Math.floor(totalCells * 0.25);
-        const nbBlackCellsWanted = Math.floor(Math.random() * (maxBlackCells - minBlackCells + 1)) + minBlackCells;
-        
-        let currentBlackCells = this.blackenedCells.size;
+		const totalCells = this.gridBoard.rows * this.gridBoard.cols;
+		const minBlackCells = Math.floor(totalCells * 0.20);
+		const maxBlackCells = Math.floor(totalCells * 0.25);
+		const nbBlackCellsWanted = Math.floor(Math.random() * (maxBlackCells - minBlackCells + 1)) + minBlackCells;
+		let currentBlackCells = this.blackenedCells.size;
 
-        while (currentBlackCells < nbBlackCellsWanted) {
-            const randomRow = Math.floor(Math.random() * this.gridBoard.rows);
-            const randomCol = Math.floor(Math.random() * this.gridBoard.cols);
-            const cellKey = `${randomRow}-${randomCol}`;
+		while (currentBlackCells < nbBlackCellsWanted) {
+			const randomRow = Math.floor(Math.random() * this.gridBoard.rows);
+			const randomCol = Math.floor(Math.random() * this.gridBoard.cols);
+			const cellKey = `${randomRow}-${randomCol}`;
 
-            if (!this.blackenedCells.has(cellKey)) {
-                this.blackenedCells.add(cellKey);
-                this.gridBoard.grid[randomRow][randomCol] = '#000000';
-                currentBlackCells++;
-            }
-        }
-        this.redraw();
-    }
-
+			if (!this.blackenedCells.has(cellKey)) {
+				this.blackenedCells.add(cellKey);
+				this.gridBoard.grid[randomRow][randomCol] = '#000000';
+				currentBlackCells++;
+			}
+		}
+		this.redraw();
+	};
 
 	autoWhitening() {
-        this.blackenedCells.clear();
-        for (let row = 0; row < this.gridBoard.rows; row++) {
-            for (let col = 0; col < this.gridBoard.cols; col++) {
-                this.gridBoard.grid[row][col] = null;
-            }
-        }
-        this.redraw();
-    }
-
+		this.blackenedCells.clear();
+		for (let row = 0; row < this.gridBoard.rows; row++) {
+			for (let col = 0; col < this.gridBoard.cols; col++) {
+				this.gridBoard.grid[row][col] = null;
+			}
+		}
+		this.redraw();
+	};
 
 	invertBlackWhite() {
-        for (let row = 0; row < this.gridBoard.rows; row++) {
-            for (let col = 0; col < this.gridBoard.cols; col++) {
-                const cellKey = `${row}-${col}`;
-                if (this.blackenedCells.has(cellKey)) {
-                    this.blackenedCells.delete(cellKey);
-                    this.gridBoard.grid[row][col] = null;
-                } else {
-                    this.blackenedCells.add(cellKey);
-                    this.gridBoard.grid[row][col] = '#000000';
-                }
-            }
-        }
-        this.redraw();
-    }
-	
-	resetRotations() {
-        this.polyominoes.forEach(polyomino => {
-            const rotationCount = polyomino.nbRotations % 4;
-            if (rotationCount === 0) {
-                return;
-            } else if (rotationCount > 0) {
-                for (let i = 0; i < rotationCount; i++) {
-                    polyomino.rotateLeft();
-                }
-            } else {
-                for (let i = 0; i < Math.abs(rotationCount); i++) {
-                    polyomino.rotateRight();
-                }
-            }
-            polyomino.nbRotations = 0;
-        });
-    }
+		for (let row = 0; row < this.gridBoard.rows; row++) {
+			for (let col = 0; col < this.gridBoard.cols; col++) {
+				const cellKey = `${row}-${col}`;
+				if (this.blackenedCells.has(cellKey)) {
+					this.blackenedCells.delete(cellKey);
+					this.gridBoard.grid[row][col] = null;
+				} else {
+					this.blackenedCells.add(cellKey);
+					this.gridBoard.grid[row][col] = '#000000';
+				}
+			}
+		}
+		this.redraw();
+	};
 
 	resetBoard() {
 		this.polyominoes.forEach(polyomino => {
@@ -321,103 +302,75 @@ class MainApp {
 		this.redraw();
 	};
 
-
 	mixPosition() {
-        const margin = 70;
-        const gridLeft = this.gridBoard.gridOffsetX;
-        const gridTop = this.gridBoard.gridOffsetY;
-        const gridRight = this.gridBoard.gridOffsetX + this.gridSize * this.cols;
-        const gridBottom = this.gridBoard.gridOffsetY + this.gridSize * this.rows;
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-
-        this.gridBoard.clearGrid();
-
-        this.polyominoes.forEach((polyomino) => {
-            let attempts = 0;
-            let randomX, randomY, validPosition;
-            do {
-                // Genere des positions random dans des zones differente zones autour de la grid
-                const zone = Math.floor(Math.random() * 4);
-                switch (zone) {
-                    case 0: // gauche de la grid
-                        randomX = Math.floor(Math.random() * (gridLeft - margin));
-                        randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
-                        break;
-                    case 1: // droite de la grid
-                        randomX = Math.floor(Math.random() * (windowWidth - gridRight - margin)) + gridRight;
-                        randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
-                        break;
-                    case 2: // en haut de la grid
-                        randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
-                        randomY = Math.floor(Math.random() * (gridTop - margin));
-                        break;
-                    case 3: // en bas de la grid
-                        randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
-                        randomY = Math.floor(Math.random() * (windowHeight - gridBottom - margin)) + gridBottom;
-                        break;
-                }
-                validPosition = true; // si la position est bonne 
-                attempts++;
-            } while (!validPosition && attempts < 100);
-
-            polyomino.x = randomX;
-            polyomino.y = randomY;
-            polyomino.isPlaced = false;
-        });
-
+		const margin = 70;
+		const gridLeft = this.gridBoard.gridOffsetX;
+		const gridTop = this.gridBoard.gridOffsetY;
+		const gridRight = this.gridBoard.gridOffsetX + this.gridSize * this.cols;
+		const gridBottom = this.gridBoard.gridOffsetY + this.gridSize * this.rows;
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+		this.polyominoes.forEach((polyomino) => {
+			let attempts = 0;
+			let randomX, randomY, validPosition;
+			this.gridBoard.removePolyomino(polyomino);
+			polyomino.isPlaced = false;
+			do {
+				const zone = Math.floor(Math.random() * 4);
+				switch (zone) {
+					case 0:
+						randomX = Math.floor(Math.random() * (gridLeft - margin));
+						randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
+						break;
+					case 1:
+						randomX = Math.floor(Math.random() * (windowWidth - gridRight - margin)) + gridRight;
+						randomY = Math.floor(Math.random() * (windowHeight - 2 * margin)) + margin;
+						break;
+					case 2:
+						randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
+						randomY = Math.floor(Math.random() * (gridTop - margin));
+						break;
+					case 3:
+						randomX = Math.floor(Math.random() * (windowWidth - 2 * margin)) + margin;
+						randomY = Math.floor(Math.random() * (windowHeight - gridBottom - margin)) + gridBottom;
+						break;
+				}
+				validPosition = true;
+				attempts++;
+			} while (!validPosition && attempts < 100);
+			polyomino.x = randomX;
+			polyomino.y = randomY;
+			polyomino.isPlaced = false;
+		});
 		this.resetRotations();
-        this.redraw();
-    }
-
+		this.redraw();
+	};
 
 	createMessageBox(type_tiling) {
 		const messageBox = document.createElement('div');
 		messageBox.id = 'messageBox';
-		if (type_tiling == 1) {
-			messageBox.textContent = 'BACKTRACKING TILING FINISHED';
-		} 
-		else if (type_tiling == 2) {
-			messageBox.textContent = 'BRUTE FORCE TILING FINISHED';
-		} 
-		else if (type_tiling == 3) {
-			messageBox.textContent = 'RANDOM TILING FINISHED';
-		} 
-		else if (type_tiling == 4) {
-			messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED';
-		} 
-		
-		else {
-			messageBox.textContent = 'TILING FINISHED';
+		switch (type_tiling) {
+			case 1: messageBox.textContent = 'BACKTRACKING TILING FINISHED'; break;
+			case 2: messageBox.textContent = 'BRUTE FORCE TILING FINISHED'; break;
+			case 3: messageBox.textContent = 'RANDOM TILING FINISHED'; break;
+			case 4: messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED'; break;
+			default: messageBox.textContent = 'TILING FINISHED';
 		}
-		Object.assign(messageBox.style, {
-			display: 'none',
-			position: 'absolute',
-			top: '50%',
-			left: '50%',
-			transform: 'translate(-50%, -50%)',
-			backgroundColor: 'red',
-			color: 'white',
-			padding: '10px',
-			borderRadius: '5px'
-		});
+		Object.assign(messageBox.style, { position: 'absolute', top: '20%', left: '50%', transform: 'translate(-50%, -50%)',
+			backgroundColor: 'blue', color: 'white', padding: '10px', borderRadius: '5px', zIndex: '1001' });
+		messageBox.style.display = 'none';
 		return messageBox;
-	}
-	
+	};
+
 	showMessageBox(messageBox) {
 		document.body.appendChild(messageBox);
-		messageBox.style.display = 'block'; // Affiche le message
-	
-		setTimeout(() => {
-			messageBox.style.display = 'none'; // Masque le message après 2 secondes
-		}, 2000);
-	}
-	
+		messageBox.style.display = 'block';
+		setTimeout(() => { messageBox.style.display = 'none'; }, 2000);
+	};
+
 	backtrackingAutoTiling() {
-		this.resetBoard();  // Réinitialisez la grille avant d'appeler la méthode de pavage
+		this.resetBoard();
 		const messageBox = this.createMessageBox(1);
-		
-		// Appeler la fonction de pavage avec un délai pour afficher le message après le pavage
 		setTimeout(() => {
 			backtrackingAutoTiling(
 				this.polyominoes, 
@@ -425,59 +378,34 @@ class MainApp {
 				this.placePolyomino.bind(this), 
 				this.gridBoard.removePolyomino.bind(this), 
 				this.redraw.bind(this),
-				() => {
-					//pourfficher le message après le pavage
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
-		}, 1000); // Delai pour voir la reinitialisation du plateau
-	}
-	
-
+		}, 1000);
+	};
 
 	bruteForceTiling() {
 		this.resetBoard(); 
-	
-		const messageBox = this.createMessageBox(2); // un autre type de message pour bruteForceTiling
-	
-
+		const messageBox = this.createMessageBox(2);
 		setTimeout(() => {
 			bruteForceTiling(
 				this.gridBoard, 
 				this.polyominoes, 
 				this.placePolyomino.bind(this), 
 				this.redraw.bind(this),
-				() => {
-					// Afficher le message après le pavage
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
-		}, 1000); // Délai pour permettre de voir la réinitialisation du plateau
-	}
-	
-
-
+		}, 1000);
+	};
 
 	randomTiling() {
 		this.resetBoard();
 		const messageBox = this.createMessageBox(3);
-	
-		setTimeout(() => {
-			randomTiling(
-				this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.redraw.bind(this), () => {
-					//pourfficher le message après le pavage
-					this.showMessageBox(messageBox);
-				}
-			);
-		}, 1000); // Delai pour permettre de voir la reinitialisation du plateau
-	}
-	
-	
-	
+		setTimeout(() => { randomTiling( this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.redraw.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000);
+	};
+
 	randomBacktrackingTiling() {
 		this.resetBoard();
 		const messageBox = this.createMessageBox(4);
-	
 		setTimeout(() => {
 			randomBacktrackingTiling(
 				this.polyominoes, 
@@ -485,14 +413,10 @@ class MainApp {
 				this.placePolyomino.bind(this), 
 				this.gridBoard.removePolyomino.bind(this), 
 				this.redraw.bind(this),
-				() => {
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
-		}, 1000); // Delai pour permettre de voir la reinitialisation du plateau
-	}
-	
-	
+		}, 1000);
+	};
 };
 
 const main_app = new MainApp();
