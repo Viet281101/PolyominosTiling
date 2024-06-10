@@ -6,7 +6,6 @@ export class GUIController {
 		this.settings = {
 			gridSize: mainApp.gridSize,
 			backgroundColor: '#c3c3c3',
-			iconSize: mainApp.icons.flip.width / 2,
 			selectedColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff',
 			tooltipPolyomino: false,
 			tooltipToolbar: true
