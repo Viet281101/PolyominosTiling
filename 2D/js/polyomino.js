@@ -211,7 +211,7 @@ export const SHAPES = {
 	TETROMINO_L: [[1, 0, 0], [1, 1, 1]],
 	PENTOMINO_F: [[0, 1, 1], [1, 1, 0], [0, 1, 0]],
 	PENTOMINO_I: [[1, 1, 1, 1, 1]],
-	PENTOMINO_L: [[1, 0, 0, 0, 0], [1, 1, 1, 1, 1]],
+	PENTOMINO_L: [[1, 0, 0, 0, 0], [1, 1, 1, 1, 0]],
 	PENTOMINO_N: [[1, 1, 1, 0], [0, 0, 1, 1]],
 	PENTOMINO_P: [[1, 1, 1], [1, 1, 0]],
 	PENTOMINO_T: [[1, 1, 1], [0, 1, 0], [0, 1, 0]],

@@ -263,10 +263,11 @@ class MainApp {
 		const gridBottom = this.gridBoard.gridOffsetY + this.gridSize * this.rows;
 		const windowWidth = window.innerWidth;
 		const windowHeight = window.innerHeight;
-		this.gridBoard.clearGrid();
 		this.polyominoes.forEach((polyomino) => {
 			let attempts = 0;
 			let randomX, randomY, validPosition;
+			this.gridBoard.removePolyomino(polyomino);
+			polyomino.isPlaced = false;
 			do {
 				const zone = Math.floor(Math.random() * 4);
 				switch (zone) {
@@ -301,34 +302,23 @@ class MainApp {
 	createMessageBox(type_tiling) {
 		const messageBox = document.createElement('div');
 		messageBox.id = 'messageBox';
-		if (type_tiling == 1) {
-			messageBox.textContent = 'BACKTRACKING TILING FINISHED';
-		} 
-		else if (type_tiling == 2) {
-			messageBox.textContent = 'BRUTE FORCE TILING FINISHED';
-		} 
-		else if (type_tiling == 3) {
-			messageBox.textContent = 'RANDOM TILING FINISHED';
-		} 
-		else if (type_tiling == 4) {
-			messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED';
-		} 
-		else {
-			messageBox.textContent = 'TILING FINISHED';
+		switch (type_tiling) {
+			case 1: messageBox.textContent = 'BACKTRACKING TILING FINISHED'; break;
+			case 2: messageBox.textContent = 'BRUTE FORCE TILING FINISHED'; break;
+			case 3: messageBox.textContent = 'RANDOM TILING FINISHED'; break;
+			case 4: messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED'; break;
+			default: messageBox.textContent = 'TILING FINISHED';
 		}
-		Object.assign(messageBox.style, {
-			display: 'none', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-			backgroundColor: 'blue', color: 'white', padding: '10px', borderRadius: '5px'
-		});
+		Object.assign(messageBox.style, { position: 'absolute', top: '20%', left: '50%', transform: 'translate(-50%, -50%)',
+			backgroundColor: 'blue', color: 'white', padding: '10px', borderRadius: '5px', zIndex: '1001' });
+		messageBox.style.display = 'none';
 		return messageBox;
 	};
 	
 	showMessageBox(messageBox) {
 		document.body.appendChild(messageBox);
 		messageBox.style.display = 'block';
-		setTimeout(() => {
-			messageBox.style.display = 'none';
-		}, 1000);
+		setTimeout(() => { messageBox.style.display = 'none'; }, 2000);
 	};
 	
 	backtrackingAutoTiling() {
@@ -376,9 +366,7 @@ class MainApp {
 				this.placePolyomino.bind(this), 
 				this.gridBoard.removePolyomino.bind(this), 
 				this.redraw.bind(this),
-				() => {
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
 		}, 1000);
 	};

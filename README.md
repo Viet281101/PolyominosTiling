@@ -22,6 +22,7 @@ Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec 
 - [dat.gui](https://github.com/dataarts/dat.gui)
 
 **The polyominoes**:
+- [Polycube Wiki](https://en.wikipedia.org/wiki/Polycube)
 - [Polyomino Wiki](https://en.wikipedia.org/wiki/Polyomino)
 - [Les pentominos](https://www.monunivers.com/pento/)
 - [Tiling Polyominoes Game](https://demonstrations.wolfram.com/TilingPolyominoesGame/)
