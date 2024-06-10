@@ -135,7 +135,7 @@ class MainApp {
 	};
 
 	handleMouseMove(mousePos) {
-		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
+		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
 		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
 			let found = false;
