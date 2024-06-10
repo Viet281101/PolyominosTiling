@@ -241,7 +241,54 @@ class MainApp {
 			else { for (let i = 0; i < Math.abs(rotationCount); i++) { polyomino.rotateRight(); } }
 			polyomino.nbRotations = 0;
 		});
-	}
+	};
+
+	autoRandomBlackening() {
+		const totalCells = this.gridBoard.rows * this.gridBoard.cols;
+		const minBlackCells = Math.floor(totalCells * 0.20);
+		const maxBlackCells = Math.floor(totalCells * 0.25);
+		const nbBlackCellsWanted = Math.floor(Math.random() * (maxBlackCells - minBlackCells + 1)) + minBlackCells;
+		let currentBlackCells = this.blackenedCells.size;
+
+		while (currentBlackCells < nbBlackCellsWanted) {
+			const randomRow = Math.floor(Math.random() * this.gridBoard.rows);
+			const randomCol = Math.floor(Math.random() * this.gridBoard.cols);
+			const cellKey = `${randomRow}-${randomCol}`;
+
+			if (!this.blackenedCells.has(cellKey)) {
+				this.blackenedCells.add(cellKey);
+				this.gridBoard.grid[randomRow][randomCol] = '#000000';
+				currentBlackCells++;
+			}
+		}
+		this.redraw();
+	};
+
+	autoWhitening() {
+		this.blackenedCells.clear();
+		for (let row = 0; row < this.gridBoard.rows; row++) {
+			for (let col = 0; col < this.gridBoard.cols; col++) {
+				this.gridBoard.grid[row][col] = null;
+			}
+		}
+		this.redraw();
+	};
+
+	invertBlackWhite() {
+		for (let row = 0; row < this.gridBoard.rows; row++) {
+			for (let col = 0; col < this.gridBoard.cols; col++) {
+				const cellKey = `${row}-${col}`;
+				if (this.blackenedCells.has(cellKey)) {
+					this.blackenedCells.delete(cellKey);
+					this.gridBoard.grid[row][col] = null;
+				} else {
+					this.blackenedCells.add(cellKey);
+					this.gridBoard.grid[row][col] = '#000000';
+				}
+			}
+		}
+		this.redraw();
+	};
 
 	resetBoard() {
 		this.polyominoes.forEach(polyomino => {
@@ -314,13 +361,13 @@ class MainApp {
 		messageBox.style.display = 'none';
 		return messageBox;
 	};
-	
+
 	showMessageBox(messageBox) {
 		document.body.appendChild(messageBox);
 		messageBox.style.display = 'block';
 		setTimeout(() => { messageBox.style.display = 'none'; }, 2000);
 	};
-	
+
 	backtrackingAutoTiling() {
 		this.resetBoard();
 		const messageBox = this.createMessageBox(1);
