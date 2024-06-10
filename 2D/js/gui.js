@@ -6,8 +6,7 @@ export class GUIController {
 		this.settings = {
 			gridSize: mainApp.gridSize,
 			backgroundColor: '#c3c3c3',
-			iconSize: mainApp.icons.flip.width / 2,
-			selectedColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff',
+			polyominoesColor: mainApp.selectedPolyomino ? mainApp.selectedPolyomino.color : '#0000ff',
 			tooltipPolyomino: false,
 			tooltipToolbar: true
 		};
@@ -31,7 +30,7 @@ export class GUIController {
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			this.mainApp.canvas.style.backgroundColor = value;
 		});
-		this.gui.addColor(this.settings, 'selectedColor').onChange((value) => {
+		this.gui.addColor(this.settings, 'polyominoesColor').onChange((value) => {
 			if (this.mainApp.selectedPolyomino) {
 				this.mainApp.selectedPolyomino.color = value;
 				this.mainApp.redraw();

@@ -42,7 +42,7 @@ class MainApp {
 		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
 		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
 		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-		this.renderer.domElement.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
+		this.renderer.domElement.addEventListener('contextmenu', (event) => { event.preventDefault(); }, false);
 	};
 
 	addPolycube(cubeData) {
@@ -135,10 +135,6 @@ class MainApp {
 		this.controls.enabled = true;
 	};
 
-	onContextMenu(event) {
-		event.preventDefault();
-	};
-
 	selectPolycube(polycube) {
 		this.selectedPolycube = polycube;
 		this.selectedPolycube.group.children.forEach(child => {
@@ -209,6 +205,16 @@ class MainApp {
 		} else {
 			group.position.copy(newPosition);
 			return true;
+		}
+	};
+
+	updatePolycubeColor(color) {
+		if (this.selectedPolycube) {
+			this.selectedPolycube.group.children.forEach(child => {
+				if (child instanceof THREE.Mesh) {
+					child.material.color.set(color);
+				}
+			});
 		}
 	};
 };

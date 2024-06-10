@@ -9,7 +9,7 @@ export function showSettingsPopup(toolbar) {
 	const rows = [
 		{ label: 'Quick settings', box: true, title: true },
 		{ label: 'Reset Polyominoes Position', icon: '../assets/ic_reset.png' },
-		{ label: 'Mix Position of Polyominoes', icon: '../assets/ic_split.png' },
+		{ label: 'Mix Position of Polyominoes', icon: '../assets/ic_shuffle.png' },
 		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' }
 	];
 

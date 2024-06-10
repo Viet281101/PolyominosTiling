@@ -5,7 +5,7 @@ export class GUIController {
 		this.mainApp = mainApp;
 		this.settings = {
 			backgroundColor: '#999999',
-			selectedColor: '#0000ff',
+			polycubeColor: '#0000ff',
 			tooltipToolbar: true,
 			showInnerGrid: false
 		};
@@ -27,8 +27,8 @@ export class GUIController {
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			this.mainApp.renderer.setClearColor(value);
 		});
-		this.gui.addColor(this.settings, 'selectedColor').onChange((value) => {
-			this.settings.selectedColor = value;
+		this.gui.addColor(this.settings, 'polycubeColor').onChange((value) => {
+			this.mainApp.updatePolycubeColor(value);
 		});
 		this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
 			this.mainApp.toolbar.tooltipToolbar = value;

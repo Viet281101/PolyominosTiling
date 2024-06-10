@@ -12,7 +12,10 @@ export function showGridPopup(toolbar) {
 		{ label: 'Enter n° columns', type: 'input' },
 		{ label: 'Draw grid by click to =>', icon: '../assets/ic_draw.png' },
 		{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
-		{ label: 'Blacken the grid cells :', icon: '../assets/ic_blackend_cell.png' }
+		{ label: 'Blacken the grid Cells :', icon: '../assets/ic_blacken_cell.png' },
+		{ label: 'Random Blackening Cells :', icon: '../assets/ic_random_blacken_cell.png' },
+		{ label: 'Clear Blacken Cells :', icon: '../assets/ic_whiten.png' },
+		{ label: 'Invert Black/White Cells :', icon: '../assets/ic_invert_blacken.png' },
 	];
 
 	const startY = 76;
@@ -77,17 +80,24 @@ export function showGridPopup(toolbar) {
 				switch (index) {
 					case 3:
 						toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize);
-						if (toolbar.isMobile) {toolbar.closePopup('grid');}
 						break;
 					case 4:
 						toolbar.mainApp.clearBoard();
-						if (toolbar.isMobile) {toolbar.closePopup('grid');}
 						break;
 					case 5:
 						toolbar.mainApp.isBlackening = true;
-						if (toolbar.isMobile) {toolbar.closePopup('grid');}
+						break;
+					case 6:
+						toolbar.mainApp.autoRandomBlackening();
+						break;
+					case 7:
+						toolbar.mainApp.autoWhitening();
+						break;
+					case 8:
+						toolbar.mainApp.invertBlackWhite();
 						break;
 				}
+				if (toolbar.isMobile) {toolbar.closePopup('grid');}
 			}
 		});
 	});
