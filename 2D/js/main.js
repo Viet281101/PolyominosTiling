@@ -55,20 +55,10 @@ class MainApp {
 	};
 
 	addEventListeners() {
-		this.canvas.addEventListener('mousedown', (e) => {
-			const mousePos = this.gridBoard.getMousePos(e);
-			this.handleMouseDown(mousePos);
-		});
-		this.canvas.addEventListener('mousemove', (e) => {
-			const mousePos = this.gridBoard.getMousePos(e);
-			this.handleMouseMove(mousePos);
-		});
-		this.canvas.addEventListener('mouseup', (e) => {
-			this.handleMouseUp();
-		});
-		window.addEventListener('keydown', (e) => {
-			if (e.key === 'r' && this.selectedPolyomino) { this.selectedPolyomino.rotate(); this.redraw(); }
-		});
+		this.canvas.addEventListener('mousedown', (e) => { const mousePos = this.gridBoard.getMousePos(e); this.handleMouseDown(mousePos); });
+		this.canvas.addEventListener('mousemove', (e) => { const mousePos = this.gridBoard.getMousePos(e); this.handleMouseMove(mousePos); });
+		this.canvas.addEventListener('mouseup', (e) => { this.handleMouseUp(); });
+		window.addEventListener('keydown', (e) => { if (e.key === 'r' && this.selectedPolyomino) { this.selectedPolyomino.rotate(); this.redraw(); } });
 		window.addEventListener('resize', () => {
 			this.gridBoard.resizeCanvas();
 			this.gridBoard.drawGrid();
@@ -182,7 +172,7 @@ class MainApp {
 		do { newColor = getRandomColor();
 		} while (newColor === polyomino.color);
 		const newShape = polyomino.shape.map(row => row.slice());
-		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this);
+		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this, polyomino.name);
 		this.polyominoes.push(newPolyomino);
 		this.redraw();
 	};

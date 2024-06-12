@@ -89,9 +89,7 @@ class MainApp {
 			this.isDragging = true;
 			this.controls.enabled = false;
 
-			if (event.button === 2) {
-				this.isRightClick = true;
-			}
+			if (event.button === 2) { this.isRightClick = true; }
 
 			this.lastMousePosition = { x: event.clientX, y: event.clientY };
 			this.lastValidPosition = this.selectedPolycube.group.position.clone();
