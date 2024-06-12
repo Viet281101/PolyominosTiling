@@ -36,19 +36,19 @@ export function showGridPopup(toolbar) {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
 		} else if (row.type === 'input') {
-			createInputField(popupContainer, y, 10);
+			createInputField(popupContainer, y, 3);
 		}
 	});
 
-	let x = 3;
-	let y = 3;
-	let z = 3;
+	let x_size = 3;
+	let y_size = 3;
+	let z_size = 3;
 
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
 		input.addEventListener('change', (e) => {
-			if (index === 0) x = parseInt(e.target.value);
-			if (index === 1) y = parseInt(e.target.value);
-			if (index === 2) z = parseInt(e.target.value);
+			if (index === 0) x_size = parseInt(e.target.value);
+			if (index === 1) y_size = parseInt(e.target.value);
+			if (index === 2) z_size = parseInt(e.target.value);
 		});
 	});
 
@@ -77,12 +77,8 @@ export function showGridPopup(toolbar) {
 			const y = startY + index * rowHeight;
 			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 				switch (index) {
-					case 4:
-						toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize);
-						break;
-					case 5:
-						toolbar.mainApp.clearBoard();
-						break;
+					case 4: toolbar.mainApp.createNewBoard(x_size, y_size, z_size); break;
+					case 5: toolbar.mainApp.clearBoard(); break;
 				}
 				if (toolbar.isMobile) {toolbar.closePopup('grid');}
 			}
@@ -101,7 +97,7 @@ function createInputField(popupContainer, y, defaultValue) {
 	input.style.height = '24px';
 	input.style.border = '1px solid #000';
 	input.style.backgroundColor = '#fff';
-	input.style.fontSize = '16px';
+	input.style.fontSize = '22px';
 	input.style.fontFamily = 'Pixellari';
 	input.style.color = '#000';
 	input.style.zIndex = '1001';

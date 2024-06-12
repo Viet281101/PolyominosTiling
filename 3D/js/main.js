@@ -132,18 +132,14 @@ class MainApp {
 	selectPolycube(polycube) {
 		this.selectedPolycube = polycube;
 		this.selectedPolycube.group.children.forEach(child => {
-			if (child instanceof THREE.LineSegments) {
-				child.material.color.set(0xffffff);
-			}
+			if (child instanceof THREE.LineSegments) { child.material.color.set(0xffffff); }
 		});
 	};
 
 	deselectPolycube() {
 		if (this.selectedPolycube) {
 			this.selectedPolycube.group.children.forEach(child => {
-				if (child instanceof THREE.LineSegments) {
-					child.material.color.set(0x000000);
-				}
+				if (child instanceof THREE.LineSegments) { child.material.color.set(0x000000); }
 			});
 			this.selectedPolycube = null;
 		}
@@ -216,8 +212,12 @@ class MainApp {
 		}
 	};
 
-	clearBoard() {
-		this.board.clearGrid();
+	clearBoard() { this.board.clearGrid(); this.board = null; }
+	createNewBoard(x, y, z) {
+		const showInnerGrid = this.board ? this.board.showInnerGrid : false;
+		if (this.board) { this.clearBoard(); }
+		this.board = new Board(this.scene, { x, y, z });
+		this.board.toggleInnerGrid(showInnerGrid);
 	};
 };
 

@@ -73,7 +73,7 @@ function createInputField(popupContainer, y, defaultValue) {
 	input.style.height = '24px';
 	input.style.border = '1px solid #000';
 	input.style.backgroundColor = '#fff';
-	input.style.fontSize = '16px';
+	input.style.fontSize = '22px';
 	input.style.fontFamily = 'Pixellari';
 	input.style.color = '#000';
 	input.style.zIndex = '1001';

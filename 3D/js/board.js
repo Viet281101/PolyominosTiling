@@ -61,9 +61,22 @@ export class Board {
 		group.add(line);
 	};
 
+	toggleInnerGrid(show) {
+		this.showInnerGrid = show;
+		if (show) {
+			this.scene.add(this.innerGrid);
+		} else {
+			this.scene.remove(this.innerGrid);
+		}
+	};
+
 	clearGrid() {
-		this.grid.children.forEach(child => this.grid.remove(child));
-		this.innerGrid.children.forEach(child => this.innerGrid.remove(child));
+		while (this.grid.children.length > 0) {
+			this.grid.remove(this.grid.children[0]);
+		}
+		while (this.innerGrid.children.length > 0) {
+			this.innerGrid.remove(this.innerGrid.children[0]);
+		}
 		this.scene.remove(this.grid);
 		this.scene.remove(this.innerGrid);
 	};
