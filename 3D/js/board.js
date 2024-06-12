@@ -61,25 +61,10 @@ export class Board {
 		group.add(line);
 	};
 
-	addPolycube(polycube) {
-		this.grid.add(polycube.group);
-	};
-
-	removePolycube(polycube) {
-		this.grid.remove(polycube.group);
-	};
-
-	toggleInnerGrid(show) {
-		this.showInnerGrid = show;
-		if (show) {
-			this.scene.add(this.innerGrid);
-		} else {
-			this.scene.remove(this.innerGrid);
-		}
-	};
-
-	updateGridSize(size) {
-		this.size = size;
-		this.grid.scale.set(size.x / 10, size.y / 10, size.z / 10);
+	clearGrid() {
+		this.grid.children.forEach(child => this.grid.remove(child));
+		this.innerGrid.children.forEach(child => this.innerGrid.remove(child));
+		this.scene.remove(this.grid);
+		this.scene.remove(this.innerGrid);
 	};
 };

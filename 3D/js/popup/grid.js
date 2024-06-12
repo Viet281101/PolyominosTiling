@@ -40,9 +40,9 @@ export function showGridPopup(toolbar) {
 		}
 	});
 
-	let x = 10;
-	let y = 10;
-	let z = 10;
+	let x = 3;
+	let y = 3;
+	let z = 3;
 
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
 		input.addEventListener('change', (e) => {

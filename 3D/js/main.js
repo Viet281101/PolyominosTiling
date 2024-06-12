@@ -47,7 +47,7 @@ class MainApp {
 
 	addPolycube(cubeData) {
 		const polycube = new Polycube(cubeData);
-		this.board.addPolycube(polycube);
+		this.scene.add(polycube.group);
 		this.polys.push(polycube);
 	};
 
@@ -55,10 +55,6 @@ class MainApp {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-	};
-
-	updateGridSize(size) {
-		this.board.updateGridSize(size);
 	};
 
 	animate() {
@@ -218,6 +214,10 @@ class MainApp {
 				}
 			});
 		}
+	};
+
+	clearBoard() {
+		this.board.clearGrid();
 	};
 };
 
