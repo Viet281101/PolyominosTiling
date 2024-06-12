@@ -15,7 +15,7 @@ export function createCubePopup(toolbar) {
 
 	const startY = 76;
 	const rowHeight = 76;
-	const colX = 16;
+	const colX = 20;
 	let n = 1;
 
 	rows.forEach((row, index) => {
