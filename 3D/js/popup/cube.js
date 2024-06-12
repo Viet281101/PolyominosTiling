@@ -9,18 +9,20 @@ export function createCubePopup(toolbar) {
 	ctx.fillRect(0, 0, popup.width, popup.height);
 
 	const rows = [
-		{ label: '', box: true, title: true },
+		{ label: 'Enter values to make Polycubes', box: true, title: true },
+		{ label: 'N° squares per cube:  n = ', type: 'input' },
 	];
 
 	const startY = 76;
 	const rowHeight = 76;
-	const colX = 30;
+	const colX = 16;
+	let n = 1;
 
 	rows.forEach((row, index) => {
 		const y = startY + index * rowHeight;
 		if (row.box) {
 			ctx.strokeStyle = '#fff';
-			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 4 : 1)));
+			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 5 : 1)));
 		}
 		ctx.font = '22px Pixellari';
 		ctx.fillStyle = '#000';
@@ -33,17 +35,13 @@ export function createCubePopup(toolbar) {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
 		} else if (row.type === 'input') {
-			createInputField(popupContainer, y, 10);
+			createInputField(popupContainer, y, n);
 		}
 	});
 
-	let newRows = 10;
-	let newCols = 10;
-
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
 		input.addEventListener('change', (e) => {
-			if (index === 0) newRows = parseInt(e.target.value);
-			if (index === 1) newCols = parseInt(e.target.value);
+			if (index === 0) n = parseInt(e.target.value);
 		});
 	});
 
@@ -69,9 +67,9 @@ function createInputField(popupContainer, y, defaultValue) {
 	input.type = 'number';
 	input.value = defaultValue;
 	input.style.position = 'absolute';
-	input.style.left = 'calc(100% - 120px)';
+	input.style.left = 'calc(100% - 90px)';
 	input.style.top = `${y}px`;
-	input.style.width = '80px';
+	input.style.width = '60px';
 	input.style.height = '24px';
 	input.style.border = '1px solid #000';
 	input.style.backgroundColor = '#fff';

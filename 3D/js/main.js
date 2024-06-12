@@ -10,6 +10,7 @@ class MainApp {
 		this.selectedPolycube = null;
 		this.isDragging = false;
 		this.isRightClick = false;
+		this.polys = [];
 		this.init();
 		this.animate();
 		this.eventListener();
@@ -28,11 +29,10 @@ class MainApp {
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-		this.board = new Board(this.scene, 10);
+		this.board = new Board(this.scene, { x: 3, y: 3, z: 3 });
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
 
-		this.polys = [];
 		this.addPolycube({ n: 1, cubes: [[0, 0, 0]], color: 0x00ff00, position: { x: 0, y: 3, z: 0 } });
 		this.addPolycube({ n: 3, cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000, position: { x: 2, y: 2, z: 2 } });
 	};
@@ -58,7 +58,7 @@ class MainApp {
 	};
 
 	updateGridSize(size) {
-		this.board.grid.scale.set(size / 10, size / 10, size / 10);
+		this.board.updateGridSize(size);
 	};
 
 	animate() {
@@ -156,12 +156,16 @@ class MainApp {
 	snapToGrid(polycube) {
 		const gridSize = 1;
 		const group = polycube.group;
+		const size = this.board.size;
 
-		const offset = gridSize / 2;
+		const offsetX = (size.x % 2 === 0) ? gridSize / 2 : 0;
+		const offsetY = (size.y % 2 === 0) ? gridSize / 2 : 0;
+		const offsetZ = (size.z % 2 === 0) ? gridSize / 2 : 0;
+
 		const newPosition = new THREE.Vector3(
-			Math.round((group.position.x - offset) / gridSize) * gridSize + offset,
-			Math.round((group.position.y - offset) / gridSize) * gridSize + offset,
-			Math.round((group.position.z - offset) / gridSize) * gridSize + offset
+			Math.round((group.position.x - offsetX) / gridSize) * gridSize + offsetX,
+			Math.round((group.position.y - offsetY) / gridSize) * gridSize + offsetY,
+			Math.round((group.position.z - offsetZ) / gridSize) * gridSize + offsetZ
 		);
 
 		const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);

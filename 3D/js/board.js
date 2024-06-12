@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export class Board {
-	constructor(scene, size = 10) {
+	constructor(scene, size = { x: 10, y: 10, z: 10 }) {
 		this.scene = scene;
 		this.size = size;
 		this.grid = new THREE.Group();
@@ -20,29 +20,33 @@ export class Board {
 		const gridMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 		const gridStep = 1;
 
-		for (let i = -size / 2; i <= size / 2; i += gridStep) {
-			this.addLine(gridMaterial, [i, -size / 2, -size / 2], [i, size / 2, -size / 2], this.grid);
-			this.addLine(gridMaterial, [i, -size / 2, size / 2], [i, size / 2, size / 2], this.grid);
-			this.addLine(gridMaterial, [i, -size / 2, -size / 2], [i, -size / 2, size / 2], this.grid);
-			this.addLine(gridMaterial, [i, size / 2, -size / 2], [i, size / 2, size / 2], this.grid);
-
-			this.addLine(gridMaterial, [-size / 2, i, -size / 2], [size / 2, i, -size / 2], this.grid);
-			this.addLine(gridMaterial, [-size / 2, i, size / 2], [size / 2, i, size / 2], this.grid);
-			this.addLine(gridMaterial, [-size / 2, i, -size / 2], [-size / 2, i, size / 2], this.grid);
-			this.addLine(gridMaterial, [size / 2, i, -size / 2], [size / 2, i, size / 2], this.grid);
-
-			this.addLine(gridMaterial, [-size / 2, -size / 2, i], [size / 2, -size / 2, i], this.grid);
-			this.addLine(gridMaterial, [-size / 2, size / 2, i], [size / 2, size / 2, i], this.grid);
-			this.addLine(gridMaterial, [-size / 2, -size / 2, i], [-size / 2, size / 2, i], this.grid);
-			this.addLine(gridMaterial, [size / 2, -size / 2, i], [size / 2, size / 2, i], this.grid);
+		for (let i = -size.x / 2; i <= size.x / 2; i += gridStep) {
+			this.addLine(gridMaterial, [i, -size.y / 2, -size.z / 2], [i, size.y / 2, -size.z / 2], this.grid);
+			this.addLine(gridMaterial, [i, -size.y / 2, size.z / 2], [i, size.y / 2, size.z / 2], this.grid);
+			this.addLine(gridMaterial, [i, -size.y / 2, -size.z / 2], [i, -size.y / 2, size.z / 2], this.grid);
+			this.addLine(gridMaterial, [i, size.y / 2, -size.z / 2], [i, size.y / 2, size.z / 2], this.grid);
 		}
 
-		for (let x = -size / 2 + gridStep; x < size / 2; x += gridStep) {
-			for (let y = -size / 2 + gridStep; y < size / 2; y += gridStep) {
-				for (let z = -size / 2 + gridStep; z < size / 2; z += gridStep) {
-					this.addLine(gridMaterial, [x, y, -size / 2], [x, y, size / 2], this.innerGrid);
-					this.addLine(gridMaterial, [x, -size / 2, z], [x, size / 2, z], this.innerGrid);
-					this.addLine(gridMaterial, [-size / 2, y, z], [size / 2, y, z], this.innerGrid);
+		for (let j = -size.y / 2; j <= size.y / 2; j += gridStep) {
+			this.addLine(gridMaterial, [-size.x / 2, j, -size.z / 2], [size.x / 2, j, -size.z / 2], this.grid);
+			this.addLine(gridMaterial, [-size.x / 2, j, size.z / 2], [size.x / 2, j, size.z / 2], this.grid);
+			this.addLine(gridMaterial, [-size.x / 2, j, -size.z / 2], [-size.x / 2, j, size.z / 2], this.grid);
+			this.addLine(gridMaterial, [size.x / 2, j, -size.z / 2], [size.x / 2, j, size.z / 2], this.grid);
+		}
+
+		for (let k = -size.z / 2; k <= size.z / 2; k += gridStep) {
+			this.addLine(gridMaterial, [-size.x / 2, -size.y / 2, k], [size.x / 2, -size.y / 2, k], this.grid);
+			this.addLine(gridMaterial, [-size.x / 2, size.y / 2, k], [size.x / 2, size.y / 2, k], this.grid);
+			this.addLine(gridMaterial, [-size.x / 2, -size.y / 2, k], [-size.x / 2, size.y / 2, k], this.grid);
+			this.addLine(gridMaterial, [size.x / 2, -size.y / 2, k], [size.x / 2, size.y / 2, k], this.grid);
+		}
+
+		for (let x = -size.x / 2 + gridStep; x < size.x / 2; x += gridStep) {
+			for (let y = -size.y / 2 + gridStep; y < size.y / 2; y += gridStep) {
+				for (let z = -size.z / 2 + gridStep; z < size.z / 2; z += gridStep) {
+					this.addLine(gridMaterial, [x, y, -size.z / 2], [x, y, size.z / 2], this.innerGrid);
+					this.addLine(gridMaterial, [x, -size.y / 2, z], [x, size.y / 2, z], this.innerGrid);
+					this.addLine(gridMaterial, [-size.x / 2, y, z], [size.x / 2, y, z], this.innerGrid);
 				}
 			}
 		}
@@ -72,5 +76,10 @@ export class Board {
 		} else {
 			this.scene.remove(this.innerGrid);
 		}
+	};
+
+	updateGridSize(size) {
+		this.size = size;
+		this.grid.scale.set(size.x / 10, size.y / 10, size.z / 10);
 	};
 };
