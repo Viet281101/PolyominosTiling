@@ -15,7 +15,6 @@ export function showSolvePopup(toolbar) {
 		{ label: '5) Full Automatic Tiling :', underline: true, icon: '../assets/ic_solution.png', description: 'Automatically fills the grid using user-selected pieces from outside the grid, such as filling the grid entirely with monominoes if only one monomino is chosen.' }
 	];
 
-	
 	const startY = 60;
 	const rowHeight = 60;
 	const colX = 30;
@@ -146,21 +145,11 @@ function attachSolveClickEvent(toolbar, popup, row, y) {
 
 		if (toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 			switch (row.label) {
-				case '1) Backtracking method :':
-					toolbar.mainApp.backtrackingAutoTiling();
-					break;
-				case '2) Brute force method :':
-					toolbar.mainApp.bruteForceTiling();
-					break;
-				case '3) Random method :':
-					toolbar.mainApp.randomTiling();
-					break;
-				case '4) Random backtracking :':
-					toolbar.mainApp.randomBacktrackingTiling();
-					break;
-				case '5) Full Automatic Tiling :':
-					toolbar.mainApp.fullAutoTiling();
-					break;
+				case '1) Backtracking method :': toolbar.mainApp.backtrackingAutoTiling(); break;
+				case '2) Brute force method :': toolbar.mainApp.bruteForceTiling(); break;
+				case '3) Random method :': toolbar.mainApp.randomTiling(); break;
+				case '4) Random backtracking :': toolbar.mainApp.randomBacktrackingTiling(); break;
+				case '5) Full Automatic Tiling :': toolbar.mainApp.fullAutoTiling(); break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('solve');
 		}

@@ -125,7 +125,7 @@ class MainApp {
 	};
 
 	handleMouseMove(mousePos) {
-		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
+		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
 		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
 			let found = false;
@@ -412,9 +412,7 @@ class MainApp {
 
 	fullAutoTiling() {
 		this.resetBoard(); 
-	
 		const messageBox = this.createMessageBox(2);
-	
 		setTimeout(() => {
 			fullAutoTiling(
 				this.gridBoard,
@@ -423,13 +421,9 @@ class MainApp {
 				this.gridBoard.removePolyomino.bind(this.gridBoard),
 				this.redraw.bind(this),
 				this.duplicatePolyomino.bind(this),
-				() => {
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
 		}, 1000); 
-	
-		console.log("Auto Tiling process initiated.");
 	};
 };
 

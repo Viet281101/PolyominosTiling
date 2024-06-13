@@ -240,7 +240,6 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
 	placeNextPolyomino();
 };
 
-
 /**
  * Automatic tiling the grid based on polyomino placed on the field by the user.
  *
@@ -253,7 +252,6 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
  * @param {Function} message - An optional callback function to be called when the tiling is complete.
  * @return {void} This function does not return anything.
  */
-
 export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePolyomino, redraw, duplicatePolyomino, message) {
 	function canPlace(polyomino, x, y) {
 		const originalX = polyomino.x;
@@ -318,5 +316,5 @@ export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePol
 		console.log("rien trouve");
 		redraw();
 	}
-}
+};
 
