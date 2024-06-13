@@ -224,7 +224,7 @@ export const SHAPES = {
 	HEXOMINO_I: [[1, 1, 1, 1, 1, 1]],
 	HEXOMINO_L: [[1, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 0]],
 	HEXOMINO_T: [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0]],
-	HEXOMINO_X: [[0, 1, 0], [1, 1, 1], [0, 1, 0], [0, 1, 0]],
+	HEXOMINO_X: [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0]],
 	HEXOMINO_U: [[1, 0, 0, 1], [1, 1, 1, 1]],
 	HEXOMINO_V: [[1, 0, 0, 0], [1, 0, 0, 0], [1, 1, 1, 1]],
 	HEXOMINO_W: [[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 1, 1]],
@@ -236,27 +236,14 @@ export const SHAPES = {
 	HEPTOMINO_T: [[0, 1, 0, 0], [1, 1, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0]],
 	HEPTOMINO_U: [[1, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 0]],
 	HEPTOMINO_V: [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 1, 1, 1]],
-	HEPTOMINO_W: [[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1, 1]],
-	HEPTOMINO_Y: [[1, 1, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]],
+	HEPTOMINO_W: [[1, 0, 0, 0], [1, 1, 0, 0], [1, 1, 1, 0], [0, 1, 1, 1]],
+	HEPTOMINO_Y: [[1, 1, 1, 1], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1]],
 	HEPTOMINO_Z: [[1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 1], [0, 0, 1, 0]],
-	HEPTOMINO_F: [[0, 1, 1], [1, 1, 0], [0, 1, 0], [0, 1, 1]],
-	HEPTOMINO_H: [[1, 1, 1], [1, 0, 1], [1, 0, 1]],
+	HEPTOMINO_F: [[0, 1, 1], [1, 1, 0], [0, 1, 0], [1, 1, 1]],
+	HEPTOMINO_H: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
 	HEPTOMINO_J: [[1, 1, 1], [0, 0, 1], [0, 0, 1], [0, 1, 1]],
-	HEPTOMINO_N: [[1, 1, 1], [0, 1, 0], [0, 1, 0], [0, 1, 1]],
-	HEPTOMINO_R: [[1, 1, 1], [1, 0, 1], [1, 1, 0]],
-	HEPTOMINO_S: [[0, 1, 1], [1, 1, 0], [0, 1, 0], [0, 1, 1]],
-	HEPTOMINO_X: [[0, 1, 1], [1, 1, 1], [0, 1, 0], [0, 1, 0]],
+	HEPTOMINO_N: [[1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 0, 1]],
+	HEPTOMINO_R: [[1, 1, 1], [1, 0, 1], [0, 1, 1], [0, 0, 1]],
+	HEPTOMINO_S: [[0, 1, 1], [1, 1, 1], [1, 0, 0], [1, 1, 1]],
+	HEPTOMINO_X: [[0, 1, 1, 0], [1, 1, 1, 1], [0, 1, 1, 0], [0, 0, 1, 0]],
 };
-
-const counts = { MONOMINO: 1, DOMINO: 2, TROMINO: 3, TETROMINO: 4, PENTOMINO: 5, HEXOMINO: 6, HEPTOMINO: 7, };
-const findIncorrectShapes = (shapes) => {
-	const incorrectShapes = [];
-	Object.keys(shapes).forEach(shape => {
-		const polyominoType = shape.split('_')[0];
-		const expectedCount = counts[polyominoType];
-		const actualCount = shapes[shape].flat().reduce((a, b) => a + b, 0);
-		if (expectedCount !== actualCount) { incorrectShapes.push(shape); }
-	});
-	return incorrectShapes;
-};
-// console.log(findIncorrectShapes(SHAPES));

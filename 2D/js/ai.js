@@ -239,3 +239,100 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
 	};
 	placeNextPolyomino();
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ai.js
+
+// ai.js
+
+// ai.js
+
+
+
+
+export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePolyomino, redraw, duplicatePolyomino, message) {
+	function canPlace(polyomino, x, y) {
+		const originalX = polyomino.x;
+		const originalY = polyomino.y;
+		polyomino.x = x;
+		polyomino.y = y;
+		if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
+			polyomino.x = originalX;
+			polyomino.y = originalY;
+			return true;
+		}
+		polyomino.x = originalX;
+		polyomino.y = originalY;
+		return false;
+	};
+
+	function placeAllPolyominoes(index) {
+		if (index >= polyominoes.length) { return true; }
+		const polyomino = polyominoes[index];
+
+		for (let row = 0; row < gridBoard.rows; row++) {
+			for (let col = 0; col < gridBoard.cols; col++) {
+				for (let rotation = 0; rotation < 4; rotation++) {
+					const x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
+					const y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
+
+					if (canPlace(polyomino, x, y)) {
+						const originalX = polyomino.x;
+						const originalY = polyomino.y;
+
+						polyomino.x = x;
+						polyomino.y = y;
+						duplicatePolyomino(polyomino);
+						placePolyomino(polyomino);
+						polyomino.isPlaced = true;
+
+						if (placeAllPolyominoes(index + 1)) { return true; }
+
+						polyomino.x = originalX;
+						polyomino.y = originalY;
+						polyomino.isPlaced = false;
+						gridBoard.removePolyomino(polyomino); 
+					}
+					polyomino.rotateRight();
+				}
+			}
+		}
+		return placeAllPolyominoes(index + 1);
+	};
+
+	const originalStates = polyominoes.map(p => ({ x: p.x, y: p.y, isPlaced: p.isPlaced }));
+	if (placeAllPolyominoes(0)) {
+		console.log("placement ok");
+		redraw();
+		if (message) { message(); }
+	} else {
+		polyominoes.forEach((p, i) => {
+			p.x = originalStates[i].x;
+			p.y = originalStates[i].y;
+			p.isPlaced = originalStates[i].isPlaced;
+		});
+		console.log("rien trouve");
+		redraw();
+	}
+}
+

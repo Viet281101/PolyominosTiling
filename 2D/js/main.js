@@ -2,7 +2,7 @@ import { GridBoard } from './board.js';
 import { Polyomino, getRandomColor } from './polyomino.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
-import { backtrackingAutoTiling, bruteForceTiling, randomTiling, randomBacktrackingTiling } from './ai.js';
+import { backtrackingAutoTiling, bruteForceTiling, randomTiling, randomBacktrackingTiling, fullAutoTiling } from './ai.js';
 
 class MainApp {
 	constructor() {
@@ -135,7 +135,7 @@ class MainApp {
 	};
 
 	handleMouseMove(mousePos) {
-		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
+		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
 		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
 			let found = false;
@@ -198,7 +198,8 @@ class MainApp {
 
 	deleteAllPolyominos() {
 		this.polyominoes = [];
-		this.selectedPolyomino = null;
+		this.selectedPoyomino = null;
+		this.autoWhitening() ;
 		this.redraw();
 	};
 
@@ -378,6 +379,7 @@ class MainApp {
 				this.placePolyomino.bind(this), 
 				this.gridBoard.removePolyomino.bind(this), 
 				this.redraw.bind(this),
+				
 				() => { this.showMessageBox(messageBox); }
 			);
 		}, 1000);
@@ -417,6 +419,37 @@ class MainApp {
 			);
 		}, 1000);
 	};
+
+
+	fullAutoTiling() {
+		this.resetBoard(); // Réinitialisez la grille avant d'appeler la méthode de pavage
+	
+		const messageBox = this.createMessageBox(2); // Utilisez un autre type de message pour autoTiling
+	
+		setTimeout(() => {
+			fullAutoTiling(
+				this.gridBoard,
+				this.polyominoes,
+				this.placePolyomino.bind(this),
+				this.gridBoard.removePolyomino.bind(this.gridBoard),
+				this.redraw.bind(this),
+				this.duplicatePolyomino.bind(this),
+				() => {
+					this.showMessageBox(messageBox);
+				}
+			);
+		}, 1000); // Délai pour permettre de voir la réinitialisation du plateau
+	
+		console.log("Auto Tiling process initiated.");
+	};
+	
+	
+	
+	
+	
+	
+	
+	
 };
 
 const main_app = new MainApp();
