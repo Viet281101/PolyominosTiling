@@ -9,16 +9,10 @@ export function showTutorialPopup(toolbar) {
 	const rows = [
 		{ label: 'Auto Tiling the Polyominoes Blocks', title: true },
 		{ 	label: '1) Create Any Polyomino :',  underline: true, icon: '../assets/ic_plus.png', description: 'Click this icon to open a menu. Select the polyomino you want to spawn it on the field. Drag and drop it onto the grid.' },
-		{ 	label: '2) Manipulate the Polyominoes :', underline: true, 	icon: '../assets/ic_solution.png', 
-			description: 'Each polyomino has an interactive menu. Click on the polyomino to : \n - rotate left or rotate right \n - flip \n - duplicate \n(the clone will appear below \n the piece selected in another color) \n - or delete.' },
+		{ 	label: '2) Manipulate the Polyominoes :', underline: true, 	icon: '../assets/ic_solution.png', 	description: 'Each polyomino has an interactive menu. Click on the polyomino to : \n - rotate left or rotate right \n - flip \n - duplicate \n(the clone will appear below \n the piece selected in another color) \n - or delete.' },
 		{ 	label: '3) Grid Settings :', underline: true, icon: '../assets/ic_table.png', description: 'This menu lets you create a new board by setting the grid\'s length and height. Click        to create the grid. \n Options include : \n - deleting the grid \n - blocking cells to prevent polyomino placement \n - creating automatically random \n black cells \n - Clear all black cells \n - and swapping black and empty cells.          ' 	},
 		{ 	label: '4) Solving Grid :', underline: true, icon: '../assets/ic_solving.png', description: 'Click this menu to use various AI solvers. Descriptions are available for each solver; just click to read them.' },
-		{ 
-			label: '5) Use Settings :',  
-			underline: true, 
-			icon: '../assets/ic_solution.png', 
-			description: 'This section facilitates user testing. In this menu, you can: \n - Reset the position \n of the polyominoes to their original spawn points.\n - Shuffle the positions \n of the polyominoes on the field, useful if duplicated pieces overlap.\n - Delete all polyominoes \n from the field and the grid.'
-		}
+		{ 	label: '5) Use Settings :',  underline: true, icon: '../assets/ic_solution.png', description: 'This section facilitates user testing. In this menu, you can: \n - Reset the position \n of the polyominoes to their original spawn points.\n - Shuffle the positions \n of the polyominoes on the field, useful if duplicated pieces overlap.\n - Delete all polyominoes \n from the field and the grid.' }
 	];
 	
 
@@ -29,19 +23,14 @@ export function showTutorialPopup(toolbar) {
 		{ path: '../assets/ic_duplicate.png', x: 135, y: 375},
 		{ path: '../assets/ic_trash.png', x: 135, y: 440},
 		{ path: '../assets/ic_draw.png', x: 80, y: 560},
-
 		{ path: '../assets/ic_trash.png', x: 182, y: 597},
 		{ path: '../assets/ic_blacken_cell.png', x: 310, y: 620},
 		{ path: '../assets/ic_random_blacken_cell.png', x: 275, y: 655},
-
 		{ path: '../assets/ic_whiten.png', x: 220, y: 697},
-		{ path: '../assets/ic_invert_blacken.png', x: 320, y: 717},
-		
+		{ path: '../assets/ic_invert_blacken.png', x: 320, y: 717},	
 		{ path: '../assets/ic_reset.png', x: 200, y: 975},
 		{ path: '../assets/ic_shuffle.png', x: 210, y: 1037},
 		{ path: '../assets/ic_trash.png', x: 250, y: 1107},
-		
-
 	];
 
 	
