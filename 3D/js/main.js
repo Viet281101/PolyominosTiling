@@ -10,6 +10,7 @@ class MainApp {
 		this.selectedPolycube = null;
 		this.isDragging = false;
 		this.isRightClick = false;
+		this.polys = [];
 		this.init();
 		this.animate();
 		this.eventListener();
@@ -28,11 +29,10 @@ class MainApp {
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-		this.board = new Board(this.scene, 10);
+		this.board = new Board(this.scene, { x: 3, y: 3, z: 3 });
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
 
-		this.polys = [];
 		this.addPolycube({ n: 1, cubes: [[0, 0, 0]], color: 0x00ff00, position: { x: 0, y: 3, z: 0 } });
 		this.addPolycube({ n: 3, cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000, position: { x: 2, y: 2, z: 2 } });
 	};
@@ -47,7 +47,7 @@ class MainApp {
 
 	addPolycube(cubeData) {
 		const polycube = new Polycube(cubeData);
-		this.board.addPolycube(polycube);
+		this.scene.add(polycube.group);
 		this.polys.push(polycube);
 	};
 
@@ -55,10 +55,6 @@ class MainApp {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
-	};
-
-	updateGridSize(size) {
-		this.board.grid.scale.set(size / 10, size / 10, size / 10);
 	};
 
 	animate() {
@@ -89,9 +85,7 @@ class MainApp {
 			this.isDragging = true;
 			this.controls.enabled = false;
 
-			if (event.button === 2) {
-				this.isRightClick = true;
-			}
+			if (event.button === 2) { this.isRightClick = true; }
 
 			this.lastMousePosition = { x: event.clientX, y: event.clientY };
 			this.lastValidPosition = this.selectedPolycube.group.position.clone();
@@ -138,18 +132,14 @@ class MainApp {
 	selectPolycube(polycube) {
 		this.selectedPolycube = polycube;
 		this.selectedPolycube.group.children.forEach(child => {
-			if (child instanceof THREE.LineSegments) {
-				child.material.color.set(0xffffff);
-			}
+			if (child instanceof THREE.LineSegments) { child.material.color.set(0xffffff); }
 		});
 	};
 
 	deselectPolycube() {
 		if (this.selectedPolycube) {
 			this.selectedPolycube.group.children.forEach(child => {
-				if (child instanceof THREE.LineSegments) {
-					child.material.color.set(0x000000);
-				}
+				if (child instanceof THREE.LineSegments) { child.material.color.set(0x000000); }
 			});
 			this.selectedPolycube = null;
 		}
@@ -158,12 +148,16 @@ class MainApp {
 	snapToGrid(polycube) {
 		const gridSize = 1;
 		const group = polycube.group;
+		const size = this.board.size;
 
-		const offset = gridSize / 2;
+		const offsetX = (size.x % 2 === 0) ? gridSize / 2 : 0;
+		const offsetY = (size.y % 2 === 0) ? gridSize / 2 : 0;
+		const offsetZ = (size.z % 2 === 0) ? gridSize / 2 : 0;
+
 		const newPosition = new THREE.Vector3(
-			Math.round((group.position.x - offset) / gridSize) * gridSize + offset,
-			Math.round((group.position.y - offset) / gridSize) * gridSize + offset,
-			Math.round((group.position.z - offset) / gridSize) * gridSize + offset
+			Math.round((group.position.x - offsetX) / gridSize) * gridSize + offsetX,
+			Math.round((group.position.y - offsetY) / gridSize) * gridSize + offsetY,
+			Math.round((group.position.z - offsetZ) / gridSize) * gridSize + offsetZ
 		);
 
 		const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);
@@ -199,13 +193,8 @@ class MainApp {
 				return newCubesPositions.some(newPos => newPos.equals(position));
 			});
 		});
-
-		if (overlapping) {
-			return false;
-		} else {
-			group.position.copy(newPosition);
-			return true;
-		}
+		if (overlapping) { return false; }
+		else { group.position.copy(newPosition); return true; }
 	};
 
 	updatePolycubeColor(color) {
@@ -216,6 +205,14 @@ class MainApp {
 				}
 			});
 		}
+	};
+
+	clearBoard() { this.board.clearGrid(); this.board = null; }
+	createNewBoard(x, y, z) {
+		const showInnerGrid = this.board ? this.board.showInnerGrid : false;
+		if (this.board) { this.clearBoard(); }
+		this.board = new Board(this.scene, { x, y, z });
+		this.board.toggleInnerGrid(showInnerGrid);
 	};
 };
 

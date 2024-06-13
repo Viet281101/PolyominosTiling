@@ -9,12 +9,11 @@ export function showTutorialPopup(toolbar) {
 	const rows = [
 		{ label: 'Auto Tiling the Polyominoes Blocks', title: true },
 		{ 	label: '1) Create Any Polyomino :',  underline: true, icon: '../assets/ic_plus.png', description: 'Click this icon to open a menu. Select the polyomino you want to spawn it on the field. Drag and drop it onto the grid.' },
-		{ 	label: '2) Manipulate the Polyominoes :', underline: true, 	icon: '../assets/ic_solution.png', 	description: 'Each polyomino has an interactive menu. Click on the polyomino to : \n - rotate left or rotate right \n - flip \n - duplicate \n(the clone will appear below \n the piece selected in another color) \n - or delete.' },
+		{ 	label: '2) Manipulate the Polyominoes', underline: true, 	icon: '../assets/ic_solution.png', 	description: 'Each polyomino has an interactive menu. Click on the polyomino to : \n - rotate left or rotate right \n - flip \n - duplicate \n(the clone will appear below \n the piece selected in another color) \n - or delete.' },
 		{ 	label: '3) Grid Settings :', underline: true, icon: '../assets/ic_table.png', description: 'This menu lets you create a new board by setting the grid\'s length and height. Click        to create the grid. \n Options include : \n - deleting the grid \n - blocking cells to prevent polyomino placement \n - creating automatically random \n black cells \n - Clear all black cells \n - and swapping black and empty cells.          ' 	},
 		{ 	label: '4) Solving Grid :', underline: true, icon: '../assets/ic_solving.png', description: 'Click this menu to use various AI solvers. Descriptions are available for each solver; just click to read them.' },
 		{ 	label: '5) Use Settings :',  underline: true, icon: '../assets/ic_solution.png', description: 'This section facilitates user testing. In this menu, you can: \n - Reset the position \n of the polyominoes to their original spawn points.\n - Shuffle the positions \n of the polyominoes on the field, useful if duplicated pieces overlap.\n - Delete all polyominoes \n from the field and the grid.' }
 	];
-	
 
 	const subIcons = [
 		{ path: '../assets/ic_rotate_right.png', x: 245, y: 339 },
@@ -33,7 +32,6 @@ export function showTutorialPopup(toolbar) {
 		{ path: '../assets/ic_trash.png', x: 250, y: 1107},
 	];
 
-	
 	const startY = 60;
 	const rowHeight = 60;
 	const colX = 25;
@@ -48,7 +46,6 @@ export function showTutorialPopup(toolbar) {
 		ctx.fillStyle = '#000';
 		ctx.fillText(row.label, colX, y + 20);
 
-		
 		if (row.description) {
 			dropdowns[index] = { description: row.description, expanded: true, y: y + 40 };
 		}
@@ -58,12 +55,12 @@ export function showTutorialPopup(toolbar) {
 	function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
 		const paragraphs = text.split('\n');
 		let totalLines = 0;
-	
+
 		paragraphs.forEach(paragraph => {
 			const words = paragraph.split(' ');
 			let line = '';
 			const lines = [];
-	
+
 			for (let n = 0; n < words.length; n++) {
 				let testLine = line + words[n] + ' ';
 				let metrics = ctx.measureText(testLine);
@@ -81,10 +78,8 @@ export function showTutorialPopup(toolbar) {
 			});
 			totalLines += lines.length;
 		});
-	
 		return totalLines;
-	}
-	
+	};
 
 	function redrawPopup() {
 		ctx.clearRect(0, 0, popup.width, popup.height);
@@ -123,7 +118,6 @@ export function showTutorialPopup(toolbar) {
 					};
 				}
 			});
-			
 
 			clickAreas.push({ index, rect: { x: colX, y, width: popup.width - colX - 100, height: rowHeight }, type: 'label' });
 
@@ -135,7 +129,6 @@ export function showTutorialPopup(toolbar) {
 			}
 		});
 	};
-
 	redrawPopup();
 };
 

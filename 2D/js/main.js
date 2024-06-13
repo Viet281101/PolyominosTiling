@@ -55,20 +55,10 @@ class MainApp {
 	};
 
 	addEventListeners() {
-		this.canvas.addEventListener('mousedown', (e) => {
-			const mousePos = this.gridBoard.getMousePos(e);
-			this.handleMouseDown(mousePos);
-		});
-		this.canvas.addEventListener('mousemove', (e) => {
-			const mousePos = this.gridBoard.getMousePos(e);
-			this.handleMouseMove(mousePos);
-		});
-		this.canvas.addEventListener('mouseup', (e) => {
-			this.handleMouseUp();
-		});
-		window.addEventListener('keydown', (e) => {
-			if (e.key === 'r' && this.selectedPolyomino) { this.selectedPolyomino.rotate(); this.redraw(); }
-		});
+		this.canvas.addEventListener('mousedown', (e) => { const mousePos = this.gridBoard.getMousePos(e); this.handleMouseDown(mousePos); });
+		this.canvas.addEventListener('mousemove', (e) => { const mousePos = this.gridBoard.getMousePos(e); this.handleMouseMove(mousePos); });
+		this.canvas.addEventListener('mouseup', (e) => { this.handleMouseUp(); });
+		window.addEventListener('keydown', (e) => { if (e.key === 'r' && this.selectedPolyomino) { this.selectedPolyomino.rotate(); this.redraw(); } });
 		window.addEventListener('resize', () => {
 			this.gridBoard.resizeCanvas();
 			this.gridBoard.drawGrid();
@@ -135,7 +125,7 @@ class MainApp {
 	};
 
 	handleMouseMove(mousePos) {
-		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blackend.png"), auto';
+		if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
 		this.polyominoes.forEach(polyomino => polyomino.onMouseMove(mousePos));
 		if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
 			let found = false;
@@ -182,7 +172,7 @@ class MainApp {
 		do { newColor = getRandomColor();
 		} while (newColor === polyomino.color);
 		const newShape = polyomino.shape.map(row => row.slice());
-		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this);
+		const newPolyomino = new Polyomino(newShape, polyomino.x, polyomino.y, newColor, this, polyomino.name);
 		this.polyominoes.push(newPolyomino);
 		this.redraw();
 	};
@@ -422,9 +412,7 @@ class MainApp {
 
 	fullAutoTiling() {
 		this.resetBoard(); 
-	
 		const messageBox = this.createMessageBox(2);
-	
 		setTimeout(() => {
 			fullAutoTiling(
 				this.gridBoard,
@@ -433,13 +421,9 @@ class MainApp {
 				this.gridBoard.removePolyomino.bind(this.gridBoard),
 				this.redraw.bind(this),
 				this.duplicatePolyomino.bind(this),
-				() => {
-					this.showMessageBox(messageBox);
-				}
+				() => { this.showMessageBox(messageBox); }
 			);
 		}, 1000); 
-	
-		console.log("Auto Tiling process initiated.");
 	};
 };
 
