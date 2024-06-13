@@ -420,11 +420,10 @@ class MainApp {
 		}, 1000);
 	};
 
-
 	fullAutoTiling() {
-		this.resetBoard(); // Réinitialisez la grille avant d'appeler la méthode de pavage
+		this.resetBoard(); 
 	
-		const messageBox = this.createMessageBox(2); // Utilisez un autre type de message pour autoTiling
+		const messageBox = this.createMessageBox(2);
 	
 		setTimeout(() => {
 			fullAutoTiling(
@@ -438,18 +437,10 @@ class MainApp {
 					this.showMessageBox(messageBox);
 				}
 			);
-		}, 1000); // Délai pour permettre de voir la réinitialisation du plateau
+		}, 1000); 
 	
 		console.log("Auto Tiling process initiated.");
 	};
-	
-	
-	
-	
-	
-	
-	
-	
 };
 
 const main_app = new MainApp();

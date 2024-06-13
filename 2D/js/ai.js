@@ -241,34 +241,18 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ai.js
-
-// ai.js
-
-// ai.js
-
-
-
+/**
+ * Automatic tiling the grid based on polyomino placed on the field by the user.
+ *
+ * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
+ * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
+ * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
+ * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
+ * @param {Function} redraw - The function to redraw the grid board after placing or removing a polyomino.
+ * @param {Function} duplicatePolyomino - The function to duplicate a polyomino.
+ * @param {Function} message - An optional callback function to be called when the tiling is complete.
+ * @return {void} This function does not return anything.
+ */
 
 export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePolyomino, redraw, duplicatePolyomino, message) {
 	function canPlace(polyomino, x, y) {
