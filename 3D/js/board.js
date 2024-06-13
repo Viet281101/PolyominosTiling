@@ -63,11 +63,8 @@ export class Board {
 
 	toggleInnerGrid(show) {
 		this.showInnerGrid = show;
-		if (show) {
-			this.scene.add(this.innerGrid);
-		} else {
-			this.scene.remove(this.innerGrid);
-		}
+		if (show) { this.scene.add(this.innerGrid); }
+		else { this.scene.remove(this.innerGrid); }
 	};
 
 	clearGrid() {

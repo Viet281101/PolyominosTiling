@@ -20,7 +20,6 @@ export class Toolbar {
 	};
 
 	checkIfMobile() { return window.innerWidth <= 800; };
-
 	setupCanvas() {
 		this.canvas = document.createElement('canvas');
 		this.ctx = this.canvas.getContext('2d');
@@ -193,9 +192,8 @@ export class Toolbar {
 	};
 
 	togglePopup(type) {
-		if (this.currentPopup === type) {
-			this.closePopup(type);
-		} else {
+		if (this.currentPopup === type) { this.closePopup(type); }
+		else {
 			this.closeCurrentPopup();
 			this.showPopup(type);
 			this.currentPopup = type;

@@ -193,13 +193,8 @@ class MainApp {
 				return newCubesPositions.some(newPos => newPos.equals(position));
 			});
 		});
-
-		if (overlapping) {
-			return false;
-		} else {
-			group.position.copy(newPosition);
-			return true;
-		}
+		if (overlapping) { return false; }
+		else { group.position.copy(newPosition); return true; }
 	};
 
 	updatePolycubeColor(color) {
