@@ -12,12 +12,10 @@ export function showSolvePopup(toolbar) {
 		{ label: '2) Brute force method :', underline: true, icon: '../assets/ic_solution.png', description: 'Brute force tries all possible combinations of polyominoes on the grid to find a solution. It is guaranteed to find a solution if one exists but is computationally expensive and slow for large grids.' },
 		{ label: '3) Random method :', underline: true, icon: '../assets/ic_solution.png', description: 'The random method places polyominoes randomly on the grid. It is fast but does not guarantee a solution or full coverage. It is useful for generating quick and varied patterns.' },
 		{ label: '4) Random backtracking :', underline: true, icon: '../assets/ic_solution.png', description: 'Random backtracking combines random placement with backtracking to find a solution. It is more efficient than brute force but less predictable than pure backtracking.' },
-		{ label: '5) Genetic Algorithm :', underline: true, icon: '../assets/ic_solution.png', description: 'Genetic Algorithm (GA) uses principles of natural selection and genetics to find the best arrangement of polyominoes. It starts with a population of random solutions and improves them over generations through crossover and mutation.' },
-		{ label: '6) Simulated Annealing :', underline: true, icon: '../assets/ic_solution.png', description: 'Simulated Annealing is an optimization algorithm inspired by the process of heating and cooling metal. It allows accepting worse solutions under certain conditions to escape local optima, aiming to find a better overall solution.' },
-		{ label: '7) Ant Colony Optimization :', underline: true, icon: '../assets/ic_solution.png', description: 'Ant Colony Optimization (ACO) is inspired by the foraging behavior of ants. It uses a group of artificial ants to explore solutions and leave pheromones, guiding other ants to follow the best paths found.' },
-		{ label: '8) Greedy Algorithm :', underline: true, icon: '../assets/ic_solution.png', description: 'The Greedy Algorithm makes the best choice at each step without considering the whole problem. It can quickly find a valid solution but does not guarantee a globally optimal solution.' }
+		{ label: '5) Full Automatic Tiling :', underline: true, icon: '../assets/ic_solution.png', description: 'Automatically fills the grid using user-selected pieces from outside the grid, such as filling the grid entirely with monominoes if only one monomino is chosen.' }
 	];
 
+	
 	const startY = 60;
 	const rowHeight = 60;
 	const colX = 30;
@@ -159,6 +157,9 @@ function attachSolveClickEvent(toolbar, popup, row, y) {
 					break;
 				case '4) Random backtracking :':
 					toolbar.mainApp.randomBacktrackingTiling();
+					break;
+				case '5) Full Automatic Tiling :':
+					toolbar.mainApp.fullAutoTiling();
 					break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('solve');

@@ -239,3 +239,84 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
 	};
 	placeNextPolyomino();
 };
+
+
+/**
+ * Automatic tiling the grid based on polyomino placed on the field by the user.
+ *
+ * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
+ * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
+ * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
+ * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
+ * @param {Function} redraw - The function to redraw the grid board after placing or removing a polyomino.
+ * @param {Function} duplicatePolyomino - The function to duplicate a polyomino.
+ * @param {Function} message - An optional callback function to be called when the tiling is complete.
+ * @return {void} This function does not return anything.
+ */
+
+export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePolyomino, redraw, duplicatePolyomino, message) {
+	function canPlace(polyomino, x, y) {
+		const originalX = polyomino.x;
+		const originalY = polyomino.y;
+		polyomino.x = x;
+		polyomino.y = y;
+		if (gridBoard.isInBounds(polyomino) && !gridBoard.isOverlapping(polyomino)) {
+			polyomino.x = originalX;
+			polyomino.y = originalY;
+			return true;
+		}
+		polyomino.x = originalX;
+		polyomino.y = originalY;
+		return false;
+	};
+
+	function placeAllPolyominoes(index) {
+		if (index >= polyominoes.length) { return true; }
+		const polyomino = polyominoes[index];
+
+		for (let row = 0; row < gridBoard.rows; row++) {
+			for (let col = 0; col < gridBoard.cols; col++) {
+				for (let rotation = 0; rotation < 4; rotation++) {
+					const x = col * gridBoard.gridSize + gridBoard.gridOffsetX;
+					const y = row * gridBoard.gridSize + gridBoard.gridOffsetY;
+
+					if (canPlace(polyomino, x, y)) {
+						const originalX = polyomino.x;
+						const originalY = polyomino.y;
+
+						polyomino.x = x;
+						polyomino.y = y;
+						duplicatePolyomino(polyomino);
+						placePolyomino(polyomino);
+						polyomino.isPlaced = true;
+
+						if (placeAllPolyominoes(index + 1)) { return true; }
+
+						polyomino.x = originalX;
+						polyomino.y = originalY;
+						polyomino.isPlaced = false;
+						gridBoard.removePolyomino(polyomino); 
+					}
+					polyomino.rotateRight();
+				}
+			}
+		}
+		return placeAllPolyominoes(index + 1);
+	};
+
+	const originalStates = polyominoes.map(p => ({ x: p.x, y: p.y, isPlaced: p.isPlaced }));
+	if (placeAllPolyominoes(0)) {
+		console.log("placement ok");
+		redraw();
+		if (message) { message(); }
+	} else {
+		polyominoes.forEach((p, i) => {
+			p.x = originalStates[i].x;
+			p.y = originalStates[i].y;
+			p.isPlaced = originalStates[i].isPlaced;
+		});
+		console.log("rien trouve");
+		redraw();
+	}
+}
+
