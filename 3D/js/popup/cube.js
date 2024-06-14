@@ -220,20 +220,13 @@ function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCub
 };
 
 function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
+	const n = parseInt(document.querySelector('input[type="number"]').value);
 	switch (index) {
 		case 0:
-			if (selectedIndex > 0) {
-				selectedIndex--;
-			} else {
-				selectedIndex = highlightCubes.length - 1;
-			}
+			selectedIndex = (selectedIndex > 0) ? selectedIndex - 1 : highlightCubes.length - 1;
 			break;
 		case 1:
-			if (selectedIndex < highlightCubes.length - 1) {
-				selectedIndex++;
-			} else {
-				selectedIndex = 0;
-			}
+			selectedIndex = (selectedIndex < highlightCubes.length - 1) ? selectedIndex + 1 : 0;
 			break;
 		case 2:
 			if (highlightCubes.length > 0) {
@@ -246,7 +239,12 @@ function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
 				if (selectedIndex >= highlightCubes.length) {
 					selectedIndex = highlightCubes.length - 1;
 				}
-				updateHighlightedCubes(scene, cubes, highlightCubes, cubes.length + 1);
+				if (cubes.length >= n) {
+					highlightCubes.forEach(cube => scene.remove(cube));
+					highlightCubes.length = 0;
+				} else {
+					updateHighlightedCubes(scene, cubes, highlightCubes, n);
+				}
 			}
 			break;
 	}
