@@ -42,7 +42,6 @@ export function createCubePopup(toolbar) {
 			const n = parseInt(popupContainer.querySelectorAll('input[type="number"]')[0].value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
 			const position = positionInputs.map(input => parseInt(input.value));
-
 			const cubesData = cubes.map(cube => cube.position.toArray());
 
 			toolbar.mainApp.addPolycube({ n, cubes: cubesData, color: 0x00ff00, position: { x: position[0], y: position[1], z: position[2] } });
@@ -56,7 +55,7 @@ export function createCubePopup(toolbar) {
 	});
 
 	const canvas3D = popupContainer.querySelector('canvas');
-	canvas3D.addEventListener('mousedown', (event) => {
+	canvas3D.addEventListener('pointerdown', (event) => {
 		const mouse = new THREE.Vector2(
 			(event.offsetX / canvas3D.width) * 2 - 1,
 			-(event.offsetY / canvas3D.height) * 2 + 1
@@ -66,10 +65,12 @@ export function createCubePopup(toolbar) {
 
 		const intersects = raycaster.intersectObjects(highlightCubes);
 		if (intersects.length > 0) {
+			console.log("Create cube in Polycube");
 			const intersectedCube = intersects[0].object;
 			intersectedCube.material.opacity = 1.0;
 			intersectedCube.material.transparent = false;
-			cubes.push(intersectedCube.clone());
+			highlightCubes.splice(highlightCubes.indexOf(intersectedCube), 1);
+			cubes.push(intersectedCube);
 			updateHighlightedCubes(scene, cubes, highlightCubes, parseInt(nInput.value));
 		}
 	});
@@ -104,17 +105,17 @@ function createInputField(popupContainer, x, y, defaultValue) {
 
 function create3DCanvas(popupContainer) {
 	const canvas3D = document.createElement('canvas');
-	canvas3D.width = 370 - 20;
+	canvas3D.width = 370 - 24;
 	canvas3D.height = 400;
 	canvas3D.style.position = 'absolute';
 	canvas3D.style.top = '172px';
 	canvas3D.style.left = '10px';
-	canvas3D.style.border = '1px solid #000';
+	canvas3D.style.border = '2px solid #000';
 	canvas3D.style.zIndex = '1002';
 	popupContainer.appendChild(canvas3D);
 
 	const scene = new THREE.Scene();
-	scene.background = new THREE.Color(0x000000);
+	scene.background = new THREE.Color(0x646464);
 
 	const camera = new THREE.PerspectiveCamera(75, canvas3D.width / canvas3D.height, 0.1, 1000);
 	camera.position.z = 5;
@@ -154,9 +155,7 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 	highlightCubes.forEach(cube => scene.remove(cube));
 	highlightCubes.length = 0;
 
-	if (cubes.length >= n) {
-		return;
-	}
+	if (cubes.length >= n) { return; }
 
 	const offsetPositions = [
 		new THREE.Vector3(1, 0, 0), new THREE.Vector3(-1, 0, 0),
@@ -171,7 +170,7 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 				const newCube = cube.clone();
 				newCube.position.copy(newPosition);
 				newCube.material = newCube.material.clone();
-				newCube.material.opacity = 0.3;
+				newCube.material.opacity = 0.2;
 				newCube.material.transparent = true;
 				newCube.visible = true;
 				scene.add(newCube);
