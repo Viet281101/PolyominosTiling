@@ -28,7 +28,7 @@ export function createCubePopup(toolbar) {
 
 	createTextZone(ctx, 10, 660, popup.width - 20, 150, 'Polycube Info...');
 
-	createButton(ctx, 'Save', 10, 820);
+	createButton(ctx, 'Info', 10, 820);
 	createButton(ctx, 'Create', 100, 820);
 
 	const state = { selectedIndex: 0 };
@@ -41,7 +41,7 @@ export function createCubePopup(toolbar) {
 		const mouseY = e.clientY - rect.top;
 
 		if (isInside(mouseX, mouseY, { x: 10, y: 820, width: 80, height: 24 })) {
-			savePolycubeInfo();
+			savePolycubeInfo(ctx, popupContainer, cubes);
 		} else if (isInside(mouseX, mouseY, { x: 100, y: 820, width: 80, height: 24 })) {
 			const n = parseInt(popupContainer.querySelectorAll('input[type="number"]')[0].value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
@@ -65,8 +65,38 @@ function isInside(x, y, rect) {
 	return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
 };
 
-function savePolycubeInfo() {
+function savePolycubeInfo(ctx, popupContainer, cubes) {
+	const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
+	const position = positionInputs.map(input => parseInt(input.value));
+	const cubesData = cubes.map(cube => cube.position.toArray());
 
+	const polycubeInfo = {
+		position,
+		cubes: cubesData
+	};
+
+	const textZoneX = 10;
+	const textZoneY = 660;
+	const textZoneWidth = popupContainer.querySelector('canvas').width - 20;
+	const textZoneHeight = 150;
+
+	ctx.clearRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
+	ctx.fillStyle = '#fff';
+	ctx.fillRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
+	ctx.strokeStyle = '#000';
+	ctx.strokeRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
+	ctx.fillStyle = '#000';
+	ctx.font = '18px Pixellari';
+
+	let infoText = `Position: [${position.join(', ')}]\nCubes:\n`;
+	cubesData.forEach((cube, index) => {
+		infoText += `  ${index + 1}: [${cube.join(', ')}]\n`;
+	});
+
+	const textLines = infoText.split('\n');
+	textLines.forEach((line, index) => {
+		ctx.fillText(line, textZoneX + 10, textZoneY + 20 + (index * 20));
+	});
 };
 
 function createInputField(popupContainer, x, y, defaultValue) {
@@ -165,8 +195,10 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 			}
 		});
 	});
-	// console.log('Highlighted Cubes:', highlightCubes.map(c => c.position));
-	updateHighlightColors(highlightCubes, 0);
+
+	highlightCubes.forEach((cube, index) => {
+		cube.material.color.set(index === 0 ? 0x0000ff : 0x00ff00);
+	});
 };
 
 function createTextZone(ctx, x, y, width, height, text) {
@@ -222,7 +254,6 @@ function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCub
 
 function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 	const n = parseInt(document.querySelector('input[type="number"]').value);
-	// console.log(`Button Clicked: ${index}`);
 	switch (index) {
 		case 0:
 			state.selectedIndex = (state.selectedIndex > 0) ? state.selectedIndex - 1 : highlightCubes.length - 1;
@@ -231,7 +262,6 @@ function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 			state.selectedIndex = (state.selectedIndex < highlightCubes.length - 1) ? state.selectedIndex + 1 : 0;
 			break;
 		case 2:
-			console.log(`Selected Index: ${state.selectedIndex}`);
 			if (highlightCubes.length > 0) {
 				const selectedCube = highlightCubes[state.selectedIndex];
 				selectedCube.material.opacity = 1.0;
@@ -242,8 +272,6 @@ function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 				if (state.selectedIndex >= highlightCubes.length) {
 					state.selectedIndex = highlightCubes.length - 1;
 				}
-				// console.log('Cubes:', cubes.map(c => c.position));
-				// console.log('Highlight Cubes after selection:', highlightCubes.map(c => c.position));
 				if (cubes.length >= n) {
 					highlightCubes.forEach(cube => scene.remove(cube));
 					highlightCubes.length = 0;
@@ -260,12 +288,10 @@ function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 			}
 			break;
 	}
-	// console.log('Selected Index after update:', state.selectedIndex);
 	updateHighlightColors(highlightCubes, state.selectedIndex);
 };
 
 function updateHighlightColors(highlightCubes, selectedIndex) {
-	// console.log(`Updating highlight colors, selected index: ${selectedIndex}`);
 	highlightCubes.forEach((cube, index) => {
 		cube.material.color.set(index === selectedIndex ? 0x0000ff : 0x00ff00);
 	});
