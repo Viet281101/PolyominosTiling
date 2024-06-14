@@ -17,6 +17,7 @@ export class Toolbar {
 		this.addEventListeners();
 		this.addHomeButton();
 		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
+		this.is3DPopupOpen = false;
 	};
 
 	checkIfMobile() { return window.innerWidth <= 800; };
@@ -33,7 +34,7 @@ export class Toolbar {
 
 	createButtons() {
 		return [
-			{ name: 'Create Cube', icon: '../assets/ic_plus.png', action: () => this.togglePopup('cube'), description: 'To create a new cube and add it to the scene.' },
+			{ name: 'Create Polycube', icon: '../assets/ic_plus.png', action: () => this.togglePopup('cube'), description: 'To create a new cube and add it to the scene.' },
 			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.' },
 			{ name: 'Solving Polycube', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve'), description: 'To solve the polycube puzzle.\nUse different algorithms to solve.' },
 			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial'), description: 'To view the tutorial.\nLearn how to use the application.' },
@@ -135,12 +136,13 @@ export class Toolbar {
 	};
 
 	handleDocumentClick(e) {
+		if (this.is3DPopupOpen) return;
 		if (this.popupOpen) {
 			const cubePopup = document.getElementById('cubePopup');
 			const gridPopup = document.getElementById('gridPopup');
 			const solvePopup = document.getElementById('solvePopup');
 			const tutorialPopup = document.getElementById('tutorialPopup');
-			if ((cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
+			if ((cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target) && !e.target.classList.contains('popup-input') && !e.target.classList.contains('popup-button')) ||
 				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target))) {
@@ -192,7 +194,7 @@ export class Toolbar {
 	};
 
 	togglePopup(type) {
-		if (this.currentPopup === type) { this.closePopup(type); }
+		if (type !== 'popup3d' && (this.currentPopup === type || this.is3DPopupOpen)) { this.closePopup(type); }
 		else {
 			this.closeCurrentPopup();
 			this.showPopup(type);
@@ -207,6 +209,7 @@ export class Toolbar {
 			case 'grid': showGridPopup(this); break;
 			case 'solve': showSolvePopup(this); break;
 			case 'tutorial': showTutorialPopup(this); break;
+			case 'popup3d': break;
 		}
 	};
 
@@ -271,7 +274,7 @@ export class Toolbar {
 		this.popupOpen = false;
 		this.currentPopup = null;
 	};
-	
+
 	closeCurrentPopup() { 
 		if (this.currentPopup) { this.closePopup(this.currentPopup); } 
 	};

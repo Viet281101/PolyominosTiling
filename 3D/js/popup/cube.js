@@ -11,10 +11,11 @@ export function createCubePopup(toolbar) {
 	const rows = [
 		{ label: 'Enter values to make Polycubes', box: true, title: true },
 		{ label: 'N° squares per cube:  n = ', type: 'input' },
-		{ label: 'Position x: ', type: 'input' },
-		{ label: 'Position y: ', type: 'input' },
-		{ label: 'Position z: ', type: 'input' },
+		{ label: 'Position X: ', type: 'input' },
+		{ label: 'Position Y: ', type: 'input' },
+		{ label: 'Position Z: ', type: 'input' },
 		{ label: 'Open 3D Editor : ', button: true },
+		{ label: 'Selected Coordinates:', textZone: true }
 	];
 
 	const startY = 76;
@@ -35,16 +36,25 @@ export function createCubePopup(toolbar) {
 		ctx.fillText(row.label, colX, y + 20);
 
 		if (row.type === 'input') {
-			createInputField(popupContainer, y, index === 0 ? n : 0);
+			let defaultValue;
+			if (index === 1) { defaultValue = n; }
+			else if (index === 2) { defaultValue = position.x; }
+			else if (index === 3) { defaultValue = position.y; }
+			else if (index === 4) { defaultValue = position.z; }
+			createInputField(popupContainer, y, defaultValue);
 		}
 		if (row.button) {
-			createButton(popupContainer, y, 'Open 3D Editor', () => {
+			createButton(popupContainer, y, 'Editor', () => {
+				toolbar.is3DPopupOpen = true;
 				create3DPopup(toolbar, n, (coords) => {
 					coordinates = coords;
 					console.log('Selected Coordinates:', coordinates);
+					updateTextZone(popupContainer, coordinates);
+					toolbar.is3DPopupOpen = false;
 				});
 			});
 		}
+		if (row.textZone) { createTextZone(popupContainer, y); }
 	});
 
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
@@ -72,7 +82,7 @@ export function createCubePopup(toolbar) {
 		popup.style.cursor = cursor;
 	});
 
-	createButton(popupContainer, startY + rows.length * rowHeight, 'Create Cube', () => {
+	createButton(popupContainer, startY + (rows.length * rowHeight) + rowHeight, 'Create Cube', () => {
 		if (coordinates.length === 0) {
 			alert('Please select coordinates in the 3D Editor first!');
 			return;
@@ -117,5 +127,29 @@ function createButton(popupContainer, y, label, onClick) {
 	button.style.zIndex = '1001';
 	button.style.cursor = 'pointer';
 	button.addEventListener('click', onClick);
+	button.classList.add('popup-button');
 	popupContainer.appendChild(button);
+};
+
+function createTextZone(popupContainer, y) {
+	const textZone = document.createElement('div');
+	textZone.style.position = 'absolute';
+	textZone.style.left = '20px';
+	textZone.style.top = `${y + 30}px`;
+	textZone.style.width = 'calc(100% - 40px)';
+	textZone.style.height = '100px';
+	textZone.style.border = '1px solid #000';
+	textZone.style.backgroundColor = '#fff';
+	textZone.style.fontSize = '16px';
+	textZone.style.fontFamily = 'Pixellari';
+	textZone.style.color = '#000';
+	textZone.style.overflowY = 'scroll';
+	textZone.style.zIndex = '1001';
+	textZone.classList.add('popup-textzone');
+	popupContainer.appendChild(textZone);
+};
+
+function updateTextZone(popupContainer, coordinates) {
+	const textZone = popupContainer.querySelector('.popup-textzone');
+	textZone.innerHTML = coordinates.map(coord => `(${coord[0]}, ${coord[1]}, ${coord[2]})`).join('<br>');
 };
