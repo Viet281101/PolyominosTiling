@@ -161,10 +161,7 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 			}
 		});
 	});
-
-	highlightCubes.forEach((cube, index) => {
-		cube.material.color.set(index === 0 ? 0x0000ff : 0x00ff00);
-	});
+	updateHighlightColors(highlightCubes, 0);
 };
 
 function createTextZone(ctx, x, y, width, height, text) {
@@ -192,25 +189,24 @@ function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCub
 	buttonContainer.style.position = 'absolute';
 	buttonContainer.style.top = '580px';
 	buttonContainer.style.left = '10px';
-	buttonContainer.style.width = '340px';
+	buttonContainer.style.width = '350px';
 	buttonContainer.style.height = '46px';
 	buttonContainer.style.display = 'flex';
 	buttonContainer.style.justifyContent = 'space-between';
 	buttonContainer.style.alignItems = 'center';
 	popupContainer.appendChild(buttonContainer);
 
-	const labels = ['Previous :', 'Next :', 'Select :'];
-	const icons = ['../assets/ic_arrow_left.png', '../assets/ic_arrow_right.png', '../assets/ic_select.png'];
+	const labels = ['Previous', 'Next', 'Select', 'Undo'];
+	const icons = ['arrow_left', 'arrow_right', 'select', 'reset'];
 
 	labels.forEach((label, index) => {
 		const labelText = document.createElement('span');
-		labelText.style.fontSize = '16px';
-		labelText.style.fontFamily = 'Pixellari';
+		labelText.style.font = '14px Pixellari';
 		labelText.textContent = label;
 		buttonContainer.appendChild(labelText);
 
 		const button = document.createElement('img');
-		button.src = icons[index];
+		button.src = `../assets/ic_${icons[index]}.png`;
 		button.width = 40;
 		button.height = 40;
 		button.style.cursor = 'pointer';
@@ -245,6 +241,13 @@ function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
 				} else {
 					updateHighlightedCubes(scene, cubes, highlightCubes, n);
 				}
+			}
+			break;
+		case 3:
+			if (cubes.length > 1) {
+				const removedCube = cubes.pop();
+				scene.remove(removedCube);
+				updateHighlightedCubes(scene, cubes, highlightCubes, n);
 			}
 			break;
 	}
