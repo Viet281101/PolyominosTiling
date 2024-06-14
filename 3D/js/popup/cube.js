@@ -24,21 +24,23 @@ export function createCubePopup(toolbar) {
 	ctx.fillText('z:', 250, startY + size);
 	createInputField(popupContainer, 270, (startY + size) - 20, 0);
 
-	const { scene, camera, renderer, cubes, highlightCubes } = create3DCanvas(popupContainer);
+	const { scene, camera, renderer, cubes, highlightCubes, selectedIndex } = create3DCanvas(popupContainer);
 
-	createTextZone(ctx, 10, 590, popup.width - 20, 150, 'Polycube Info...');
+	createTextZone(ctx, 10, 660, popup.width - 20, 150, 'Polycube Info...');
 
-	createButton(ctx, 'Save', 10, 750);
-	createButton(ctx, 'Create', 100, 750);
+	createButton(ctx, 'Save', 10, 820);
+	createButton(ctx, 'Create', 100, 820);
+
+	createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, selectedIndex);
 
 	popup.addEventListener('click', (e) => {
 		const rect = popup.getBoundingClientRect();
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
-		if (isInside(mouseX, mouseY, { x: 10, y: 750, width: 80, height: 24 })) {
+		if (isInside(mouseX, mouseY, { x: 10, y: 820, width: 80, height: 24 })) {
 			savePolycubeInfo();
-		} else if (isInside(mouseX, mouseY, { x: 100, y: 750, width: 80, height: 24 })) {
+		} else if (isInside(mouseX, mouseY, { x: 100, y: 820, width: 80, height: 24 })) {
 			const n = parseInt(popupContainer.querySelectorAll('input[type="number"]')[0].value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
 			const position = positionInputs.map(input => parseInt(input.value));
@@ -52,27 +54,6 @@ export function createCubePopup(toolbar) {
 	nInput.addEventListener('change', () => {
 		const n = parseInt(nInput.value);
 		updateHighlightedCubes(scene, cubes, highlightCubes, n);
-	});
-
-	const canvas3D = popupContainer.querySelector('canvas');
-	canvas3D.addEventListener('pointerdown', (event) => {
-		const mouse = new THREE.Vector2(
-			(event.offsetX / canvas3D.width) * 2 - 1,
-			-(event.offsetY / canvas3D.height) * 2 + 1
-		);
-		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera(mouse, camera);
-
-		const intersects = raycaster.intersectObjects(highlightCubes);
-		if (intersects.length > 0) {
-			console.log("Create cube in Polycube");
-			const intersectedCube = intersects[0].object;
-			intersectedCube.material.opacity = 1.0;
-			intersectedCube.material.transparent = false;
-			highlightCubes.splice(highlightCubes.indexOf(intersectedCube), 1);
-			cubes.push(intersectedCube);
-			updateHighlightedCubes(scene, cubes, highlightCubes, parseInt(nInput.value));
-		}
 	});
 };
 
@@ -127,6 +108,7 @@ function create3DCanvas(popupContainer) {
 
 	const cubes = [];
 	const highlightCubes = [];
+	let selectedIndex = 0;
 
 	const geometry = new THREE.BoxGeometry();
 	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -148,7 +130,7 @@ function create3DCanvas(popupContainer) {
 		renderer.render(scene, camera);
 	};
 	animate();
-	return { scene, camera, renderer, cubes, edges, highlightCubes };
+	return { scene, camera, renderer, cubes, highlightCubes, selectedIndex };
 };
 
 function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
@@ -170,6 +152,7 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 				const newCube = cube.clone();
 				newCube.position.copy(newPosition);
 				newCube.material = newCube.material.clone();
+				newCube.material.color.set(0x0000ff);
 				newCube.material.opacity = 0.2;
 				newCube.material.transparent = true;
 				newCube.visible = true;
@@ -177,6 +160,10 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 				highlightCubes.push(newCube);
 			}
 		});
+	});
+
+	highlightCubes.forEach((cube, index) => {
+		cube.material.color.set(index === 0 ? 0x0000ff : 0x00ff00);
 	});
 };
 
@@ -198,4 +185,76 @@ function createButton(ctx, label, x, y, width = 80, height = 24) {
 	ctx.fillStyle = '#fff';
 	ctx.font = '18px Pixellari';
 	ctx.fillText(label, x + 10, y + 18);
+};
+
+function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, selectedIndex) {
+	const buttonContainer = document.createElement('div');
+	buttonContainer.style.position = 'absolute';
+	buttonContainer.style.top = '580px';
+	buttonContainer.style.left = '10px';
+	buttonContainer.style.width = '340px';
+	buttonContainer.style.height = '46px';
+	buttonContainer.style.display = 'flex';
+	buttonContainer.style.justifyContent = 'space-between';
+	buttonContainer.style.alignItems = 'center';
+	popupContainer.appendChild(buttonContainer);
+
+	const labels = ['Previous :', 'Next :', 'Select :'];
+	const icons = ['../assets/ic_arrow_left.png', '../assets/ic_arrow_right.png', '../assets/ic_select.png'];
+
+	labels.forEach((label, index) => {
+		const labelText = document.createElement('span');
+		labelText.style.fontSize = '16px';
+		labelText.style.fontFamily = 'Pixellari';
+		labelText.textContent = label;
+		buttonContainer.appendChild(labelText);
+
+		const button = document.createElement('img');
+		button.src = icons[index];
+		button.width = 40;
+		button.height = 40;
+		button.style.cursor = 'pointer';
+		button.addEventListener('click', () => handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex));
+		buttonContainer.appendChild(button);
+	});
+};
+
+function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
+	switch (index) {
+		case 0:
+			if (selectedIndex > 0) {
+				selectedIndex--;
+			} else {
+				selectedIndex = highlightCubes.length - 1;
+			}
+			break;
+		case 1:
+			if (selectedIndex < highlightCubes.length - 1) {
+				selectedIndex++;
+			} else {
+				selectedIndex = 0;
+			}
+			break;
+		case 2:
+			if (highlightCubes.length > 0) {
+				const selectedCube = highlightCubes[selectedIndex];
+				selectedCube.material.opacity = 1.0;
+				selectedCube.material.transparent = false;
+				selectedCube.material.color.set(0x00ff00);
+				cubes.push(selectedCube);
+				highlightCubes.splice(selectedIndex, 1);
+				if (selectedIndex >= highlightCubes.length) {
+					selectedIndex = highlightCubes.length - 1;
+				}
+				updateHighlightedCubes(scene, cubes, highlightCubes, cubes.length + 1);
+			}
+			break;
+	}
+	updateHighlightColors(highlightCubes, selectedIndex);
+};
+
+function updateHighlightColors(highlightCubes, selectedIndex) {
+	highlightCubes.forEach((cube, index) => {
+		cube.material.color.set(index === selectedIndex ? 0x0000ff : 0x00ff00);
+	});
 };
