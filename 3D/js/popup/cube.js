@@ -31,7 +31,9 @@ export function createCubePopup(toolbar) {
 	createButton(ctx, 'Save', 10, 820);
 	createButton(ctx, 'Create', 100, 820);
 
-	createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, selectedIndex);
+	const state = { selectedIndex: 0 };
+
+	createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state);
 
 	popup.addEventListener('click', (e) => {
 		const rect = popup.getBoundingClientRect();
@@ -54,6 +56,8 @@ export function createCubePopup(toolbar) {
 	nInput.addEventListener('change', () => {
 		const n = parseInt(nInput.value);
 		updateHighlightedCubes(scene, cubes, highlightCubes, n);
+		state.selectedIndex = 0;
+		updateHighlightColors(highlightCubes, state.selectedIndex);
 	});
 };
 
@@ -130,7 +134,7 @@ function create3DCanvas(popupContainer) {
 		renderer.render(scene, camera);
 	};
 	animate();
-	return { scene, camera, renderer, cubes, highlightCubes, selectedIndex };
+	return { scene, camera, renderer, cubes, highlightCubes };
 };
 
 function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
@@ -161,6 +165,7 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 			}
 		});
 	});
+	// console.log('Highlighted Cubes:', highlightCubes.map(c => c.position));
 	updateHighlightColors(highlightCubes, 0);
 };
 
@@ -184,7 +189,7 @@ function createButton(ctx, label, x, y, width = 80, height = 24) {
 	ctx.fillText(label, x + 10, y + 18);
 };
 
-function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, selectedIndex) {
+function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state) {
 	const buttonContainer = document.createElement('div');
 	buttonContainer.style.position = 'absolute';
 	buttonContainer.style.top = '580px';
@@ -210,31 +215,35 @@ function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCub
 		button.width = 40;
 		button.height = 40;
 		button.style.cursor = 'pointer';
-		button.addEventListener('click', () => handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex));
+		button.addEventListener('click', () => handleButtonClick(index, scene, highlightCubes, cubes, state));
 		buttonContainer.appendChild(button);
 	});
 };
 
-function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
+function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 	const n = parseInt(document.querySelector('input[type="number"]').value);
+	// console.log(`Button Clicked: ${index}`);
 	switch (index) {
 		case 0:
-			selectedIndex = (selectedIndex > 0) ? selectedIndex - 1 : highlightCubes.length - 1;
+			state.selectedIndex = (state.selectedIndex > 0) ? state.selectedIndex - 1 : highlightCubes.length - 1;
 			break;
 		case 1:
-			selectedIndex = (selectedIndex < highlightCubes.length - 1) ? selectedIndex + 1 : 0;
+			state.selectedIndex = (state.selectedIndex < highlightCubes.length - 1) ? state.selectedIndex + 1 : 0;
 			break;
 		case 2:
+			console.log(`Selected Index: ${state.selectedIndex}`);
 			if (highlightCubes.length > 0) {
-				const selectedCube = highlightCubes[selectedIndex];
+				const selectedCube = highlightCubes[state.selectedIndex];
 				selectedCube.material.opacity = 1.0;
 				selectedCube.material.transparent = false;
 				selectedCube.material.color.set(0x00ff00);
 				cubes.push(selectedCube);
-				highlightCubes.splice(selectedIndex, 1);
-				if (selectedIndex >= highlightCubes.length) {
-					selectedIndex = highlightCubes.length - 1;
+				highlightCubes.splice(state.selectedIndex, 1);
+				if (state.selectedIndex >= highlightCubes.length) {
+					state.selectedIndex = highlightCubes.length - 1;
 				}
+				// console.log('Cubes:', cubes.map(c => c.position));
+				// console.log('Highlight Cubes after selection:', highlightCubes.map(c => c.position));
 				if (cubes.length >= n) {
 					highlightCubes.forEach(cube => scene.remove(cube));
 					highlightCubes.length = 0;
@@ -251,10 +260,12 @@ function handleButtonClick(index, scene, highlightCubes, cubes, selectedIndex) {
 			}
 			break;
 	}
-	updateHighlightColors(highlightCubes, selectedIndex);
+	// console.log('Selected Index after update:', state.selectedIndex);
+	updateHighlightColors(highlightCubes, state.selectedIndex);
 };
 
 function updateHighlightColors(highlightCubes, selectedIndex) {
+	// console.log(`Updating highlight colors, selected index: ${selectedIndex}`);
 	highlightCubes.forEach((cube, index) => {
 		cube.material.color.set(index === selectedIndex ? 0x0000ff : 0x00ff00);
 	});

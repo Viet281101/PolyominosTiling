@@ -32,9 +32,6 @@ class MainApp {
 		this.board = new Board(this.scene, { x: 3, y: 3, z: 3 });
 		this.guiController = new GUIController(this);
 		this.toolbar = new Toolbar(this);
-
-		this.addPolycube({ n: 1, cubes: [[0, 0, 0]], color: 0x00ff00, position: { x: 0, y: 3, z: 0 } });
-		this.addPolycube({ n: 3, cubes: [[0, 0, 0], [0, 1, 0], [0, 0, 1]], color: 0xff0000, position: { x: 2, y: 2, z: 2 } });
 	};
 
 	eventListener() {
