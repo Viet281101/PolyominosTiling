@@ -33,7 +33,7 @@ export class Toolbar {
 
 	createButtons() {
 		return [
-			{ name: 'Create Cube', icon: '../assets/ic_plus.png', action: () => this.togglePopup('cube'), description: 'To create a new cube and add it to the scene.' },
+			{ name: 'Create Polycube', icon: '../assets/ic_plus.png', action: () => this.togglePopup('cube'), description: 'To create a new cube and add it to the scene.' },
 			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.' },
 			{ name: 'Solving Polycube', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve'), description: 'To solve the polycube puzzle.\nUse different algorithms to solve.' },
 			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial'), description: 'To view the tutorial.\nLearn how to use the application.' },
@@ -271,7 +271,7 @@ export class Toolbar {
 		this.popupOpen = false;
 		this.currentPopup = null;
 	};
-	
+
 	closeCurrentPopup() { 
 		if (this.currentPopup) { this.closePopup(this.currentPopup); } 
 	};
