@@ -24,7 +24,7 @@ export function createCubePopup(toolbar) {
 	ctx.fillText('z:', 250, startY + size);
 	createInputField(popupContainer, 270, (startY + size) - 20, 0);
 
-	const { scene, camera, renderer, cube } = create3DCanvas(popupContainer);
+	const { scene, camera, renderer, cubes, highlightCubes } = create3DCanvas(popupContainer);
 
 	createTextZone(ctx, 10, 590, popup.width - 20, 150, 'Polycube Info...');
 
@@ -39,7 +39,38 @@ export function createCubePopup(toolbar) {
 		if (isInside(mouseX, mouseY, { x: 10, y: 750, width: 80, height: 24 })) {
 			savePolycubeInfo();
 		} else if (isInside(mouseX, mouseY, { x: 100, y: 750, width: 80, height: 24 })) {
-			createPolycube(toolbar.mainApp);
+			const n = parseInt(popupContainer.querySelectorAll('input[type="number"]')[0].value);
+			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
+			const position = positionInputs.map(input => parseInt(input.value));
+
+			const cubesData = cubes.map(cube => cube.position.toArray());
+
+			toolbar.mainApp.addPolycube({ n, cubes: cubesData, color: 0x00ff00, position: { x: position[0], y: position[1], z: position[2] } });
+		}
+	});
+
+	const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
+	nInput.addEventListener('change', () => {
+		const n = parseInt(nInput.value);
+		updateHighlightedCubes(scene, cubes, highlightCubes, n);
+	});
+
+	const canvas3D = popupContainer.querySelector('canvas');
+	canvas3D.addEventListener('mousedown', (event) => {
+		const mouse = new THREE.Vector2(
+			(event.offsetX / canvas3D.width) * 2 - 1,
+			-(event.offsetY / canvas3D.height) * 2 + 1
+		);
+		const raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera(mouse, camera);
+
+		const intersects = raycaster.intersectObjects(highlightCubes);
+		if (intersects.length > 0) {
+			const intersectedCube = intersects[0].object;
+			intersectedCube.material.opacity = 1.0;
+			intersectedCube.material.transparent = false;
+			cubes.push(intersectedCube.clone());
+			updateHighlightedCubes(scene, cubes, highlightCubes, parseInt(nInput.value));
 		}
 	});
 };
@@ -93,10 +124,18 @@ function create3DCanvas(popupContainer) {
 
 	const controls = new OrbitControls(camera, renderer.domElement);
 
+	const cubes = [];
+	const highlightCubes = [];
+
 	const geometry = new THREE.BoxGeometry();
 	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+	const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+
 	const cube = new THREE.Mesh(geometry, material);
+	const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), edgeMaterial);
+	cube.add(edges);
 	scene.add(cube);
+	cubes.push(cube);
 
 	const light = new THREE.DirectionalLight(0xffffff, 1);
 	light.position.set(0, 1, 1).normalize();
@@ -108,7 +147,38 @@ function create3DCanvas(popupContainer) {
 		renderer.render(scene, camera);
 	};
 	animate();
-	return { scene, camera, renderer, cube };
+	return { scene, camera, renderer, cubes, edges, highlightCubes };
+};
+
+function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
+	highlightCubes.forEach(cube => scene.remove(cube));
+	highlightCubes.length = 0;
+
+	if (cubes.length >= n) {
+		return;
+	}
+
+	const offsetPositions = [
+		new THREE.Vector3(1, 0, 0), new THREE.Vector3(-1, 0, 0),
+		new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, -1, 0),
+		new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, -1)
+	];
+
+	cubes.forEach(cube => {
+		offsetPositions.forEach(offset => {
+			const newPosition = cube.position.clone().add(offset);
+			if (!cubes.some(c => c.position.equals(newPosition)) && !highlightCubes.some(c => c.position.equals(newPosition))) {
+				const newCube = cube.clone();
+				newCube.position.copy(newPosition);
+				newCube.material = newCube.material.clone();
+				newCube.material.opacity = 0.3;
+				newCube.material.transparent = true;
+				newCube.visible = true;
+				scene.add(newCube);
+				highlightCubes.push(newCube);
+			}
+		});
+	});
 };
 
 function createTextZone(ctx, x, y, width, height, text) {
