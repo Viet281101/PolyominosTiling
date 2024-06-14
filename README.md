@@ -13,6 +13,15 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 
 Il s'agit d'étudier les polyominos et de proposer des solutions de pavage avec une ou plusieurs pièces fixées, en 2D avec l'API Canvas, en 3D avec la librairie three.js. 
 
+### Preview
+
+- Polyominoes:
+![Screenshot from 2024-06-15 01-36-33](https://github.com/Viet281101/PolyominosTiling/assets/77735678/45a08b7c-ded8-49f6-a119-1759ea16dbe9)
+
+
+- Polycube:
+![Screenshot from 2024-06-15 01-27-01](https://github.com/Viet281101/PolyominosTiling/assets/77735678/3376ba5f-a740-4f07-be51-79c195779d37)
+
 
 ### Infos research & documentation
 
