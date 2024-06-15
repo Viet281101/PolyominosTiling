@@ -1,7 +1,9 @@
 class Tetris {
-	constructor(canvasId) {
+	constructor(canvasId, controlsId) {
 		this.canvas = document.getElementById(canvasId);
+		this.controlsCanvas = document.getElementById(controlsId);
 		this.ctx = this.canvas.getContext('2d');
+		this.controlsCtx = this.controlsCanvas.getContext('2d');
 		this.blockSize = 30;
 		this.rows = this.canvas.height / this.blockSize;
 		this.cols = this.canvas.width / this.blockSize;
@@ -16,17 +18,40 @@ class Tetris {
 			{ shape: [[1, 1, 1], [0, 1, 0]], color: 'purple' },
 			{ shape: [[0, 1, 1, 0], [0, 1, 1]], color: 'red' }
 		];
+		this.icons = {};
+		this.iconsLoaded = 0;
+		this.loadIcons();
+	};
+
+	loadIcons() {
+		const iconNames = ['ic_arrow_left.png', 'ic_arrow_right.png', 'ic_rotate_left.png', 'ic_rotate_right.png', 'ic_home.png'];
+		iconNames.forEach(iconName => {
+			const img = new Image();
+			img.src = `./assets/${iconName}`;
+			img.onload = () => {
+				this.iconsLoaded++;
+				if (this.iconsLoaded === iconNames.length) { this.init(); }
+			};
+			this.icons[iconName] = img;
+		});
+	};
+
+	init() {
 		this.applyStyles();
 		this.reset();
 		this.bindEvents();
+		this.draw();
+		this.drawControls();
 	};
 
 	applyStyles() {
 		this.canvas.style.border = '1px solid black';
 		this.canvas.style.display = 'block';
 		this.canvas.style.margin = 'auto';
+		this.controlsCanvas.style.display = 'block';
+		this.controlsCanvas.style.margin = 'auto';
 		const html = document.querySelector('html');
-		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%', background: '#999999', userSelect: 'none' });
+		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%', background: '#c3c3c3', userSelect: 'none' });
 	};
 
 	reset() {
@@ -35,6 +60,7 @@ class Tetris {
 		this.currentTetrimino = this.getRandomTetrimino();
 		if (this.collides()) {
 			// game over
+			alert(`Game Over, you have ${this.score} points!`);
 			this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(0));
 			this.score = 0;
 		}
@@ -46,9 +72,7 @@ class Tetris {
 				if (
 					this.currentTetrimino.shape[row][col] &&
 					(this.board[row + this.y] && this.board[row + this.y][col + this.x]) !== 0
-				) {
-					return true;
-				}
+				) { return true; }
 			}
 		}
 		return false;
@@ -114,23 +138,55 @@ class Tetris {
 		}
 	};
 
-	getRandomTetrimino() {
-		return { ...this.tetriminos[Math.floor(Math.random() * this.tetriminos.length)] };
+	drawControls() {
+		const iconSize = 48;
+		const padding = 10;
+		const icons = ['ic_arrow_left.png', 'ic_arrow_right.png', 'ic_rotate_left.png', 'ic_rotate_right.png', 'ic_home.png'];
+		const y = (this.controlsCanvas.height - iconSize) / 2;
+
+		icons.forEach((icon, index) => {
+			const x = padding + index * (iconSize + padding);
+			this.controlsCtx.drawImage(this.icons[icon], x, y, iconSize, iconSize);
+		});
 	};
 
-	clearRows() {
-		outer: for (let row = this.rows - 1; row >= 0; row--) {
-			for (let col = 0; col < this.cols; col++) {
-				if (!this.board[row][col]) {
-					continue outer;
-				}
-			}
+	handleIconClick(mouseX, mouseY) {
+		const iconSize = 48;
+		const padding = 10;
+		const y = (this.controlsCanvas.height - iconSize) / 2;
+		const icons = [
+			{ name: 'ic_arrow_left.png', action: () => this.move(-1) },
+			{ name: 'ic_arrow_right.png', action: () => this.move(1) },
+			{ name: 'ic_rotate_left.png', action: () => this.rotateLeft() },
+			{ name: 'ic_rotate_right.png', action: () => this.rotateRight() },
+			{ name: 'ic_home.png', action: () => this.goHome() }
+		];
 
-			this.board.splice(row, 1);
-			this.board.unshift(Array(this.cols).fill(0));
-			this.score += 10;
+		icons.forEach((icon, index) => {
+			const x = padding + index * (iconSize + padding);
+			if (mouseX >= x && mouseX <= x + iconSize && mouseY >= y && mouseY <= y + iconSize) { icon.action(); }
+		});
+	};
+
+	rotateLeft() {
+		this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+		if (this.collides()) {
+			this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+			this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+			this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
 		}
 	};
+
+	rotateRight() {
+		this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+		this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+		this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+		if (this.collides()) {
+			this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
+		}
+	};
+
+	goHome() { window.location.reload(); }
 
 	bindEvents() {
 		document.addEventListener('keydown', (e) => {
@@ -151,6 +207,13 @@ class Tetris {
 
 			this.draw();
 		});
+
+		this.controlsCanvas.addEventListener('click', (e) => {
+			const rect = this.controlsCanvas.getBoundingClientRect();
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+			this.handleIconClick(mouseX, mouseY);
+		});
 	};
 
 	draw() {
@@ -168,12 +231,13 @@ class Tetris {
 		this.draw();
 	};
 
-	stopGame() {
-		clearInterval(this.gameInterval);
+	stopGame() { clearInterval(this.gameInterval); };
+	getRandomTetrimino() {
+		return { ...this.tetriminos[Math.floor(Math.random() * this.tetriminos.length)] };
 	};
 };
 
 export function startTetris() {
-	const tetris = new Tetris('canvas');
+	const tetris = new Tetris('canvas', 'controls');
 	tetris.startGame();
 };

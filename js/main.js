@@ -220,6 +220,12 @@ class MainApp {
 		canvas.height = 600;
 		document.body.appendChild(canvas);
 
+		const control = document.createElement('canvas');
+		control.id = 'controls';
+		control.width = 300;
+		control.height = 100;
+		document.body.appendChild(control);
+
 		const script = document.createElement('script');
 		script.type = 'module';
 		script.src = './js/tetris.js';
