@@ -7,7 +7,8 @@ export class GUIController {
 			backgroundColor: '#999999',
 			polycubeColor: '#0000ff',
 			tooltipToolbar: true,
-			showInnerGrid: false
+			showInnerGrid: false,
+			showOuterGrid: true
 		};
 		this.init();
 		this.checkWindowSize();
@@ -34,6 +35,9 @@ export class GUIController {
 		});
 		this.gui.add(this.settings, 'showInnerGrid').onChange((value) => {
 			this.mainApp.board.toggleInnerGrid(value);
+		});
+		this.gui.add(this.settings, 'showOuterGrid').onChange((value) => {
+			this.mainApp.board.toggleOuterGrid(value);
 		});
 	};
 
