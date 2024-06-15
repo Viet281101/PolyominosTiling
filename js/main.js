@@ -11,7 +11,6 @@ class MainApp {
 		this.usedColors = [];
 		this.iconImage = new Image();
 		this.iconImage.src = './assets/ic_arrow_right.png';
-
 		this.initialize();
 		this.addEventListeners();
 		this.animate();
@@ -60,15 +59,16 @@ class MainApp {
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText('Research polyominoes &', this.canvas.width / 2, 200);
 		this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
-		this.ctx.fillText('Polyominoes Minigames :', this.canvas.width / 2, 650);
+		this.ctx.fillText('Mini Polyominoes Games :', this.canvas.width / 2, 650);
 
 		this.buttons = [];
 		this.drawButton('2D Version', (this.canvas.width / 2), 350, () => { window.location.href = './2D/index.html'; });
 		this.drawButton('3D Version', (this.canvas.width / 2), 450, () => { window.location.href = './3D/index.html'; });
-		this.drawButton('2D Tetris', (this.canvas.width / 2), 700, this.switchToTetris.bind(this));
+		this.drawButton('2D Tetris', (this.canvas.width / 2), 710, this.switchToTetris.bind(this), false);
+		this.drawButton('2D Pentominos', (this.canvas.width / 2), 780, () => {}, false);
 	};
 
-	drawButton(text, x, y, onClick) {
+	drawButton(text, x, y, onClick, icon_visible=true) {
 		const buttonWidth = 200;
 		const buttonHeight = 50;
 
@@ -85,8 +85,7 @@ class MainApp {
 		const iconX = x + textWidth / 2 + 10;
 		const iconY = y - iconSize / 2;
 
-		this.ctx.drawImage(this.iconImage, iconX, iconY, iconSize, iconSize);
-
+		if (icon_visible) { this.ctx.drawImage(this.iconImage, iconX, iconY, iconSize, iconSize); };
 		this.buttons.push({ text, x, y, width: buttonWidth, height: buttonHeight, onClick });
 	};
 
@@ -149,18 +148,13 @@ class MainApp {
 				y = startY + Math.random() * (endY - startY - shape.length * size);
 
 				for (const polyomino of this.polyominoes) {
-					if (this.isOverlap(x, y, shape, polyomino)) {
-						isOverlap = true;
-						break;
-					}
+					if (this.isOverlap(x, y, shape, polyomino)) { isOverlap = true; break; }
 				}
 			} while (isOverlap);
 
 			const dx = (Math.random() * (maxSpeed - minSpeed) + minSpeed) * (Math.random() < 0.5 ? -1 : 1);
 			const dy = (Math.random() * (maxSpeed - minSpeed) + minSpeed) * (Math.random() < 0.5 ? -1 : 1);
-
 			const color = this.getRandomColor();
-
 			this.polyominoes.push(new Polyomino(this.ctx, type, x, y, dx, dy, color));
 		}
 	};
@@ -189,20 +183,13 @@ class MainApp {
 							if (polyomino.grid[prow][pcol]) {
 								const ppx = polyomino.x + pcol * size;
 								const ppy = polyomino.y + prow * size;
-
-								if (px < ppx + size &&
-									px + size > ppx &&
-									py < ppy + size &&
-									py + size > ppy) {
-									return true;
-								}
+								if (px < ppx + size && px + size > ppx && py < ppy + size && py + size > ppy) { return true; }
 							}
 						}
 					}
 				}
 			}
 		}
-
 		return false;
 	};
 
@@ -231,9 +218,7 @@ class MainApp {
 		script.src = './js/tetris.js';
 		document.body.appendChild(script);
 
-		script.onload = () => {
-			startTetris();
-		};
+		script.onload = () => { startTetris(); };
 	};
 };
 

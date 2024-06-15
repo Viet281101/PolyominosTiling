@@ -186,8 +186,7 @@ class Tetris {
 		}
 	};
 
-	goHome() { window.location.reload(); }
-
+	goHome() { window.location.reload(); };
 	bindEvents() {
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'ArrowLeft') {
@@ -204,7 +203,6 @@ class Tetris {
 					this.currentTetrimino.shape = this.rotate(this.currentTetrimino.shape);
 				}
 			}
-
 			this.draw();
 		});
 
@@ -224,10 +222,7 @@ class Tetris {
 	};
 
 	startGame() {
-		this.gameInterval = setInterval(() => {
-			this.drop();
-			this.draw();
-		}, 1000);
+		this.gameInterval = setInterval(() => { this.drop(); this.draw(); }, 1000);
 		this.draw();
 	};
 
