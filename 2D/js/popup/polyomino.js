@@ -34,7 +34,6 @@ export function showPolyominoPopup(toolbar) {
 		polyomino.y = y - shapeSize / 2;
 		polyomino.width = shapeSize * polyomino.shape[0].length;
 		polyomino.height = shapeSize * polyomino.shape.length;
-
 		polyominoes.push({ polyomino, shape, shapeSize, y });
 	});
 
@@ -43,16 +42,13 @@ export function showPolyominoPopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 		let cursor = 'default';
-
 		polyominoes.forEach(({ polyomino, y }) => {
 			const leftColumnRect = { x: 10, y: y - shapeSize / 2, width: 180, height: shapeSize + 20 };
 			const rightColumnRect = { x: polyomino.x, y: polyomino.y, width: polyomino.width, height: polyomino.height };
-
 			if (toolbar.isInside(mouseX, mouseY, leftColumnRect) || toolbar.isInside(mouseX, mouseY, rightColumnRect)) {
 				cursor = 'pointer';
 			}
 		});
-
 		popup.style.cursor = cursor;
 	});
 

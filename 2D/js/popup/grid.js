@@ -31,7 +31,6 @@ export function showGridPopup(toolbar) {
 		ctx.font = '22px Pixellari';
 		ctx.fillStyle = '#000';
 		ctx.fillText(row.label, colX, y + 20);
-
 		if (row.icon) {
 			const icon = new Image();
 			icon.src = row.icon;
@@ -45,7 +44,6 @@ export function showGridPopup(toolbar) {
 
 	let newRows = 10;
 	let newCols = 10;
-
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
 		input.addEventListener('change', (e) => {
 			if (index === 0) newRows = parseInt(e.target.value);
@@ -58,14 +56,12 @@ export function showGridPopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 		let cursor = 'default';
-
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight;
 			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 				cursor = 'pointer';
 			}
 		});
-
 		popup.style.cursor = cursor;
 	});
 
@@ -73,29 +69,16 @@ export function showGridPopup(toolbar) {
 		const rect = popup.getBoundingClientRect();
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
-
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight;
 			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 				switch (index) {
-					case 3:
-						toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize);
-						break;
-					case 4:
-						toolbar.mainApp.clearBoard();
-						break;
-					case 5:
-						toolbar.mainApp.isBlackening = true;
-						break;
-					case 6:
-						toolbar.mainApp.autoRandomBlackening();
-						break;
-					case 7:
-						toolbar.mainApp.autoWhitening();
-						break;
-					case 8:
-						toolbar.mainApp.invertBlackWhite();
-						break;
+					case 3: toolbar.mainApp.createNewBoard(newRows, newCols, toolbar.mainApp.gridSize); break;
+					case 4: toolbar.mainApp.clearBoard(); break;
+					case 5: toolbar.mainApp.isBlackening = true; break;
+					case 6: toolbar.mainApp.autoRandomBlackening(); break;
+					case 7: toolbar.mainApp.autoWhitening(); break;
+					case 8: toolbar.mainApp.invertBlackWhite(); break;
 				}
 				if (toolbar.isMobile) {toolbar.closePopup('grid');}
 			}

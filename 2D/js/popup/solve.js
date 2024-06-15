@@ -37,10 +37,7 @@ export function showSolvePopup(toolbar) {
 			};
 			attachSolveClickEvent(toolbar, popup, row, y);
 		}
-
-		if (row.description) {
-			dropdowns[index] = { description: row.description, expanded: false, y: y + 40 };
-		}
+		if (row.description) { dropdowns[index] = { description: row.description, expanded: false, y: y + 40 }; }
 	});
 
 	popup.addEventListener('mousemove', (e) => {
@@ -113,7 +110,6 @@ export function showSolvePopup(toolbar) {
 				ctx.lineTo(colX + ctx.measureText(row.label).width, y + 25);
 				ctx.stroke();
 			}
-
 			if (row.icon) {
 				const icon = new Image();
 				icon.src = row.icon;
@@ -122,9 +118,7 @@ export function showSolvePopup(toolbar) {
 				};
 				clickAreas.push({ index, rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 }, type: 'icon' });
 			}
-
 			clickAreas.push({ index, rect: { x: colX, y, width: popup.width - colX - 100, height: rowHeight }, type: 'label' });
-
 			if (dropdowns[index] && dropdowns[index].expanded) {
 				ctx.font = '16px Pixellari';
 				ctx.fillStyle = '#000';
@@ -133,7 +127,6 @@ export function showSolvePopup(toolbar) {
 			}
 		});
 	};
-
 	redrawPopup();
 };
 

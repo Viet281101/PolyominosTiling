@@ -11,13 +11,7 @@ class MainApp {
 		this.rows = this.cols = 10;
 		this.polyominoes = [];
 		this.selectedPolyomino = null;
-		this.icons = {
-			flip: new Image(),
-			rotateLeft: new Image(),
-			rotateRight: new Image(),
-			duplicate: new Image(),
-			trash: new Image()
-		};
+		this.icons = { flip: new Image(), rotateLeft: new Image(), rotateRight: new Image(), duplicate: new Image(), trash: new Image() };
 		const as = "../assets/";
 		this.icons.flip.src = as + 'ic_flip.png';
 		this.icons.rotateLeft.src = as + 'ic_rotate_left.png';
@@ -65,20 +59,9 @@ class MainApp {
 			this.guiController.checkWindowSize();
 			this.toolbar.resizeToolbar();
 		});
-		this.canvas.addEventListener('touchstart', (e) => {
-			e.preventDefault();
-			const touchPos = this.gridBoard.getTouchPos(e);
-			this.handleMouseDown(touchPos);
-		});
-		this.canvas.addEventListener('touchmove', (e) => {
-			e.preventDefault();
-			const touchPos = this.gridBoard.getTouchPos(e);
-			this.handleMouseMove(touchPos);
-		});
-		this.canvas.addEventListener('touchend', (e) => {
-			e.preventDefault();
-			this.handleMouseUp();
-		});
+		this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.handleMouseDown(this.gridBoard.getTouchPos(e)); });
+		this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.handleMouseMove(this.gridBoard.getTouchPos(e)); });
+		this.canvas.addEventListener('touchend', (e) => { e.preventDefault(); this.handleMouseUp(); });
 	};
 
 	handleMouseDown(mousePos) {
@@ -189,7 +172,7 @@ class MainApp {
 	deleteAllPolyominos() {
 		this.polyominoes = [];
 		this.selectedPoyomino = null;
-		this.autoWhitening() ;
+		this.autoWhitening();
 		this.redraw();
 	};
 
@@ -362,31 +345,13 @@ class MainApp {
 	backtrackingAutoTiling() {
 		this.resetBoard();
 		const messageBox = this.createMessageBox(1);
-		setTimeout(() => {
-			backtrackingAutoTiling(
-				this.polyominoes, 
-				this.gridBoard, 
-				this.placePolyomino.bind(this), 
-				this.gridBoard.removePolyomino.bind(this), 
-				this.redraw.bind(this),
-				
-				() => { this.showMessageBox(messageBox); }
-			);
-		}, 1000);
+		setTimeout(() => { backtrackingAutoTiling( this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this), this.redraw.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000);
 	};
 
 	bruteForceTiling() {
 		this.resetBoard(); 
 		const messageBox = this.createMessageBox(2);
-		setTimeout(() => {
-			bruteForceTiling(
-				this.gridBoard, 
-				this.polyominoes, 
-				this.placePolyomino.bind(this), 
-				this.redraw.bind(this),
-				() => { this.showMessageBox(messageBox); }
-			);
-		}, 1000);
+		setTimeout(() => { bruteForceTiling( this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.redraw.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000);
 	};
 
 	randomTiling() {
@@ -398,32 +363,13 @@ class MainApp {
 	randomBacktrackingTiling() {
 		this.resetBoard();
 		const messageBox = this.createMessageBox(4);
-		setTimeout(() => {
-			randomBacktrackingTiling(
-				this.polyominoes, 
-				this.gridBoard, 
-				this.placePolyomino.bind(this), 
-				this.gridBoard.removePolyomino.bind(this), 
-				this.redraw.bind(this),
-				() => { this.showMessageBox(messageBox); }
-			);
-		}, 1000);
+		setTimeout(() => { randomBacktrackingTiling( this.polyominoes, this.gridBoard, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this), this.redraw.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000);
 	};
 
 	fullAutoTiling() {
 		this.resetBoard(); 
 		const messageBox = this.createMessageBox(2);
-		setTimeout(() => {
-			fullAutoTiling(
-				this.gridBoard,
-				this.polyominoes,
-				this.placePolyomino.bind(this),
-				this.gridBoard.removePolyomino.bind(this.gridBoard),
-				this.redraw.bind(this),
-				this.duplicatePolyomino.bind(this),
-				() => { this.showMessageBox(messageBox); }
-			);
-		}, 1000); 
+		setTimeout(() => { fullAutoTiling( this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this.gridBoard), this.redraw.bind(this), this.duplicatePolyomino.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000); 
 	};
 };
 

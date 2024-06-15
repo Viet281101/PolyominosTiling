@@ -23,7 +23,6 @@ export class GUIController {
 			guiContainer.style.transformOrigin = 'top right';
 			guiContainer.style.transform = 'scale(1.5)';
 		}
-
 		this.gui.addColor(this.settings, 'backgroundColor').onChange((value) => {
 			this.mainApp.renderer.setClearColor(value);
 		});
