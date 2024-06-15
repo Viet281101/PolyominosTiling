@@ -232,7 +232,7 @@ export class Toolbar {
 
 		const popup = document.createElement('canvas');
 		popup.width = 370;
-		popup.height = 6000;
+		popup.height = 2000;
 		popupContainer.appendChild(popup);
 
 		const titleElement = document.createElement('h3');

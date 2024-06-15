@@ -24,11 +24,12 @@ export function createCubePopup(toolbar) {
 	ctx.fillText('z:', 250, startY + size);
 	createInputField(popupContainer, 270, (startY + size) - 20, 0);
 
-	const { scene, camera, renderer, cubes, highlightCubes, selectedIndex } = create3DCanvas(popupContainer);
+	const { scene, camera, renderer, cubes, highlightCubes, controls } = create3DCanvas(popupContainer);
 
-	createTextZone(popupContainer, 10, 660, popup.width - 48, 128, 'Polycube Info...');
-	createButton(ctx, 'Info', 10, 820);
-	createButton(ctx, 'Create', 230, 820);
+	createTextZone(popupContainer, 10, 660, popup.width - 48, 84, 'Polycube Info...');
+	createButton(ctx, 'Info', 10, 800);
+	createButton(ctx, 'Clear', 128, 800);
+	createButton(ctx, 'Create', 254, 800);
 
 	const state = { selectedIndex: 0 };
 
@@ -39,9 +40,11 @@ export function createCubePopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
-		if (isInside(mouseX, mouseY, { x: 10, y: 820, width: 128, height: 32 })) {
+		if (isInside(mouseX, mouseY, { x: 10, y: 800, width: 128, height: 32 })) {
 			showPolycubeInfo(ctx, popupContainer, cubes);
-		} else if (isInside(mouseX, mouseY, { x: 230, y: 820, width: 128, height: 32 })) {
+		} else if (isInside(mouseX, mouseY, { x: 128, y: 800, width: 128, height: 32 })) {
+			resetCubePopup(popupContainer, scene, cubes, highlightCubes, state, controls);
+		} else if (isInside(mouseX, mouseY, { x: 254, y: 800, width: 128, height: 32 })) {
 			const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
 			const n = parseInt(nInput.value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
@@ -74,6 +77,30 @@ function showPolycubeInfo(ctx, popupContainer, cubes) {
 	let infoText = `Position: [${position.join(', ')}]\nCubes:\n`;
 	cubesData.forEach((cube, index) => { infoText += `  ${index + 1}: [${cube.join(', ')}]\n`; });
 	textZone.innerText = infoText;
+};
+
+function resetCubePopup(popupContainer, scene, cubes, highlightCubes, state, controls) {
+	const inputs = popupContainer.querySelectorAll('input[type="number"]');
+	inputs.forEach(input => input.value = 0);
+	inputs[0].value = 1;
+
+	const textZone = popupContainer.querySelector('.text-zone');
+	textZone.innerText = 'Polycube Info...';
+	cubes.forEach(cube => scene.remove(cube));
+	highlightCubes.forEach(cube => scene.remove(cube));
+	cubes.length = 0;
+	highlightCubes.length = 0;
+
+	const geometry = new THREE.BoxGeometry();
+	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+	const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+	const cube = new THREE.Mesh(geometry, material);
+	const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), edgeMaterial);
+	cube.add(edges);
+	scene.add(cube);
+	cubes.push(cube);
+	controls.reset();
+	state.selectedIndex = 0;
 };
 
 function createInputField(popupContainer, x, y, defaultValue) {
@@ -140,7 +167,7 @@ function create3DCanvas(popupContainer) {
 		renderer.render(scene, camera);
 	};
 	animate();
-	return { scene, camera, renderer, cubes, highlightCubes };
+	return { scene, camera, renderer, cubes, highlightCubes, controls };
 };
 
 function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
@@ -196,14 +223,14 @@ function createTextZone(popupContainer, x, y, width, height, text) {
 	popupContainer.appendChild(textZone);
 };
 
-function createButton(ctx, label, x, y, width = 128, height = 32) {
+function createButton(ctx, label, x, y, width = 102, height = 32) {
 	ctx.fillStyle = '#00f';
 	ctx.fillRect(x, y, width, height);
 	ctx.strokeStyle = '#000';
 	ctx.strokeRect(x, y, width, height);
 	ctx.fillStyle = '#fff';
 	ctx.font = '22px Pixellari';
-	ctx.fillText(label, x + 24, y + 24);
+	ctx.fillText(label, x + 20, y + 24);
 };
 
 function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state) {
@@ -240,12 +267,8 @@ function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCub
 function handleButtonClick(index, scene, highlightCubes, cubes, state) {
 	const n = parseInt(document.querySelector('input[type="number"]').value);
 	switch (index) {
-		case 0:
-			state.selectedIndex = (state.selectedIndex > 0) ? state.selectedIndex - 1 : highlightCubes.length - 1;
-			break;
-		case 1:
-			state.selectedIndex = (state.selectedIndex < highlightCubes.length - 1) ? state.selectedIndex + 1 : 0;
-			break;
+		case 0: state.selectedIndex = (state.selectedIndex > 0) ? state.selectedIndex - 1 : highlightCubes.length - 1; break;
+		case 1: state.selectedIndex = (state.selectedIndex < highlightCubes.length - 1) ? state.selectedIndex + 1 : 0; break;
 		case 2:
 			if (highlightCubes.length > 0) {
 				const selectedCube = highlightCubes[state.selectedIndex];
