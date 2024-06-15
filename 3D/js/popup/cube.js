@@ -26,10 +26,9 @@ export function createCubePopup(toolbar) {
 
 	const { scene, camera, renderer, cubes, highlightCubes, selectedIndex } = create3DCanvas(popupContainer);
 
-	createTextZone(ctx, 10, 660, popup.width - 20, 150, 'Polycube Info...');
-
+	createTextZone(popupContainer, 10, 660, popup.width - 48, 128, 'Polycube Info...');
 	createButton(ctx, 'Info', 10, 820);
-	createButton(ctx, 'Create', 100, 820);
+	createButton(ctx, 'Create', 230, 820);
 
 	const state = { selectedIndex: 0 };
 
@@ -40,14 +39,16 @@ export function createCubePopup(toolbar) {
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
-		if (isInside(mouseX, mouseY, { x: 10, y: 820, width: 80, height: 24 })) {
-			savePolycubeInfo(ctx, popupContainer, cubes);
-		} else if (isInside(mouseX, mouseY, { x: 100, y: 820, width: 80, height: 24 })) {
-			const n = parseInt(popupContainer.querySelectorAll('input[type="number"]')[0].value);
+		if (isInside(mouseX, mouseY, { x: 10, y: 820, width: 128, height: 32 })) {
+			showPolycubeInfo(ctx, popupContainer, cubes);
+		} else if (isInside(mouseX, mouseY, { x: 230, y: 820, width: 128, height: 32 })) {
+			const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
+			const n = parseInt(nInput.value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
 			const position = positionInputs.map(input => parseInt(input.value));
 			const cubesData = cubes.map(cube => cube.position.toArray());
-			toolbar.mainApp.addPolycube({ n, cubes: cubesData, color: 0x00ff00, position: { x: position[0], y: position[1], z: position[2] } });
+			if (n !== cubes.length) { nInput.value = cubes.length; }
+			toolbar.mainApp.addPolycube({ n: cubes.length, cubes: cubesData, color: 0x00ff00, position: { x: position[0], y: position[1], z: position[2] } });
 			if (toolbar.isMobile) toolbar.closePopup('cube');
 		}
 	});
@@ -65,38 +66,14 @@ function isInside(x, y, rect) {
 	return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
 };
 
-function savePolycubeInfo(ctx, popupContainer, cubes) {
+function showPolycubeInfo(ctx, popupContainer, cubes) {
 	const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
 	const position = positionInputs.map(input => parseInt(input.value));
 	const cubesData = cubes.map(cube => cube.position.toArray());
-
-	const polycubeInfo = {
-		position,
-		cubes: cubesData
-	};
-
-	const textZoneX = 10;
-	const textZoneY = 660;
-	const textZoneWidth = popupContainer.querySelector('canvas').width - 20;
-	const textZoneHeight = 150;
-
-	ctx.clearRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
-	ctx.fillStyle = '#fff';
-	ctx.fillRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
-	ctx.strokeStyle = '#000';
-	ctx.strokeRect(textZoneX, textZoneY, textZoneWidth, textZoneHeight);
-	ctx.fillStyle = '#000';
-	ctx.font = '18px Pixellari';
-
+	const textZone = popupContainer.querySelector('.text-zone');
 	let infoText = `Position: [${position.join(', ')}]\nCubes:\n`;
-	cubesData.forEach((cube, index) => {
-		infoText += `  ${index + 1}: [${cube.join(', ')}]\n`;
-	});
-
-	const textLines = infoText.split('\n');
-	textLines.forEach((line, index) => {
-		ctx.fillText(line, textZoneX + 10, textZoneY + 20 + (index * 20));
-	});
+	cubesData.forEach((cube, index) => { infoText += `  ${index + 1}: [${cube.join(', ')}]\n`; });
+	textZone.innerText = infoText;
 };
 
 function createInputField(popupContainer, x, y, defaultValue) {
@@ -142,7 +119,6 @@ function create3DCanvas(popupContainer) {
 
 	const cubes = [];
 	const highlightCubes = [];
-	let selectedIndex = 0;
 
 	const geometry = new THREE.BoxGeometry();
 	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -201,24 +177,33 @@ function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
 	});
 };
 
-function createTextZone(ctx, x, y, width, height, text) {
-	ctx.fillStyle = '#fff';
-	ctx.fillRect(x, y, width, height);
-	ctx.strokeStyle = '#000';
-	ctx.strokeRect(x, y, width, height);
-	ctx.fillStyle = '#000';
-	ctx.font = '18px Pixellari';
-	ctx.fillText(text, x + 10, y + 20);
+function createTextZone(popupContainer, x, y, width, height, text) {
+	const textZone = document.createElement('div');
+	textZone.className = 'text-zone';
+	textZone.style.position = 'absolute';
+	textZone.style.left = `${x}px`;
+	textZone.style.top = `${y}px`;
+	textZone.style.width = `${width}px`;
+	textZone.style.height = `${height}px`;
+	textZone.style.overflowY = 'auto';
+	textZone.style.backgroundColor = '#fff';
+	textZone.style.border = '3px solid #000';
+	textZone.style.fontSize = '18px';
+	textZone.style.fontFamily = 'Pixellari';
+	textZone.style.color = '#000';
+	textZone.style.padding = '10px';
+	textZone.innerText = text;
+	popupContainer.appendChild(textZone);
 };
 
-function createButton(ctx, label, x, y, width = 80, height = 24) {
+function createButton(ctx, label, x, y, width = 128, height = 32) {
 	ctx.fillStyle = '#00f';
 	ctx.fillRect(x, y, width, height);
 	ctx.strokeStyle = '#000';
 	ctx.strokeRect(x, y, width, height);
 	ctx.fillStyle = '#fff';
-	ctx.font = '18px Pixellari';
-	ctx.fillText(label, x + 10, y + 18);
+	ctx.font = '22px Pixellari';
+	ctx.fillText(label, x + 24, y + 24);
 };
 
 function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state) {
