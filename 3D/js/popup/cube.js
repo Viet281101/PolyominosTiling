@@ -47,8 +47,8 @@ export function createCubePopup(toolbar) {
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
 			const position = positionInputs.map(input => parseInt(input.value));
 			const cubesData = cubes.map(cube => cube.position.toArray());
-
 			toolbar.mainApp.addPolycube({ n, cubes: cubesData, color: 0x00ff00, position: { x: position[0], y: position[1], z: position[2] } });
+			if (toolbar.isMobile) toolbar.closePopup('cube');
 		}
 	});
 

@@ -2,6 +2,7 @@ import { createCubePopup } from './popup/cube.js';
 import { showGridPopup } from './popup/grid.js';
 import { showSolvePopup } from './popup/solve.js';
 import { showTutorialPopup } from './popup/tutorial.js';
+import { showSettingsPopup } from './popup/setting.js';
 
 export class Toolbar {
 	constructor(mainApp) {
@@ -37,6 +38,7 @@ export class Toolbar {
 			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.' },
 			{ name: 'Solving Polycube', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve'), description: 'To solve the polycube puzzle.\nUse different algorithms to solve.' },
 			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial'), description: 'To view the tutorial.\nLearn how to use the application.' },
+			{ name: 'Settings', icon: '../assets/ic_setting.png', action: () => this.togglePopup('settings'), description: 'To adjust application settings.\nChange colors, tooltips, and more.' },
 		];
 	};
 
@@ -140,10 +142,12 @@ export class Toolbar {
 			const gridPopup = document.getElementById('gridPopup');
 			const solvePopup = document.getElementById('solvePopup');
 			const tutorialPopup = document.getElementById('tutorialPopup');
+			const settingsPopup = document.getElementById('settingsPopup');
 			if ((cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
 				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target))) {
+				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
+				(settingsPopup && !settingsPopup.contains(e.target) && !this.canvas.contains(e.target))) {
 				this.closeCurrentPopup();
 				this.tooltip.style.display = 'none';
 			}
@@ -207,6 +211,7 @@ export class Toolbar {
 			case 'grid': showGridPopup(this); break;
 			case 'solve': showSolvePopup(this); break;
 			case 'tutorial': showTutorialPopup(this); break;
+			case 'settings': showSettingsPopup(this); break;
 		}
 	};
 
