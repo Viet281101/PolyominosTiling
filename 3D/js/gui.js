@@ -8,7 +8,9 @@ export class GUIController {
 			polycubeColor: '#0000ff',
 			tooltipToolbar: true,
 			showInnerGrid: false,
-			showOuterGrid: true
+			showOuterGrid: true,
+			polycubeVisible: true,
+			allCubesVisible: true
 		};
 		this.init();
 		this.checkWindowSize();
@@ -39,9 +41,16 @@ export class GUIController {
 		this.gui.add(this.settings, 'showOuterGrid').onChange((value) => {
 			this.mainApp.board.toggleOuterGrid(value);
 		});
+		this.gui.add(this.settings, 'polycubeVisible').onChange((value) => {
+			this.mainApp.toggleSelectedPolycubeVisibility(value);
+		});
+		this.gui.add(this.settings, 'allCubesVisible').onChange((value) => {
+			this.mainApp.toggleAllCubesVisibility(value);
+		});
 	};
 
 	checkWindowSize() {
 		this.gui.domElement.style.display = window.innerWidth <= 800 ? 'none' : 'block';
 	};
 };
+

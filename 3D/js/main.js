@@ -222,6 +222,18 @@ class MainApp {
 			this.selectedPolycube = null;
 		}
 	};
+
+	toggleSelectedPolycubeVisibility(visible) {
+		if (this.selectedPolycube) {
+			this.selectedPolycube.group.visible = visible;
+		}
+	};
+
+	toggleAllCubesVisibility(visible) {
+		this.polys.forEach(polycube => {
+			polycube.group.visible = visible;
+		});
+	};
 };
 
 const app = new MainApp();
