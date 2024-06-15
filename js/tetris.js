@@ -19,13 +19,14 @@ class Tetris {
 		this.applyStyles();
 		this.reset();
 		this.bindEvents();
-		this.startGame();
 	};
 
 	applyStyles() {
 		this.canvas.style.border = '1px solid black';
 		this.canvas.style.display = 'block';
 		this.canvas.style.margin = 'auto';
+		const html = document.querySelector('html');
+		Object.assign(html.style, { overflow: 'hidden', height: '100%', width: '100%', background: '#999999', userSelect: 'none' });
 	};
 
 	reset() {
@@ -160,14 +161,19 @@ class Tetris {
 	};
 
 	startGame() {
-		setInterval(() => {
+		this.gameInterval = setInterval(() => {
 			this.drop();
 			this.draw();
 		}, 1000);
 		this.draw();
 	};
+
+	stopGame() {
+		clearInterval(this.gameInterval);
+	};
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-	new Tetris('canvas');
-});
+export function startTetris() {
+	const tetris = new Tetris('canvas');
+	tetris.startGame();
+};
