@@ -43,7 +43,6 @@ export function showGridPopup(toolbar) {
 	let x_size = 3;
 	let y_size = 3;
 	let z_size = 3;
-
 	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
 		input.addEventListener('change', (e) => {
 			if (index === 0) x_size = parseInt(e.target.value);
@@ -64,7 +63,6 @@ export function showGridPopup(toolbar) {
 				cursor = 'pointer';
 			}
 		});
-
 		popup.style.cursor = cursor;
 	});
 

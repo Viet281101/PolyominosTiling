@@ -7,13 +7,12 @@ export class Board {
 		this.grid = new THREE.Group();
 		this.innerGrid = new THREE.Group();
 		this.showInnerGrid = false;
+		this.showOuterGrid = true;
 
 		this.createGridBox(size);
 
 		this.scene.add(this.grid);
-		if (this.showInnerGrid) {
-			this.scene.add(this.innerGrid);
-		}
+		if (this.showInnerGrid) { this.scene.add(this.innerGrid); }
 	};
 
 	createGridBox(size) {
@@ -65,6 +64,12 @@ export class Board {
 		this.showInnerGrid = show;
 		if (show) { this.scene.add(this.innerGrid); }
 		else { this.scene.remove(this.innerGrid); }
+	};
+
+	toggleOuterGrid(show) {
+		this.showOuterGrid = show;
+		if (show) { this.scene.add(this.grid); }
+		else { this.scene.remove(this.grid); }
 	};
 
 	clearGrid() {

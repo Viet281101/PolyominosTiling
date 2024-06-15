@@ -63,15 +63,9 @@ function attachSettingClickEvent(toolbar, popup, row, y) {
 
 		if (toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 			switch (row.label) {
-				case 'Reset Polyominoes Position':
-					toolbar.mainApp.resetBoard();
-					break;
-				case 'Mix Position of Polyominoes':
-					toolbar.mainApp.mixPosition();
-					break;
-				case 'Delete All Polyominoes':
-					toolbar.mainApp.deleteAllPolyominos();
-					break;
+				case 'Reset Polyominoes Position': toolbar.mainApp.resetBoard(); break;
+				case 'Mix Position of Polyominoes': toolbar.mainApp.mixPosition(); break;
+				case 'Delete All Polyominoes': toolbar.mainApp.deleteAllPolyominos(); break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
@@ -87,15 +81,9 @@ function handleTouchClick(e, toolbar, rows, popup, startY, rowHeight) {
 		const y = startY + index * rowHeight;
 		if (row.icon && toolbar.isInside(touchX, touchY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
 			switch (row.label) {
-				case 'Reset Polyominoes Position':
-					toolbar.mainApp.resetBoard();
-					break;
-				case 'Mix Position of Polyominoes':
-					toolbar.mainApp.mixPosition();
-					break;
-				case 'Delete All Polyominoes':
-					toolbar.mainApp.deleteAllPolyominos();
-					break;
+				case 'Reset Polyominoes Position': toolbar.mainApp.resetBoard(); break;
+				case 'Mix Position of Polyominoes': toolbar.mainApp.mixPosition(); break;
+				case 'Delete All Polyominoes': toolbar.mainApp.deleteAllPolyominos(); break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}

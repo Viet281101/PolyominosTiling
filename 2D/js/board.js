@@ -60,10 +60,7 @@ export class GridBoard {
 		};
 	};
 
-	clear() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	};
-
+	clear() { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); };
 	clearGrid() {
 		this.grid = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
 		this.clear();

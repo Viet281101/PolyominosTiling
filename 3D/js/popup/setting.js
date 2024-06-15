@@ -8,6 +8,7 @@ export function showSettingsPopup(toolbar) {
 
 	const rows = [
 		{ label: 'Quick settings', box: true, title: true },
+		{ label: 'Delete Selected Polycube', icon: '../assets/ic_trash.png' },
 	];
 
 	const startY = 76;
@@ -45,5 +46,21 @@ export function showSettingsPopup(toolbar) {
 			}
 		});
 		popup.style.cursor = cursor;
+	});
+
+	popup.addEventListener('click', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+
+		rows.forEach((row, index) => {
+			const y = startY + index * rowHeight;
+			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
+				switch (index) {
+					case 1: toolbar.mainApp.deleteSelectedPolycube(); break;
+				}
+				if (toolbar.isMobile) {toolbar.closePopup('grid');}
+			}
+		});
 	});
 };

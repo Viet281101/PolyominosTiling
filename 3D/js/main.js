@@ -117,9 +117,7 @@ class MainApp {
 		if (this.isRightClick) {
 			if (this.snapToGrid(this.selectedPolycube)) {
 				this.lastValidPosition = this.selectedPolycube.group.position.clone();
-			} else {
-				this.selectedPolycube.group.position.copy(this.lastValidPosition);
-			}
+			} else { this.selectedPolycube.group.position.copy(this.lastValidPosition); }
 		}
 		this.isDragging = false;
 		this.isRightClick = false;
@@ -207,9 +205,34 @@ class MainApp {
 	clearBoard() { this.board.clearGrid(); this.board = null; }
 	createNewBoard(x, y, z) {
 		const showInnerGrid = this.board ? this.board.showInnerGrid : false;
+		const showOuterGrid = this.board ? this.board.showOuterGrid : true;
 		if (this.board) { this.clearBoard(); }
 		this.board = new Board(this.scene, { x, y, z });
 		this.board.toggleInnerGrid(showInnerGrid);
+		this.board.toggleOuterGrid(showOuterGrid);
+	};
+
+	deleteSelectedPolycube() {
+		if (this.selectedPolycube) {
+			this.scene.remove(this.selectedPolycube.group);
+			const index = this.polys.indexOf(this.selectedPolycube);
+			if (index > -1) {
+				this.polys.splice(index, 1);
+			}
+			this.selectedPolycube = null;
+		}
+	};
+
+	toggleSelectedPolycubeVisibility(visible) {
+		if (this.selectedPolycube) {
+			this.selectedPolycube.group.visible = visible;
+		}
+	};
+
+	toggleAllCubesVisibility(visible) {
+		this.polys.forEach(polycube => {
+			polycube.group.visible = visible;
+		});
 	};
 };
 

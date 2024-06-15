@@ -1,81 +1,5 @@
-class Polyomino {
-	constructor(ctx, type, x, y, dx, dy, color) {
-		this.ctx = ctx;
-		this.type = type;
-		this.x = x;
-		this.y = y;
-		this.dx = dx;
-		this.dy = dy;
-		this.size = 30;
-		this.color = color;
-		this.grid = this.createGrid(type);
-	};
-
-	createGrid(type) {
-		const shapes = {
-			domino: [[1, 1]],
-			tromino: [
-				[[1, 1, 1]], // I
-				[[1], [1], [1]], // I
-				[[1, 1], [1, 0]], // L
-				[[1, 1], [0, 1]]  // J
-			],
-			tetromino: [
-				[[1, 1, 1, 1]], // I
-				[[1, 1], [1, 1]], // O
-				[[1, 1, 1], [0, 1, 0]], // T
-				[[1, 1, 0], [0, 1, 1]], // S
-				[[0, 1, 1], [1, 1, 0]], // Z
-				[[1, 1, 1], [1, 0, 0]], // L
-				[[1, 1, 1], [0, 0, 1]]  // J
-			],
-			pentomino: [
-				[[1, 1, 1, 1, 1]], // I
-				[[1, 1, 1], [1, 0, 0], [1, 0, 0]], // L
-				[[1, 1, 1], [0, 1, 0], [0, 1, 0]], // T
-				[[1, 1, 1], [1, 1, 0]], // P
-				[[1, 1, 1], [0, 1, 1]], // F
-				[[1, 1, 1, 1], [0, 0, 1, 0]], // T
-				[[1, 1, 0], [0, 1, 1], [0, 1, 0]], // Y
-				[[0, 1, 1], [1, 1, 0], [1, 0, 0]], // S
-				[[1, 1], [1, 1], [1, 0]], // U
-				[[1, 0, 1], [1, 1, 1]], // X
-				[[1, 1, 1], [0, 1, 0], [0, 1, 0]], // T
-				[[1, 0, 0], [1, 1, 1], [0, 1, 0]]  // W
-			]
-		};
-		const shapeVariations = shapes[type];
-		const shape = shapeVariations[Math.floor(Math.random() * shapeVariations.length)];
-		return shape;
-	};
-
-	draw() {
-		this.ctx.fillStyle = this.color;
-		this.ctx.strokeStyle = 'black';
-		this.ctx.lineWidth = 2;
-
-		for (let row = 0; row < this.grid.length; row++) {
-			for (let col = 0; col < this.grid[row].length; col++) {
-				if (this.grid[row][col]) {
-					this.ctx.fillRect(this.x + col * this.size, this.y + row * this.size, this.size, this.size);
-					this.ctx.strokeRect(this.x + col * this.size, this.y + row * this.size, this.size, this.size);
-				}
-			}
-		}
-	};
-
-	update() {
-		this.x += this.dx;
-		this.y += this.dy;
-
-		if (this.x <= 0 || this.x + this.grid[0].length * this.size >= this.ctx.canvas.width) {
-			this.dx = -this.dx;
-		}
-		if (this.y <= 0 || this.y + this.grid.length * this.size >= this.ctx.canvas.height) {
-			this.dy = -this.dy;
-		}
-	};
-};
+import { startTetris } from './tetris.js';
+import { Polyomino } from './polyomino.js';
 
 class MainApp {
 	constructor() {
@@ -136,10 +60,12 @@ class MainApp {
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText('Research polyominoes &', this.canvas.width / 2, 200);
 		this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
+		this.ctx.fillText('Polyominoes Minigames :', this.canvas.width / 2, 650);
 
 		this.buttons = [];
 		this.drawButton('2D Version', (this.canvas.width / 2), 350, () => { window.location.href = './2D/index.html'; });
 		this.drawButton('3D Version', (this.canvas.width / 2), 450, () => { window.location.href = './3D/index.html'; });
+		this.drawButton('2D Tetris', (this.canvas.width / 2), 700, this.switchToTetris.bind(this));
 	};
 
 	drawButton(text, x, y, onClick) {
@@ -232,7 +158,7 @@ class MainApp {
 
 			const dx = (Math.random() * (maxSpeed - minSpeed) + minSpeed) * (Math.random() < 0.5 ? -1 : 1);
 			const dy = (Math.random() * (maxSpeed - minSpeed) + minSpeed) * (Math.random() < 0.5 ? -1 : 1);
-			
+
 			const color = this.getRandomColor();
 
 			this.polyominoes.push(new Polyomino(this.ctx, type, x, y, dx, dy, color));
@@ -284,6 +210,30 @@ class MainApp {
 		requestAnimationFrame(() => this.animate());
 		this.polyominoes.forEach(polyomino => polyomino.update());
 		this.drawContent();
+	};
+
+	switchToTetris() {
+		document.body.innerHTML = '';
+		const canvas = document.createElement('canvas');
+		canvas.id = 'canvas';
+		canvas.width = 300;
+		canvas.height = 600;
+		document.body.appendChild(canvas);
+
+		const control = document.createElement('canvas');
+		control.id = 'controls';
+		control.width = 300;
+		control.height = 100;
+		document.body.appendChild(control);
+
+		const script = document.createElement('script');
+		script.type = 'module';
+		script.src = './js/tetris.js';
+		document.body.appendChild(script);
+
+		script.onload = () => {
+			startTetris();
+		};
 	};
 };
 
