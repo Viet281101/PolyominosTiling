@@ -211,6 +211,17 @@ class MainApp {
 		this.board.toggleInnerGrid(showInnerGrid);
 		this.board.toggleOuterGrid(showOuterGrid);
 	};
+
+	deleteSelectedPolycube() {
+		if (this.selectedPolycube) {
+			this.scene.remove(this.selectedPolycube.group);
+			const index = this.polys.indexOf(this.selectedPolycube);
+			if (index > -1) {
+				this.polys.splice(index, 1);
+			}
+			this.selectedPolycube = null;
+		}
+	};
 };
 
 const app = new MainApp();

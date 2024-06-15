@@ -35,16 +35,33 @@ export function createCubePopup(toolbar) {
 
 	createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state);
 
+	const buttons = [
+		{ label: 'Info', x: 10, y: 800, width: 128, height: 32 },
+		{ label: 'Clear', x: 128, y: 800, width: 128, height: 32 },
+		{ label: 'Create', x: 254, y: 800, width: 128, height: 32 }
+	];
+
+	popup.addEventListener('mousemove', (e) => {
+		const rect = popup.getBoundingClientRect();
+		const mouseX = e.clientX - rect.left;
+		const mouseY = e.clientY - rect.top;
+		let cursor = 'default';
+		for (const button of buttons) {
+			if (isInside(mouseX, mouseY, button)) { cursor = 'pointer'; break; }
+		}
+		popup.style.cursor = cursor;
+	});
+
 	popup.addEventListener('click', (e) => {
 		const rect = popup.getBoundingClientRect();
 		const mouseX = e.clientX - rect.left;
 		const mouseY = e.clientY - rect.top;
 
-		if (isInside(mouseX, mouseY, { x: 10, y: 800, width: 128, height: 32 })) {
+		if (isInside(mouseX, mouseY, buttons[0])) {
 			showPolycubeInfo(ctx, popupContainer, cubes);
-		} else if (isInside(mouseX, mouseY, { x: 128, y: 800, width: 128, height: 32 })) {
+		} else if (isInside(mouseX, mouseY, buttons[1])) {
 			resetCubePopup(popupContainer, scene, cubes, highlightCubes, state, controls);
-		} else if (isInside(mouseX, mouseY, { x: 254, y: 800, width: 128, height: 32 })) {
+		} else if (isInside(mouseX, mouseY, buttons[2])) {
 			const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
 			const n = parseInt(nInput.value);
 			const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(1);
