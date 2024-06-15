@@ -136,10 +136,12 @@ class MainApp {
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText('Research polyominoes &', this.canvas.width / 2, 200);
 		this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
+		this.ctx.fillText('Polyominoes Minigames', this.canvas.width / 2, 650);
 
 		this.buttons = [];
 		this.drawButton('2D Version', (this.canvas.width / 2), 350, () => { window.location.href = './2D/index.html'; });
 		this.drawButton('3D Version', (this.canvas.width / 2), 450, () => { window.location.href = './3D/index.html'; });
+		this.drawButton('2D Tetris', (this.canvas.width / 2), 720, () => {  });
 	};
 
 	drawButton(text, x, y, onClick) {
