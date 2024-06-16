@@ -1,7 +1,9 @@
+import { Polyomino } from "./polyomino";
+
 /**
  * Performs backtracking auto tiling on a grid board using the given polyominoes.
  *
- * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
+ * @param {Array<Polyomino>} polyominoes - The list of polyominoes to be placed on the grid board.
  * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
  * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
@@ -56,7 +58,7 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
  * Random tiling of polyominoes blocks to the grid board.
  *
  * @param {Object} gridBoard - The grid board object.
- * @param {Array} polyominoes - The array of polyominoes.
+ * @param {Array<Polyomino>} polyominoes - The list of polyominoes.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
  * @param {Function} redraw - The function to redraw the grid board.
  * @param {Function} [message] - An optional function to display a message.
@@ -171,7 +173,7 @@ export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw,
 /**
  * Random backtracking tiling for a given set of polyominoes on a grid board.
  *
- * @param {Array} polyominoes - The array of polyominoes to be placed on the grid board.
+ * @param {Array} polyominoes - The list of polyominoes to be placed on the grid board.
  * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
  * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
@@ -253,6 +255,14 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
  * @return {void} This function does not return anything.
  */
 export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePolyomino, redraw, duplicatePolyomino, message) {
+		/**
+	 * Determines if a polyomino can be placed at the specified coordinates on the grid board.
+	 *
+	 * @param {Polyomino} polyomino - The polyomino to be placed.
+	 * @param {number} x - The x-coordinate to place the polyomino.
+	 * @param {number} y - The y-coordinate to place the polyomino.
+	 * @return {boolean} True if the polyomino can be placed, false otherwise.
+	 */
 	function canPlace(polyomino, x, y) {
 		const originalX = polyomino.x;
 		const originalY = polyomino.y;
@@ -268,6 +278,12 @@ export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePol
 		return false;
 	};
 
+	/**
+	 * Recursively places all polyominoes on the gridBoard starting from the given index.
+	 *
+	 * @param {number} index - The index of the polyomino to start placing.
+	 * @return {boolean} Returns true if all polyominoes are placed successfully, false otherwise.
+	 */
 	function placeAllPolyominoes(index) {
 		if (index >= polyominoes.length) { return true; }
 		const polyomino = polyominoes[index];

@@ -1,6 +1,6 @@
 # Polyominoes Tiling in JS (Pavages de Polyominos en JavaScript)
 
-In pure html, css and javascript with ES6 modules.
+In pure html, css and javascript with ES6 modules, 2 libraries: [three.js](https://threejs.org/) and [dat.gui](https://github.com/dataarts/dat.gui).
 
 ## Description
 
@@ -30,9 +30,15 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 - [Tiling with Pentominos](https://demonstrations.wolfram.com/TilingWithPentominos/)
 
 
-## Authors (Auteurs):
+## Authors (Auteurs)
 
 | Name (Nom) | N° student | GitHub  |
 | -------- | ------- | ---------------------------------------- |
 | Viet Nguyen | 20006303 | [Viet281101](https://github.com/Viet281101) |
 | GEOFFROY Damien | 21007431 | [D-TheProgrammer](https://github.com/D-TheProgrammer) |
+
+
+## Contribution
+
+This is a study project, but if you want to contribute, please don't hesitate.
+Be free to add the Issues, Pull Requests or new features in this repository.

@@ -328,6 +328,7 @@ class MainApp {
 			case 2: messageBox.textContent = 'BRUTE FORCE TILING FINISHED'; break;
 			case 3: messageBox.textContent = 'RANDOM TILING FINISHED'; break;
 			case 4: messageBox.textContent = 'RANDOM BACKTRACKING TILING FINISHED'; break;
+			case 5: messageBox.textContent = 'FULL AUTOMATIC TILING FINISHED'; break;
 			default: messageBox.textContent = 'TILING FINISHED';
 		}
 		Object.assign(messageBox.style, { position: 'absolute', top: '20%', left: '50%', transform: 'translate(-50%, -50%)',
@@ -368,7 +369,7 @@ class MainApp {
 
 	fullAutoTiling() {
 		this.resetBoard(); 
-		const messageBox = this.createMessageBox(2);
+		const messageBox = this.createMessageBox(5);
 		setTimeout(() => { fullAutoTiling( this.gridBoard, this.polyominoes, this.placePolyomino.bind(this), this.gridBoard.removePolyomino.bind(this.gridBoard), this.redraw.bind(this), this.duplicatePolyomino.bind(this), () => { this.showMessageBox(messageBox); } ); }, 1000); 
 	};
 };
