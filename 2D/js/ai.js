@@ -1,9 +1,7 @@
-import { Polyomino } from "./polyomino";
-
 /**
  * Performs backtracking auto tiling on a grid board using the given polyominoes.
  *
- * @param {Array<Polyomino>} polyominoes - The list of polyominoes to be placed on the grid board.
+ * @param {Array} polyominoes - The list of polyominoes to be placed on the grid board.
  * @param {GridBoard} gridBoard - The grid board object representing the grid on which the polyominoes will be placed.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
  * @param {Function} removePolyomino - The function to remove a polyomino from the grid board.
@@ -18,7 +16,6 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
 
 	function placeNextPolyomino() {
 		if (index >= polyominoesCopy.length) {
-			console.log("Pavage Réussi!");
 			if (message) { message(); }
 			return;
 		}
@@ -58,7 +55,7 @@ export function backtrackingAutoTiling(polyominoes, gridBoard, placePolyomino, r
  * Random tiling of polyominoes blocks to the grid board.
  *
  * @param {Object} gridBoard - The grid board object.
- * @param {Array<Polyomino>} polyominoes - The list of polyominoes.
+ * @param {Array} polyominoes - The list of polyominoes.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid board.
  * @param {Function} redraw - The function to redraw the grid board.
  * @param {Function} [message] - An optional function to display a message.
@@ -99,7 +96,7 @@ export function randomTiling(gridBoard, polyominoes, placePolyomino, redraw , me
  * Tries to tile the grid with polyominoes using brute force.
  *
  * @param {GridBoard} gridBoard - The grid to be tiled.
- * @param {Array<Polyomino>} polyominoes - The polyominoes to be placed on the grid.
+ * @param {Array} polyominoes - The polyominoes to be placed on the grid.
  * @param {Function} placePolyomino - The function to place a polyomino on the grid.
  * @param {Function} redraw - The function to redraw the grid.
  * @param {Function} [message] - An optional function to be called when the tiling is successful.
@@ -156,7 +153,6 @@ export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw,
 
 	const originalStates = polyominoes.map(p => ({ x: p.x, y: p.y, isPlaced: p.isPlaced }));
 	if (placeAllPolyominoes(0)) {
-		console.log("placement ok");
 		redraw();
 		if (message) { message(); }
 	} else {
@@ -165,7 +161,6 @@ export function bruteForceTiling(gridBoard, polyominoes, placePolyomino, redraw,
 			p.y = originalStates[i].y;
 			p.isPlaced = originalStates[i].isPlaced;
 		});
-		console.log("rien trouve");
 		redraw();
 	}
 };
@@ -196,7 +191,6 @@ export function randomBacktrackingTiling(polyominoes, gridBoard, placePolyomino,
 
 	function placeNextPolyomino() {
 		if (index >= polyominoesCopy.length) {
-			console.log("Pavage Réussi!");
 			if (message) { message(); }
 			return;
 		}
@@ -258,7 +252,7 @@ export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePol
 		/**
 	 * Determines if a polyomino can be placed at the specified coordinates on the grid board.
 	 *
-	 * @param {Polyomino} polyomino - The polyomino to be placed.
+	 * @param {Array} polyomino - The polyomino to be placed.
 	 * @param {number} x - The x-coordinate to place the polyomino.
 	 * @param {number} y - The y-coordinate to place the polyomino.
 	 * @return {boolean} True if the polyomino can be placed, false otherwise.
@@ -320,7 +314,6 @@ export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePol
 
 	const originalStates = polyominoes.map(p => ({ x: p.x, y: p.y, isPlaced: p.isPlaced }));
 	if (placeAllPolyominoes(0)) {
-		console.log("placement ok");
 		redraw();
 		if (message) { message(); }
 	} else {
@@ -329,7 +322,6 @@ export function fullAutoTiling(gridBoard, polyominoes, placePolyomino, removePol
 			p.y = originalStates[i].y;
 			p.isPlaced = originalStates[i].isPlaced;
 		});
-		console.log("rien trouve");
 		redraw();
 	}
 };
