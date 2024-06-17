@@ -11,8 +11,8 @@ export function showGridPopup(toolbar) {
 		{ label: 'Enter n° x size', type: 'input' },
 		{ label: 'Enter n° y size', type: 'input' },
 		{ label: 'Enter n° z size', type: 'input' },
-		{ label: 'Draw grid by click to =>', icon: '../assets/ic_draw.png' },
-		{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
+		{ label: 'Draw grid by click to =>', icon: 'draw' },
+		{ label: 'Delete current grid :', icon: 'trash' },
 	];
 
 	const startY = 76;
@@ -31,7 +31,7 @@ export function showGridPopup(toolbar) {
 
 		if (row.icon) {
 			const icon = new Image();
-			icon.src = row.icon;
+			icon.src = `../assets/ic_${row.icon}.png`;
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};

@@ -8,11 +8,11 @@ export function showSolvePopup(toolbar) {
 
 	const rows = [
 		{ label: 'Auto tiling the Polyominoes blocks', title: true },
-		{ label: '1) Backtracking method :', underline: true, icon: '../assets/ic_solution.png', description: 'Backtracking places polyominoes on a grid, checking validity, and backtracks when stuck, ensuring no overlaps and full coverage. Usually runs in order of placing the larger blocks first, then the smaller.' },
-		{ label: '2) Brute force method :', underline: true, icon: '../assets/ic_solution.png', description: 'Brute force tries all possible combinations of polyominoes on the grid to find a solution. It is guaranteed to find a solution if one exists but is computationally expensive and slow for large grids.' },
-		{ label: '3) Random method :', underline: true, icon: '../assets/ic_solution.png', description: 'The random method places polyominoes randomly on the grid. It is fast but does not guarantee a solution or full coverage. It is useful for generating quick and varied patterns.' },
-		{ label: '4) Random backtracking :', underline: true, icon: '../assets/ic_solution.png', description: 'Random backtracking combines random placement with backtracking to find a solution. It is more efficient than brute force but less predictable than pure backtracking.' },
-		{ label: '5) Full Automatic Tiling :', underline: true, icon: '../assets/ic_solution.png', description: 'Automatically fills the grid using user-selected pieces from outside the grid, such as filling the grid entirely with monominoes if only one monomino is chosen.' }
+		{ label: '1) Backtracking method :', underline: true, icon: 'solution', description: 'Backtracking places polyominoes on a grid, checking validity, and backtracks when stuck, ensuring no overlaps and full coverage. Usually runs in order of placing the larger blocks first, then the smaller.' },
+		{ label: '2) Brute force method :', underline: true, icon: 'solution', description: 'Brute force tries all possible combinations of polyominoes on the grid to find a solution. It is guaranteed to find a solution if one exists but is computationally expensive and slow for large grids.' },
+		{ label: '3) Random method :', underline: true, icon: 'solution', description: 'The random method places polyominoes randomly on the grid. It is fast but does not guarantee a solution or full coverage. It is useful for generating quick and varied patterns.' },
+		{ label: '4) Random backtracking :', underline: true, icon: 'solution', description: 'Random backtracking combines random placement with backtracking to find a solution. It is more efficient than brute force but less predictable than pure backtracking.' },
+		{ label: '5) Full Automatic Tiling :', underline: true, icon: 'solution', description: 'Automatically fills the grid using user-selected pieces from outside the grid, such as filling the grid entirely with monominoes if only one monomino is chosen.' }
 	];
 
 	const startY = 60;
@@ -31,7 +31,7 @@ export function showSolvePopup(toolbar) {
 
 		if (row.icon) {
 			const icon = new Image();
-			icon.src = row.icon;
+			icon.src = `../assets/ic_${row.icon}.png`;
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
@@ -81,9 +81,7 @@ export function showSolvePopup(toolbar) {
 			if (testWidth > maxWidth && n > 0) {
 				lines.push(line);
 				line = words[n] + ' ';
-			} else {
-				line = testLine;
-			}
+			} else { line = testLine; }
 		}
 		lines.push(line);
 		lines.forEach((line, index) => {
@@ -112,7 +110,7 @@ export function showSolvePopup(toolbar) {
 			}
 			if (row.icon) {
 				const icon = new Image();
-				icon.src = row.icon;
+				icon.src = `../assets/ic_${row.icon}.png`;
 				icon.onload = () => {
 					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 				};

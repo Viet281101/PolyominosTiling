@@ -8,7 +8,7 @@ export function showSettingsPopup(toolbar) {
 
 	const rows = [
 		{ label: 'Quick settings', box: true, title: true },
-		{ label: 'Delete Selected Polycube', icon: '../assets/ic_trash.png' },
+		{ label: 'Delete Selected Polycube', icon: 'trash' },
 	];
 
 	const startY = 76;
@@ -27,7 +27,7 @@ export function showSettingsPopup(toolbar) {
 
 		if (row.icon) {
 			const icon = new Image();
-			icon.src = row.icon;
+			icon.src = `../assets/ic_${row.icon}.png`;
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};

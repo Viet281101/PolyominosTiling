@@ -8,22 +8,20 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 
 ## Preview
 
-**Polyominoes**:
+#### Polyominoes
 ![Screenshot from 2024-06-15 01-36-33](https://github.com/Viet281101/PolyominosTiling/assets/77735678/45a08b7c-ded8-49f6-a119-1759ea16dbe9)
 
-**Polycube**:
-![Screenshot from 2024-06-15 01-27-01](https://github.com/Viet281101/PolyominosTiling/assets/77735678/3376ba5f-a740-4f07-be51-79c195779d37)
-
+#### Polycube
 ![Screenshot from 2024-06-16 19-40-54](https://github.com/Viet281101/PolyominosTiling/assets/77735678/af2e756a-258d-4dee-9937-b2d14fd99b30)
 
 ## Infos research & documentation
 
-**JavaScript**:
+**JavaScript modules, libraries**
 - [API Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 - [ThreeJS](https://threejs.org/)
 - [dat.gui](https://github.com/dataarts/dat.gui)
 
-**The polyominoes**:
+**The polyominoes, polycubes**
 - [Polycube Wiki](https://en.wikipedia.org/wiki/Polycube)
 - [Polyomino Wiki](https://en.wikipedia.org/wiki/Polyomino)
 - [Les pentominos](https://www.monunivers.com/pento/)

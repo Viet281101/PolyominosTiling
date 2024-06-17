@@ -10,12 +10,12 @@ export function showGridPopup(toolbar) {
 		{ label: 'Create new grid board here', box: true, title: true },
 		{ label: 'Enter n° rows', type: 'input' },
 		{ label: 'Enter n° columns', type: 'input' },
-		{ label: 'Draw grid by click to =>', icon: '../assets/ic_draw.png' },
-		{ label: 'Delete current grid :', icon: '../assets/ic_trash.png' },
-		{ label: 'Blacken the grid Cells :', icon: '../assets/ic_blacken_cell.png' },
-		{ label: 'Random Blackening Cells :', icon: '../assets/ic_random_blacken_cell.png' },
-		{ label: 'Clear Blacken Cells :', icon: '../assets/ic_whiten.png' },
-		{ label: 'Invert Black/White Cells :', icon: '../assets/ic_invert_blacken.png' },
+		{ label: 'Draw grid by click to =>', icon: 'draw' },
+		{ label: 'Delete current grid :', icon: 'trash' },
+		{ label: 'Blacken the grid Cells :', icon: 'blacken_cell' },
+		{ label: 'Random Blackening Cells :', icon: 'random_blacken_cell' },
+		{ label: 'Clear Blacken Cells :', icon: 'whiten' },
+		{ label: 'Invert Black/White Cells :', icon: 'invert_blacken' },
 	];
 
 	const startY = 76;
@@ -33,7 +33,7 @@ export function showGridPopup(toolbar) {
 		ctx.fillText(row.label, colX, y + 20);
 		if (row.icon) {
 			const icon = new Image();
-			icon.src = row.icon;
+			icon.src = `../assets/ic_${row.icon}.png`;
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};

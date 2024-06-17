@@ -8,9 +8,9 @@ export function showSettingsPopup(toolbar) {
 
 	const rows = [
 		{ label: 'Quick settings', box: true, title: true },
-		{ label: 'Reset Polyominoes Position', icon: '../assets/ic_reset.png' },
-		{ label: 'Mix Position of Polyominoes', icon: '../assets/ic_shuffle.png' },
-		{ label: 'Delete All Polyominoes', icon: '../assets/ic_trash.png' }
+		{ label: 'Reset Polyominoes Position', icon: 'reset' },
+		{ label: 'Mix Position of Polyominoes', icon: 'shuffle' },
+		{ label: 'Delete All Polyominoes', icon: 'trash' }
 	];
 
 	const startY = 76;
@@ -29,7 +29,7 @@ export function showSettingsPopup(toolbar) {
 
 		if (row.icon) {
 			const icon = new Image();
-			icon.src = row.icon;
+			icon.src = `../assets/ic_${row.icon}.png`;
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
