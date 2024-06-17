@@ -14,6 +14,7 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 **Polycube**:
 ![Screenshot from 2024-06-15 01-27-01](https://github.com/Viet281101/PolyominosTiling/assets/77735678/3376ba5f-a740-4f07-be51-79c195779d37)
 
+![Screenshot from 2024-06-16 19-40-54](https://github.com/Viet281101/PolyominosTiling/assets/77735678/af2e756a-258d-4dee-9937-b2d14fd99b30)
 
 ## Infos research & documentation
 
