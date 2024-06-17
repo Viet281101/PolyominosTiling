@@ -12,7 +12,7 @@ export function showTutorialPopup(toolbar) {
 		{ label: '2) Manipulate the Polyominoes', underline: true, icon: 'solution', description: 'Each polyomino has an interactive menu. Click on the polyomino to : \n - rotate left or rotate right \n - flip \n - duplicate \n(the clone will appear below \n the piece selected in another color) \n - or delete.' },
 		{ label: '3) Grid Settings :', underline: true, icon: 'table', description: 'This menu lets you create a new board by setting the grid\'s length and height. Click        to create the grid. \n Options include : \n - deleting the grid \n - blocking cells to prevent polyomino placement \n - creating automatically random \n black cells \n - Clear all black cells \n - and swapping black and empty cells.          ' 	},
 		{ label: '4) Solving Grid :', underline: true, icon: 'solving', description: 'Click this menu to use various AI solvers. Descriptions are available for each solver; just click to read them.' },
-		{ label: '5) Use Settings :', underline: true, icon: 'setting', description: 'This section facilitates user testing. In this menu, you can: \n - Reset the position \n of the polyominoes to their original spawn points.\n - Shuffle the positions \n of the polyominoes on the field, useful if duplicated pieces overlap.\n - Delete all polyominoes \n from the field and the grid.' }
+		{ label: '5) Use Settings :', underline: true, icon: 'setting', description: 'This section facilitates user testing. In this menu, you can: \n - Reset the position \n of the polyominoes to their original spawn points.\n - Shuffle the positions \n of the polyominoes on the field, useful if duplicated pieces overlap.\n - Delete all polyominoes \n from the field and the grid.\n - Delete all polyominoes \n outside grid from the field.' }
 	];
 
 	const subIcons = [
@@ -30,6 +30,7 @@ export function showTutorialPopup(toolbar) {
 		{ path: 'reset', x: 200, y: 975},
 		{ path: 'shuffle', x: 210, y: 1037},
 		{ path: 'trash', x: 250, y: 1107},
+		{ path: 'trash', x: 250, y: 1150},
 	];
 
 	const startY = 60;

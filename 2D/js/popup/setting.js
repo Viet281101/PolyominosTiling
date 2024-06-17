@@ -7,10 +7,11 @@ export function showSettingsPopup(toolbar) {
 	ctx.fillRect(0, 0, popup.width, popup.height);
 
 	const rows = [
-		{ label: 'Quick settings', box: true, title: true },
+		{ label: 'Quick Play Settings', box: true, title: true },
 		{ label: 'Reset Polyominoes Position', icon: 'reset' },
 		{ label: 'Mix Position of Polyominoes', icon: 'shuffle' },
-		{ label: 'Delete All Polyominoes', icon: 'trash' }
+		{ label: 'Delete All Polyominoes', icon: 'trash' },
+		{ label: 'Delete Polyominoes Outside', icon: 'trash' },
 	];
 
 	const startY = 76;
@@ -21,7 +22,7 @@ export function showSettingsPopup(toolbar) {
 		const y = startY + index * rowHeight;
 		if (row.box) {
 			ctx.strokeStyle = '#fff';
-			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 4 : 1)));
+			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 5 : 1)));
 		}
 		ctx.font = '20px Pixellari';
 		ctx.fillStyle = '#000';
@@ -66,6 +67,7 @@ function attachSettingClickEvent(toolbar, popup, row, y) {
 				case 'Reset Polyominoes Position': toolbar.mainApp.resetBoard(); break;
 				case 'Mix Position of Polyominoes': toolbar.mainApp.mixPosition(); break;
 				case 'Delete All Polyominoes': toolbar.mainApp.deleteAllPolyominos(); break;
+				case 'Delete Polyominoes Outside': toolbar.mainApp.deleteAllBlocksOutsideGrid(); break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}
@@ -84,6 +86,7 @@ function handleTouchClick(e, toolbar, rows, popup, startY, rowHeight) {
 				case 'Reset Polyominoes Position': toolbar.mainApp.resetBoard(); break;
 				case 'Mix Position of Polyominoes': toolbar.mainApp.mixPosition(); break;
 				case 'Delete All Polyominoes': toolbar.mainApp.deleteAllPolyominos(); break;
+				case 'Delete Polyominoes Outside': toolbar.mainApp.deleteAllBlocksOutsideGrid(); break;
 			}
 			if (toolbar.isMobile) toolbar.closePopup('settings');
 		}

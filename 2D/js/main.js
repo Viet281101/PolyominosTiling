@@ -169,6 +169,26 @@ class MainApp {
 		}
 	};
 
+	deleteAllBlocksOutsideGrid() {
+		const isWithinBounds = (polyomino) => {
+			const { x, y, shape } = polyomino;
+			const gridSize = this.gridSize;
+			const offsetX = this.gridBoard.gridOffsetX;
+			const offsetY = this.gridBoard.gridOffsetY;
+			for (let i = 0; i < shape.length; i++) {
+				for (let j = 0; j < shape[i].length; j++) {
+					if (shape[i][j] === 1) {
+						const posX = Math.floor((x - offsetX + j * gridSize) / gridSize);
+						const posY = Math.floor((y - offsetY + i * gridSize) / gridSize);
+						if (posX < 0 || posX >= this.cols || posY < 0 || posY >= this.rows) { return false; }
+					}
+				}
+			}
+			return true;
+		};
+		this.polyominoes = this.polyominoes.filter(polyomino => isWithinBounds(polyomino));
+		this.redraw();
+	};
 	deleteAllPolyominos() {
 		this.polyominoes = [];
 		this.selectedPoyomino = null;
