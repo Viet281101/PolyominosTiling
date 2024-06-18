@@ -22,6 +22,7 @@ export function showSolvePopup(toolbar) {
 
 	const dropdowns = {};
 	let clickAreas = [];
+	let iconClickAreas = [];
 
 	rows.forEach((row, index) => {
 		const y = startY + index * rowHeight;
@@ -35,9 +36,10 @@ export function showSolvePopup(toolbar) {
 			icon.onload = () => {
 				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 			};
-			attachSolveClickEvent(toolbar, popup, row, y);
 		}
-		if (row.description) { dropdowns[index] = { description: row.description, expanded: false, y: y + 40 }; }
+		if (row.description) {
+			dropdowns[index] = { description: row.description, expanded: false, y: y + 40 };
+		}
 	});
 
 	popup.addEventListener('mousemove', (e) => {
@@ -51,6 +53,13 @@ export function showSolvePopup(toolbar) {
 				cursor = 'pointer';
 			}
 		});
+
+		iconClickAreas.forEach(area => {
+			if (toolbar.isInside(mouseX, mouseY, area.rect)) {
+				cursor = 'pointer';
+			}
+		});
+
 		popup.style.cursor = cursor;
 	});
 
@@ -67,7 +76,24 @@ export function showSolvePopup(toolbar) {
 				}
 			}
 		});
+
+		iconClickAreas.forEach(area => {
+			if (toolbar.isInside(mouseX, mouseY, area.rect)) {
+				handleIconClick(area.index);
+			}
+		});
 	});
+
+	function handleIconClick(index) {
+		switch (rows[index].label) {
+			case '1) Backtracking method :': toolbar.mainApp.backtrackingAutoTiling(); break;
+			case '2) Brute force method :': toolbar.mainApp.bruteForceTiling(); break;
+			case '3) Random method :': toolbar.mainApp.randomTiling(); break;
+			case '4) Random backtracking :': toolbar.mainApp.randomBacktrackingTiling(); break;
+			case '5) Full Automatic Tiling :': toolbar.mainApp.fullAutoTiling(); break;
+		}
+		if (toolbar.isMobile) toolbar.closePopup('solve');
+	};
 
 	function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
 		const words = text.split(' ');
@@ -97,6 +123,7 @@ export function showSolvePopup(toolbar) {
 
 		let yOffset = 0;
 		clickAreas = [];
+		iconClickAreas = [];
 		rows.forEach((row, index) => {
 			const y = startY + index * rowHeight + yOffset;
 			ctx.font = '21px Pixellari';
@@ -114,7 +141,7 @@ export function showSolvePopup(toolbar) {
 				icon.onload = () => {
 					ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
 				};
-				clickAreas.push({ index, rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 }, type: 'icon' });
+				iconClickAreas.push({ index, rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 } });
 			}
 			clickAreas.push({ index, rect: { x: colX, y, width: popup.width - colX - 100, height: rowHeight }, type: 'label' });
 			if (dropdowns[index] && dropdowns[index].expanded) {
@@ -124,25 +151,6 @@ export function showSolvePopup(toolbar) {
 				yOffset += linesCount * 20;
 			}
 		});
-	};
+	}
 	redrawPopup();
-};
-
-function attachSolveClickEvent(toolbar, popup, row, y) {
-	popup.addEventListener('click', (e) => {
-		const rect = popup.getBoundingClientRect();
-		const mouseX = e.clientX - rect.left;
-		const mouseY = e.clientY - rect.top;
-
-		if (toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
-			switch (row.label) {
-				case '1) Backtracking method :': toolbar.mainApp.backtrackingAutoTiling(); break;
-				case '2) Brute force method :': toolbar.mainApp.bruteForceTiling(); break;
-				case '3) Random method :': toolbar.mainApp.randomTiling(); break;
-				case '4) Random backtracking :': toolbar.mainApp.randomBacktrackingTiling(); break;
-				case '5) Full Automatic Tiling :': toolbar.mainApp.fullAutoTiling(); break;
-			}
-			if (toolbar.isMobile) toolbar.closePopup('solve');
-		}
-	});
 };

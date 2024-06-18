@@ -218,7 +218,7 @@ export class Toolbar {
 		popupContainer.style.width = '370px';
 		popupContainer.style.height = '600px';
 		popupContainer.style.border = '3px solid #000';
-		popupContainer.style.backgroundColor = '#fff';
+		popupContainer.style.backgroundColor = '#a0a0a0';
 		popupContainer.style.overflowY = 'auto';
 		popupContainer.style.zIndex = '1000';
 		document.body.appendChild(popupContainer);
