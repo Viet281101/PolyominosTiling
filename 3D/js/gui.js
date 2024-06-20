@@ -10,7 +10,8 @@ export class GUIController {
 			showInnerGrid: false,
 			showOuterGrid: true,
 			polycubeVisible: true,
-			allCubesVisible: true
+			allCubesVisible: true,
+			polycubeOpacity: 0.7,
 		};
 		this.init();
 		this.checkWindowSize();
@@ -31,6 +32,9 @@ export class GUIController {
 		});
 		this.gui.addColor(this.settings, 'polycubeColor').onChange((value) => {
 			this.mainApp.updatePolycubeColor(value);
+		});
+		this.gui.add(this.settings, 'polycubeOpacity', 0, 1).onChange((value) => {
+			this.mainApp.updatePolycubeOpacity(value);
 		});
 		this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
 			this.mainApp.toolbar.tooltipToolbar = value;

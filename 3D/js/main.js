@@ -201,6 +201,16 @@ class MainApp {
 			});
 		}
 	};
+	updatePolycubeOpacity(opacity) {
+		if (this.selectedPolycube) {
+			this.selectedPolycube.group.children.forEach(child => {
+				if (child instanceof THREE.Mesh) {
+					child.material.opacity = opacity;
+					child.material.transparent = opacity < 1;
+				}
+			});
+		}
+	};
 
 	clearBoard() { this.board.clearGrid(); this.board = null; }
 	createNewBoard(x, y, z) {
