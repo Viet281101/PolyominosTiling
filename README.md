@@ -34,7 +34,7 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 | Name (Nom) | N° student | GitHub  |
 | -------- | ------- | ---------------------------------------- |
 | Viet Nguyen | 20006303 | [Viet281101](https://github.com/Viet281101) |
-| GEOFFROY Damien | 21007431 | [D-TheProgrammer](https://github.com/D-TheProgrammer) |
+| D-TheProgrammer | XXXXXXX | [D-TheProgrammer](https://github.com/D-TheProgrammer) |
 
 
 ## Contribution
