@@ -9,10 +9,10 @@ Learn about the Polyominoes and give the solutions of tiling with one or several
 ## Preview
 
 #### Polyominoes
-![Screenshot from 2024-06-15 01-36-33](https://github.com/Viet281101/PolyominosTiling/assets/77735678/45a08b7c-ded8-49f6-a119-1759ea16dbe9)
+[![Screenshot from 2024-06-15 01-36-33](https://github.com/Viet281101/PolyominosTiling/assets/77735678/45a08b7c-ded8-49f6-a119-1759ea16dbe9)](https://github.com/Viet281101/PolyominosTiling/wiki#polyominoes)
 
 #### Polycube
-![Screenshot from 2024-06-16 19-40-54](https://github.com/Viet281101/PolyominosTiling/assets/77735678/af2e756a-258d-4dee-9937-b2d14fd99b30)
+[![Screenshot from 2024-06-16 19-40-54](https://github.com/Viet281101/PolyominosTiling/assets/77735678/af2e756a-258d-4dee-9937-b2d14fd99b30)](https://github.com/Viet281101/PolyominosTiling/wiki#polycubes)
 
 ## Infos research & documentation
 
