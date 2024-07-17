@@ -2,7 +2,9 @@
 
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Viet281101/PolyominosTiling) ![Github language count](https://img.shields.io/github/languages/count/Viet281101/PolyominosTiling) ![GitHub Created At](https://img.shields.io/github/created-at/Viet281101/PolyominosTiling)
 
-In pure html, css and javascript with ES6 modules, 2 libraries: [three.js](https://threejs.org/) and [dat.gui](https://github.com/dataarts/dat.gui).
+In pure html, css and javascript with ES6 modules, 2 libraries: 
+
+[![alt text](assets/threejs.png)](https://threejs.org/) **&** [![alt text](assets/dat.png)](https://github.com/dataarts/dat.gui) [dat.GUI](https://github.com/dataarts/dat.gui)
 
 ## Description
 
