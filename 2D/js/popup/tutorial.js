@@ -1,10 +1,11 @@
 export function showTutorialPopup(toolbar) {
-  const popupContainer = toolbar.createPopupContainer('tutorialPopup', toolbar.buttons[3].name);
+  const popupContainer = toolbar.createPopupContainer(
+    'tutorialPopup',
+    toolbar.buttons[3].name,
+    2600
+  );
   const popup = popupContainer.querySelector('canvas');
   const ctx = popup.getContext('2d');
-
-  ctx.fillStyle = '#a0a0a0';
-  ctx.fillRect(0, 0, popup.width, popup.height);
 
   const rows = [
     { label: 'How to interact with this version', title: true },
@@ -82,6 +83,34 @@ export function showTutorialPopup(toolbar) {
     }
   });
 
+  const iconMap = new Map();
+  const allIconPaths = [
+    ...rows.filter((row) => row.icon).map((row) => `ic_${row.icon}.png`),
+    ...subIcons.map((icon) => `ic_${icon.path}.png`),
+  ];
+
+  const uniqueIconPaths = [...new Set(allIconPaths)];
+
+  const loadImage = (src) =>
+    new Promise((resolve) => {
+      const image = new Image();
+      image.src = src;
+      if (image.complete) {
+        resolve(image);
+      } else {
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+      }
+    });
+
+  const assetsReady = Promise.all(
+    uniqueIconPaths.map((fileName) =>
+      loadImage(`../assets/${fileName}`).then((image) => {
+        if (image) iconMap.set(fileName, image);
+      })
+    )
+  );
+
   function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
     const paragraphs = text.split('\n');
     let totalLines = 0;
@@ -131,27 +160,16 @@ export function showTutorialPopup(toolbar) {
       }
 
       if (row.icon) {
-        const icon = new Image();
-        icon.src = `../assets/ic_${row.icon}.png`;
-        icon.onload = () => {
+        const icon = iconMap.get(`ic_${row.icon}.png`);
+        if (icon) {
           ctx.drawImage(icon, popup.width - 64, y - 14, 50, 50);
-        };
+        }
         clickAreas.push({
           index,
           rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 },
           type: 'icon',
         });
       }
-
-      subIcons.forEach((subIcon) => {
-        if (subIcon.path) {
-          const subIconImage = new Image();
-          subIconImage.src = `../assets/ic_${subIcon.path}.png`;
-          subIconImage.onload = () => {
-            ctx.drawImage(subIconImage, subIcon.x, subIcon.y, 25, 25);
-          };
-        }
-      });
 
       clickAreas.push({
         index,
@@ -173,6 +191,16 @@ export function showTutorialPopup(toolbar) {
         yOffset += linesCount * 20;
       }
     });
+
+    subIcons.forEach((subIcon) => {
+      const subIconImage = iconMap.get(`ic_${subIcon.path}.png`);
+      if (subIconImage) {
+        ctx.drawImage(subIconImage, subIcon.x, subIcon.y, 25, 25);
+      }
+    });
   }
-  redrawPopup();
+  const fontReady = document.fonts ? document.fonts.ready : Promise.resolve();
+  Promise.all([fontReady, assetsReady]).then(() => {
+    redrawPopup();
+  });
 }

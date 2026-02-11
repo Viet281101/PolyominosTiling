@@ -1,10 +1,7 @@
 export function showGridPopup(toolbar) {
-  const popupContainer = toolbar.createPopupContainer('gridPopup', toolbar.buttons[1].name);
+  const popupContainer = toolbar.createPopupContainer('gridPopup', toolbar.buttons[1].name, 1100);
   const popup = popupContainer.querySelector('canvas');
   const ctx = popup.getContext('2d');
-
-  ctx.fillStyle = '#a0a0a0';
-  ctx.fillRect(0, 0, popup.width, popup.height);
 
   const rows = [
     { label: 'Create new grid board here', box: true, title: true },
@@ -22,24 +19,58 @@ export function showGridPopup(toolbar) {
   const rowHeight = 76;
   const colX = 30;
 
-  rows.forEach((row, index) => {
-    const y = startY + index * rowHeight;
-    if (row.box) {
-      ctx.strokeStyle = '#fff';
-      ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 4 : 1));
-    }
-    ctx.font = '22px Pixellari';
-    ctx.fillStyle = '#000';
-    ctx.fillText(row.label, colX, y + 20);
-    if (row.icon) {
-      const icon = new Image();
-      icon.src = `../assets/ic_${row.icon}.png`;
-      icon.onload = () => {
-        ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-      };
-    } else if (row.type === 'input') {
-      createInputField(popupContainer, y, 10);
-    }
+  const iconMap = new Map();
+  const iconRows = rows.filter((row) => row.icon);
+
+  const loadImage = (src) =>
+    new Promise((resolve) => {
+      const image = new Image();
+      image.src = src;
+      if (image.complete) {
+        resolve(image);
+      } else {
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+      }
+    });
+
+  const assetsReady = Promise.all(
+    iconRows.map((row) =>
+      loadImage(`../assets/ic_${row.icon}.png`).then((image) => {
+        if (image) iconMap.set(row.icon, image);
+      })
+    )
+  );
+
+  const fontReady = document.fonts ? document.fonts.ready : Promise.resolve();
+
+  const renderPopup = () => {
+    ctx.clearRect(0, 0, popup.width, popup.height);
+    ctx.fillStyle = '#a0a0a0';
+    ctx.fillRect(0, 0, popup.width, popup.height);
+
+    rows.forEach((row, index) => {
+      const y = startY + index * rowHeight;
+      if (row.box) {
+        ctx.strokeStyle = '#fff';
+        ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 4 : 1));
+      }
+      ctx.font = '22px Pixellari';
+      ctx.fillStyle = '#000';
+      ctx.fillText(row.label, colX, y + 20);
+      if (row.icon) {
+        const icon = iconMap.get(row.icon);
+        if (icon) {
+          ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
+        }
+      } else if (row.type === 'input') {
+        createInputField(popupContainer, y, 10);
+      }
+    });
+  };
+
+  Promise.all([fontReady, assetsReady]).then(() => {
+    renderPopup();
   });
 
   let newRows = 10;

@@ -35,6 +35,7 @@ class MainApp {
     this.toolbar = new Toolbar(this);
     this.isBlackening = false;
     this.blackenedCells = new Set();
+    this.redrawPending = false;
     this.tooltipPolyominoBlocks();
     this.init();
   }
@@ -43,6 +44,14 @@ class MainApp {
     Object.assign(document.body.style, { margin: '0', padding: '0', overflow: 'hidden' });
     this.canvas.style.backgroundColor = '#c3c3c3';
     this.addEventListeners();
+    this.refreshLayoutAndRender();
+  }
+
+  refreshLayoutAndRender() {
+    this.gridBoard.resizeCanvas();
+    this.guiController.checkWindowSize();
+    this.toolbar.resizeToolbar();
+    this.redraw();
   }
 
   tooltipPolyominoBlocks() {
@@ -81,10 +90,15 @@ class MainApp {
       }
     });
     window.addEventListener('resize', () => {
-      this.gridBoard.resizeCanvas();
-      this.gridBoard.drawGrid();
-      this.guiController.checkWindowSize();
-      this.toolbar.resizeToolbar();
+      this.refreshLayoutAndRender();
+    });
+    window.addEventListener('load', () => this.refreshLayoutAndRender());
+    window.addEventListener('pageshow', () => this.refreshLayoutAndRender());
+    window.addEventListener('focus', () => this.refreshLayoutAndRender());
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.refreshLayoutAndRender();
+      }
     });
     this.canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
@@ -149,8 +163,18 @@ class MainApp {
   }
 
   handleMouseMove(mousePos) {
-    if (this.isBlackening) this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
-    this.polyominoes.forEach((polyomino) => polyomino.onMouseMove(mousePos));
+    if (this.isBlackening) {
+      this.canvas.style.cursor = 'url("../assets/cursor_blacken.png"), auto';
+    }
+
+    let hasDraggingPolyomino = false;
+    this.polyominoes.forEach((polyomino) => {
+      if (polyomino.isDragging) {
+        hasDraggingPolyomino = true;
+        polyomino.onMouseMove(mousePos);
+      }
+    });
+
     if (this.tooltipPolyomino && !this.selectedPolyomino?.isDragging) {
       let found = false;
       for (let i = this.polyominoes.length - 1; i >= 0; i--) {
@@ -170,7 +194,10 @@ class MainApp {
     } else {
       this.tooltip.style.display = 'none';
     }
-    this.redraw();
+
+    if (hasDraggingPolyomino) {
+      this.redraw();
+    }
   }
 
   handleMouseUp() {
@@ -179,13 +206,19 @@ class MainApp {
   }
 
   redraw() {
-    this.gridBoard.clear();
-    this.gridBoard.drawGrid();
-    this.drawPolyominoes();
-    if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
-      this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
+    if (this.redrawPending) {
+      return;
     }
-    if (this.clearedBoard) this.clearBoard();
+    this.redrawPending = true;
+    requestAnimationFrame(() => {
+      this.redrawPending = false;
+      this.gridBoard.clear();
+      this.gridBoard.drawGrid();
+      this.drawPolyominoes();
+      if (this.selectedPolyomino && !this.selectedPolyomino.isDragging) {
+        this.selectedPolyomino.drawIcons(this.gridBoard.ctx, this.gridSize, this.icons);
+      }
+    });
   }
 
   placePolyomino(polyomino) {
@@ -246,7 +279,7 @@ class MainApp {
   }
   deleteAllPolyominos() {
     this.polyominoes = [];
-    this.selectedPoyomino = null;
+    this.selectedPolyomino = null;
     this.autoWhitening();
     this.redraw();
   }
@@ -262,7 +295,6 @@ class MainApp {
     this.gridBoard.clear();
     this.polyominoes = [];
     this.selectedPolyomino = null;
-    this.clearedBoard = true;
     polyominoStates.forEach((state) => {
       const newPolyomino = new Polyomino(
         state.shape,
@@ -274,12 +306,10 @@ class MainApp {
       );
       this.polyominoes.push(newPolyomino);
     });
-    this.gridBoard.clear();
-    this.drawPolyominoes();
+    this.redraw();
   }
 
   createNewBoard(rows, cols, gridSize) {
-    this.clearedBoard = false;
     this.rows = rows;
     this.cols = cols;
     this.gridSize = gridSize;

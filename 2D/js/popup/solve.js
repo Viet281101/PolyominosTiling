@@ -1,10 +1,7 @@
 export function showSolvePopup(toolbar) {
-  const popupContainer = toolbar.createPopupContainer('solvePopup', toolbar.buttons[2].name);
+  const popupContainer = toolbar.createPopupContainer('solvePopup', toolbar.buttons[2].name, 1900);
   const popup = popupContainer.querySelector('canvas');
   const ctx = popup.getContext('2d');
-
-  ctx.fillStyle = '#a0a0a0';
-  ctx.fillRect(0, 0, popup.width, popup.height);
 
   const rows = [
     { label: 'Auto tiling the Polyominoes blocks', title: true },
@@ -55,22 +52,34 @@ export function showSolvePopup(toolbar) {
   let iconClickAreas = [];
 
   rows.forEach((row, index) => {
-    const y = startY + index * rowHeight;
-    ctx.font = '21px Pixellari';
-    ctx.fillStyle = '#000';
-    ctx.fillText(row.label, colX, y + 20);
-
-    if (row.icon) {
-      const icon = new Image();
-      icon.src = `../assets/ic_${row.icon}.png`;
-      icon.onload = () => {
-        ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-      };
-    }
     if (row.description) {
+      const y = startY + index * rowHeight;
       dropdowns[index] = { description: row.description, expanded: false, y: y + 40 };
     }
   });
+
+  const iconMap = new Map();
+  const iconRows = rows.filter((row) => row.icon);
+
+  const loadImage = (src) =>
+    new Promise((resolve) => {
+      const image = new Image();
+      image.src = src;
+      if (image.complete) {
+        resolve(image);
+      } else {
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+      }
+    });
+
+  const assetsReady = Promise.all(
+    iconRows.map((row) =>
+      loadImage(`../assets/ic_${row.icon}.png`).then((image) => {
+        if (image) iconMap.set(row.icon, image);
+      })
+    )
+  );
 
   popup.addEventListener('mousemove', (e) => {
     const rect = popup.getBoundingClientRect();
@@ -178,11 +187,10 @@ export function showSolvePopup(toolbar) {
         ctx.stroke();
       }
       if (row.icon) {
-        const icon = new Image();
-        icon.src = `../assets/ic_${row.icon}.png`;
-        icon.onload = () => {
+        const icon = iconMap.get(row.icon);
+        if (icon) {
           ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-        };
+        }
         iconClickAreas.push({
           index,
           rect: { x: popup.width - 94, y: y - 14, width: 50, height: 50 },
@@ -208,5 +216,8 @@ export function showSolvePopup(toolbar) {
       }
     });
   }
-  redrawPopup();
+  const fontReady = document.fonts ? document.fonts.ready : Promise.resolve();
+  Promise.all([fontReady, assetsReady]).then(() => {
+    redrawPopup();
+  });
 }
