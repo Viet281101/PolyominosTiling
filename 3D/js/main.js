@@ -6,244 +6,280 @@ import { Toolbar } from './toolbar.js';
 import { Polycube } from './polycube.js';
 
 class MainApp {
-	constructor() {
-		this.selectedPolycube = null;
-		this.isDragging = false;
-		this.isRightClick = false;
-		this.polys = [];
-		this.init();
-		this.animate();
-		this.eventListener();
-	};
+  constructor() {
+    this.selectedPolycube = null;
+    this.isDragging = false;
+    this.isRightClick = false;
+    this.polys = [];
+    this.init();
+    this.animate();
+    this.eventListener();
+  }
 
-	init() {
-		Object.assign(document.body.style, { margin: '0', padding: '0', overflow: 'hidden' });
-		this.scene = new THREE.Scene();
+  init() {
+    Object.assign(document.body.style, {
+      margin: '0',
+      padding: '0',
+      overflow: 'hidden',
+    });
+    this.scene = new THREE.Scene();
 
-		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		this.camera.position.z = 15;
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    this.camera.position.z = 15;
 
-		this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('myCanvas') });
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.setClearColor('#c3c3c3');
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: document.getElementById('myCanvas'),
+    });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setClearColor('#c3c3c3');
 
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-		this.board = new Board(this.scene, { x: 3, y: 3, z: 3 });
-		this.guiController = new GUIController(this);
-		this.toolbar = new Toolbar(this);
-	};
+    this.board = new Board(this.scene, { x: 3, y: 3, z: 3 });
+    this.guiController = new GUIController(this);
+    this.toolbar = new Toolbar(this);
+  }
 
-	eventListener() {
-		window.addEventListener('resize', this.onWindowResize.bind(this), false);
-		this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-		this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-		this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-		this.renderer.domElement.addEventListener('contextmenu', (event) => { event.preventDefault(); }, false);
-	};
+  eventListener() {
+    window.addEventListener('resize', this.onWindowResize.bind(this), false);
+    this.renderer.domElement.addEventListener('mousedown', this.onMouseDown.bind(this), false);
+    this.renderer.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+    this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    this.renderer.domElement.addEventListener(
+      'contextmenu',
+      (event) => {
+        event.preventDefault();
+      },
+      false
+    );
+  }
 
-	addPolycube(cubeData) {
-		const polycube = new Polycube(cubeData);
-		this.scene.add(polycube.group);
-		this.polys.push(polycube);
-	};
+  addPolycube(cubeData) {
+    const polycube = new Polycube(cubeData);
+    this.scene.add(polycube.group);
+    this.polys.push(polycube);
+  }
 
-	onWindowResize() {
-		this.camera.aspect = window.innerWidth / window.innerHeight;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-	};
+  onWindowResize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-	animate() {
-		requestAnimationFrame(this.animate.bind(this));
-		this.renderer.render(this.scene, this.camera);
-	};
+  animate() {
+    requestAnimationFrame(this.animate.bind(this));
+    this.renderer.render(this.scene, this.camera);
+  }
 
-	onMouseDown(event) {
-		event.preventDefault();
-		const mouse = new THREE.Vector2(
-			(event.clientX / window.innerWidth) * 2 - 1,
-			-(event.clientY / window.innerHeight) * 2 + 1
-		);
-		const raycaster = new THREE.Raycaster();
-		raycaster.setFromCamera(mouse, this.camera);
+  onMouseDown(event) {
+    event.preventDefault();
+    const mouse = new THREE.Vector2(
+      (event.clientX / window.innerWidth) * 2 - 1,
+      -(event.clientY / window.innerHeight) * 2 + 1
+    );
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, this.camera);
 
-		const intersects = raycaster.intersectObjects(this.polys.map(p => p.group.children).flat());
+    const intersects = raycaster.intersectObjects(this.polys.map((p) => p.group.children).flat());
 
-		if (intersects.length > 0) {
-			const intersectedObject = intersects[0].object;
+    if (intersects.length > 0) {
+      const intersectedObject = intersects[0].object;
 
-			const intersectedPolycube = this.polys.find(p => p.group.children.includes(intersectedObject));
-			if (intersectedPolycube !== this.selectedPolycube) {
-				this.deselectPolycube();
-				this.selectPolycube(intersectedPolycube);
-			}
+      const intersectedPolycube = this.polys.find((p) =>
+        p.group.children.includes(intersectedObject)
+      );
+      if (intersectedPolycube !== this.selectedPolycube) {
+        this.deselectPolycube();
+        this.selectPolycube(intersectedPolycube);
+      }
 
-			this.isDragging = true;
-			this.controls.enabled = false;
+      this.isDragging = true;
+      this.controls.enabled = false;
 
-			if (event.button === 2) { this.isRightClick = true; }
+      if (event.button === 2) {
+        this.isRightClick = true;
+      }
 
-			this.lastMousePosition = { x: event.clientX, y: event.clientY };
-			this.lastValidPosition = this.selectedPolycube.group.position.clone();
-		} else {
-			this.deselectPolycube();
-			this.controls.enabled = true;
-		}
-	};
+      this.lastMousePosition = { x: event.clientX, y: event.clientY };
+      this.lastValidPosition = this.selectedPolycube.group.position.clone();
+    } else {
+      this.deselectPolycube();
+      this.controls.enabled = true;
+    }
+  }
 
-	onMouseMove(event) {
-		if (!this.isDragging || !this.selectedPolycube) return;
+  onMouseMove(event) {
+    if (!this.isDragging || !this.selectedPolycube) return;
 
-		const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-		const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		if (this.isRightClick) {
-			const deltaX = event.clientX - this.lastMousePosition.x;
-			const deltaY = event.clientY - this.lastMousePosition.y;
+    if (this.isRightClick) {
+      const deltaX = event.clientX - this.lastMousePosition.x;
+      const deltaY = event.clientY - this.lastMousePosition.y;
 
-			const moveVector = new THREE.Vector3(deltaX * 0.01, -deltaY * 0.01, 0);
-			moveVector.applyQuaternion(this.camera.quaternion);
-			this.selectedPolycube.group.position.add(moveVector);
+      const moveVector = new THREE.Vector3(deltaX * 0.01, -deltaY * 0.01, 0);
+      moveVector.applyQuaternion(this.camera.quaternion);
+      this.selectedPolycube.group.position.add(moveVector);
 
-			this.lastMousePosition = { x: event.clientX, y: event.clientY };
-		} else {
-			this.selectedPolycube.group.rotation.y += movementX * 0.01;
-			this.selectedPolycube.group.rotation.x += movementY * 0.01;
-		}
-	};
+      this.lastMousePosition = { x: event.clientX, y: event.clientY };
+    } else {
+      this.selectedPolycube.group.rotation.y += movementX * 0.01;
+      this.selectedPolycube.group.rotation.x += movementY * 0.01;
+    }
+  }
 
-	onMouseUp(event) {
-		if (this.isRightClick) {
-			if (this.snapToGrid(this.selectedPolycube)) {
-				this.lastValidPosition = this.selectedPolycube.group.position.clone();
-			} else { this.selectedPolycube.group.position.copy(this.lastValidPosition); }
-		}
-		this.isDragging = false;
-		this.isRightClick = false;
-		this.controls.enabled = true;
-	};
+  onMouseUp(event) {
+    if (this.isRightClick) {
+      if (this.snapToGrid(this.selectedPolycube)) {
+        this.lastValidPosition = this.selectedPolycube.group.position.clone();
+      } else {
+        this.selectedPolycube.group.position.copy(this.lastValidPosition);
+      }
+    }
+    this.isDragging = false;
+    this.isRightClick = false;
+    this.controls.enabled = true;
+  }
 
-	selectPolycube(polycube) {
-		this.selectedPolycube = polycube;
-		this.selectedPolycube.group.children.forEach(child => {
-			if (child instanceof THREE.LineSegments) { child.material.color.set(0xffffff); }
-		});
-	};
+  selectPolycube(polycube) {
+    this.selectedPolycube = polycube;
+    this.selectedPolycube.group.children.forEach((child) => {
+      if (child instanceof THREE.LineSegments) {
+        child.material.color.set(0xffffff);
+      }
+    });
+  }
 
-	deselectPolycube() {
-		if (this.selectedPolycube) {
-			this.selectedPolycube.group.children.forEach(child => {
-				if (child instanceof THREE.LineSegments) { child.material.color.set(0x000000); }
-			});
-			this.selectedPolycube = null;
-		}
-	};
+  deselectPolycube() {
+    if (this.selectedPolycube) {
+      this.selectedPolycube.group.children.forEach((child) => {
+        if (child instanceof THREE.LineSegments) {
+          child.material.color.set(0x000000);
+        }
+      });
+      this.selectedPolycube = null;
+    }
+  }
 
-	snapToGrid(polycube) {
-		const gridSize = 1;
-		const group = polycube.group;
-		const size = this.board.size;
+  snapToGrid(polycube) {
+    const gridSize = 1;
+    const group = polycube.group;
+    const size = this.board.size;
 
-		const offsetX = (size.x % 2 === 0) ? gridSize / 2 : 0;
-		const offsetY = (size.y % 2 === 0) ? gridSize / 2 : 0;
-		const offsetZ = (size.z % 2 === 0) ? gridSize / 2 : 0;
+    const offsetX = size.x % 2 === 0 ? gridSize / 2 : 0;
+    const offsetY = size.y % 2 === 0 ? gridSize / 2 : 0;
+    const offsetZ = size.z % 2 === 0 ? gridSize / 2 : 0;
 
-		const newPosition = new THREE.Vector3(
-			Math.round((group.position.x - offsetX) / gridSize) * gridSize + offsetX,
-			Math.round((group.position.y - offsetY) / gridSize) * gridSize + offsetY,
-			Math.round((group.position.z - offsetZ) / gridSize) * gridSize + offsetZ
-		);
+    const newPosition = new THREE.Vector3(
+      Math.round((group.position.x - offsetX) / gridSize) * gridSize + offsetX,
+      Math.round((group.position.y - offsetY) / gridSize) * gridSize + offsetY,
+      Math.round((group.position.z - offsetZ) / gridSize) * gridSize + offsetZ
+    );
 
-		const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);
-		const decomposed = {
-			scale: new THREE.Vector3(),
-			position: new THREE.Vector3(),
-			rotation: new THREE.Quaternion(),
-		};
-		rotationMatrix.decompose(decomposed.position, decomposed.rotation, decomposed.scale);
+    const rotationMatrix = new THREE.Matrix4().makeRotationFromQuaternion(group.quaternion);
+    const decomposed = {
+      scale: new THREE.Vector3(),
+      position: new THREE.Vector3(),
+      rotation: new THREE.Quaternion(),
+    };
+    rotationMatrix.decompose(decomposed.position, decomposed.rotation, decomposed.scale);
 
-		const euler = new THREE.Euler().setFromQuaternion(decomposed.rotation, 'XYZ');
-		euler.x = Math.round(euler.x / (Math.PI / 2)) * (Math.PI / 2);
-		euler.y = Math.round(euler.y / (Math.PI / 2)) * (Math.PI / 2);
-		euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
+    const euler = new THREE.Euler().setFromQuaternion(decomposed.rotation, 'XYZ');
+    euler.x = Math.round(euler.x / (Math.PI / 2)) * (Math.PI / 2);
+    euler.y = Math.round(euler.y / (Math.PI / 2)) * (Math.PI / 2);
+    euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
 
-		group.setRotationFromEuler(euler);
+    group.setRotationFromEuler(euler);
 
-		const newCubesPositions = polycube.cubeData.cubes.map(coord => {
-			const [x, y, z] = coord;
-			const position = new THREE.Vector3(x, y, z);
-			position.applyEuler(group.rotation);
-			position.add(newPosition);
-			return position;
-		});
+    const newCubesPositions = polycube.cubeData.cubes.map((coord) => {
+      const [x, y, z] = coord;
+      const position = new THREE.Vector3(x, y, z);
+      position.applyEuler(group.rotation);
+      position.add(newPosition);
+      return position;
+    });
 
-		const overlapping = this.polys.some(otherPolycube => {
-			if (otherPolycube === polycube) return false;
-			return otherPolycube.cubeData.cubes.some(coord => {
-				const [x, y, z] = coord;
-				const position = new THREE.Vector3(x, y, z);
-				position.applyEuler(otherPolycube.group.rotation);
-				position.add(otherPolycube.group.position);
-				return newCubesPositions.some(newPos => newPos.equals(position));
-			});
-		});
-		if (overlapping) { return false; }
-		else { group.position.copy(newPosition); return true; }
-	};
+    const overlapping = this.polys.some((otherPolycube) => {
+      if (otherPolycube === polycube) return false;
+      return otherPolycube.cubeData.cubes.some((coord) => {
+        const [x, y, z] = coord;
+        const position = new THREE.Vector3(x, y, z);
+        position.applyEuler(otherPolycube.group.rotation);
+        position.add(otherPolycube.group.position);
+        return newCubesPositions.some((newPos) => newPos.equals(position));
+      });
+    });
+    if (overlapping) {
+      return false;
+    } else {
+      group.position.copy(newPosition);
+      return true;
+    }
+  }
 
-	updatePolycubeColor(color) {
-		if (this.selectedPolycube) {
-			this.selectedPolycube.group.children.forEach(child => {
-				if (child instanceof THREE.Mesh) {
-					child.material.color.set(color);
-				}
-			});
-		}
-	};
-	updatePolycubeOpacity(opacity) {
-		if (this.selectedPolycube) {
-			this.selectedPolycube.group.children.forEach(child => {
-				if (child instanceof THREE.Mesh) {
-					child.material.opacity = opacity;
-					child.material.transparent = opacity < 1;
-				}
-			});
-		}
-	};
+  updatePolycubeColor(color) {
+    if (this.selectedPolycube) {
+      this.selectedPolycube.group.children.forEach((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.material.color.set(color);
+        }
+      });
+    }
+  }
+  updatePolycubeOpacity(opacity) {
+    if (this.selectedPolycube) {
+      this.selectedPolycube.group.children.forEach((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.material.opacity = opacity;
+          child.material.transparent = opacity < 1;
+        }
+      });
+    }
+  }
 
-	clearBoard() { this.board.clearGrid(); this.board = null; }
-	createNewBoard(x, y, z) {
-		const showInnerGrid = this.board ? this.board.showInnerGrid : false;
-		const showOuterGrid = this.board ? this.board.showOuterGrid : true;
-		if (this.board) { this.clearBoard(); }
-		this.board = new Board(this.scene, { x, y, z });
-		this.board.toggleInnerGrid(showInnerGrid);
-		this.board.toggleOuterGrid(showOuterGrid);
-	};
+  clearBoard() {
+    this.board.clearGrid();
+    this.board = null;
+  }
+  createNewBoard(x, y, z) {
+    const showInnerGrid = this.board ? this.board.showInnerGrid : false;
+    const showOuterGrid = this.board ? this.board.showOuterGrid : true;
+    if (this.board) {
+      this.clearBoard();
+    }
+    this.board = new Board(this.scene, { x, y, z });
+    this.board.toggleInnerGrid(showInnerGrid);
+    this.board.toggleOuterGrid(showOuterGrid);
+  }
 
-	deleteSelectedPolycube() {
-		if (this.selectedPolycube) {
-			this.scene.remove(this.selectedPolycube.group);
-			const index = this.polys.indexOf(this.selectedPolycube);
-			if (index > -1) {
-				this.polys.splice(index, 1);
-			}
-			this.selectedPolycube = null;
-		}
-	};
+  deleteSelectedPolycube() {
+    if (this.selectedPolycube) {
+      this.scene.remove(this.selectedPolycube.group);
+      const index = this.polys.indexOf(this.selectedPolycube);
+      if (index > -1) {
+        this.polys.splice(index, 1);
+      }
+      this.selectedPolycube = null;
+    }
+  }
 
-	toggleSelectedPolycubeVisibility(visible) {
-		if (this.selectedPolycube) {
-			this.selectedPolycube.group.visible = visible;
-		}
-	};
+  toggleSelectedPolycubeVisibility(visible) {
+    if (this.selectedPolycube) {
+      this.selectedPolycube.group.visible = visible;
+    }
+  }
 
-	toggleAllCubesVisibility(visible) {
-		this.polys.forEach(polycube => {
-			polycube.group.visible = visible;
-		});
-	};
-};
+  toggleAllCubesVisibility(visible) {
+    this.polys.forEach((polycube) => {
+      polycube.group.visible = visible;
+    });
+  }
+}
 
 const app = new MainApp();

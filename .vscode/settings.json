@@ -1,0 +1,19 @@
+{
+  "cSpell.words": [
+    "pentomino",
+    "Pentominos",
+    "Pixellari",
+    "Polycube",
+    "Polycubes",
+    "Polyomino",
+    "polyominoes",
+    "raycaster",
+    "Tetrimino",
+    "tetriminos",
+    "Tetris",
+    "tetromino",
+    "tromino"
+  ],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
