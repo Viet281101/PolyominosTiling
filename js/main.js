@@ -1,5 +1,6 @@
 import { startTetris } from './tetris.js';
 import { Polyomino } from './polyomino.js';
+import { POLYOMINO_CONFIG, POLYOMINO_TYPES, TETRIS_CONFIG } from './constants.js';
 
 class MainApp {
   constructor() {
@@ -18,6 +19,13 @@ class MainApp {
           window.location.href = './3D/index.html';
         },
       },
+      {
+        text: '2D Tetris',
+        isMiniGame: true,
+        onClick: () => {
+          this.switchToTetris();
+        },
+      },
     ];
     this.polyominoes = [];
     this.colors = [
@@ -33,13 +41,18 @@ class MainApp {
     this.usedColors = [];
     this.iconImage = new Image();
     this.iconImage.src = './assets/ic_arrow_right.png';
+    this.targetFps = 60;
+    this.frameDurationMs = 1000 / this.targetFps;
+    this.maxDeltaMs = 100;
+    this.lastFrameTimeMs = 0;
+    this.isRunning = true;
+    this.animate = this.animate.bind(this);
     this.initialize();
     this.addEventListeners();
-    this.animate();
+    requestAnimationFrame(this.animate);
   }
 
   initialize() {
-    this.loadIconPage();
     this.resizeCanvas();
     this.updateButtonLayout();
     this.drawContent();
@@ -56,13 +69,14 @@ class MainApp {
       background: '#c3c3c3',
       userSelect: 'none',
     });
-  }
-
-  loadIconPage() {
-    let icon_page = document.createElement('link');
-    icon_page.rel = 'shortcut icon';
-    icon_page.href = './assets/icon.png';
-    document.head.appendChild(icon_page);
+    Object.assign(document.body.style, {
+      margin: '0',
+      overflow: 'hidden',
+      height: '100%',
+      width: '100%',
+      background: '#c3c3c3',
+      userSelect: 'none',
+    });
   }
 
   resizeCanvas() {
@@ -74,15 +88,19 @@ class MainApp {
     const centerX = this.canvas.width / 2;
     const startY = 350;
     const gapY = 100;
+    this.miniGamesLabelY = Math.min(this.canvas.height - 220, 650);
     const width = 200;
     const height = 50;
+    let primaryIndex = 0;
 
-    this.buttons.forEach((button, index) => {
+    this.buttons.forEach((button) => {
       button.x = centerX;
-      button.y = startY + index * gapY;
+      button.y = button.isMiniGame ? this.miniGamesLabelY + 70 : startY + primaryIndex++ * gapY;
       button.width = width;
       button.height = height;
       button.iconVisible = true;
+      this.ctx.font = '20px Pixellari';
+      button.textWidth = this.ctx.measureText(button.text).width;
     });
   }
 
@@ -104,11 +122,9 @@ class MainApp {
     this.ctx.textAlign = 'center';
     this.ctx.fillText('Research polyominoes &', this.canvas.width / 2, 200);
     this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
-    // this.ctx.fillText('Mini Polyominoes Games :', this.canvas.width / 2, 650);
+    this.ctx.fillText('Mini Polyominoes Games :', this.canvas.width / 2, this.miniGamesLabelY);
 
     this.buttons.forEach((button) => this.drawButton(button));
-    // this.drawButton('2D Tetris', (this.canvas.width / 2), 710, this.switchToTetris.bind(this), false);
-    // this.drawButton('2D Pentominos', (this.canvas.width / 2), 780, () => {}, false);
   }
 
   drawButton(button) {
@@ -123,7 +139,7 @@ class MainApp {
     this.ctx.fillText(text, x, y);
 
     const iconSize = 32;
-    const textWidth = this.ctx.measureText(text).width;
+    const textWidth = button.textWidth ?? this.ctx.measureText(text).width;
     const iconX = x + textWidth / 2 + 10;
     const iconY = y - iconSize / 2;
 
@@ -174,9 +190,9 @@ class MainApp {
   }
 
   createPolyominoes() {
-    const types = ['domino', 'tromino', 'tetromino', 'pentomino'];
-    const minSpeed = 1;
-    const maxSpeed = 1.5;
+    const types = POLYOMINO_TYPES;
+    const minSpeed = POLYOMINO_CONFIG.MIN_SPEED;
+    const maxSpeed = POLYOMINO_CONFIG.MAX_SPEED;
 
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
@@ -187,8 +203,9 @@ class MainApp {
 
     for (let i = 0; i < 10; i++) {
       const type = types[Math.floor(Math.random() * types.length)];
-      const size = 30;
+      const size = POLYOMINO_CONFIG.CELL_SIZE;
       const shape = Polyomino.getRandomGrid(type);
+      const shapeCells = Polyomino.getOccupiedCells(shape);
 
       let x, y;
       let isOverlap;
@@ -200,7 +217,7 @@ class MainApp {
         y = startY + Math.random() * (endY - startY - shape.length * size);
 
         for (const polyomino of this.polyominoes) {
-          if (this.isOverlap(x, y, shape, polyomino)) {
+          if (this.isOverlap(x, y, shapeCells, polyomino)) {
             isOverlap = true;
             break;
           }
@@ -231,60 +248,58 @@ class MainApp {
     return color;
   }
 
-  isOverlap(x, y, shape, polyomino) {
-    const size = 30;
+  isOverlap(x, y, shapeCells, polyomino) {
+    const size = POLYOMINO_CONFIG.CELL_SIZE;
 
-    for (let row = 0; row < shape.length; row++) {
-      for (let col = 0; col < shape[row].length; col++) {
-        if (shape[row][col]) {
-          const px = x + col * size;
-          const py = y + row * size;
+    for (const [row, col] of shapeCells) {
+      const px = x + col * size;
+      const py = y + row * size;
 
-          for (let prow = 0; prow < polyomino.grid.length; prow++) {
-            for (let pcol = 0; pcol < polyomino.grid[prow].length; pcol++) {
-              if (polyomino.grid[prow][pcol]) {
-                const ppx = polyomino.x + pcol * size;
-                const ppy = polyomino.y + prow * size;
-                if (px < ppx + size && px + size > ppx && py < ppy + size && py + size > ppy) {
-                  return true;
-                }
-              }
-            }
-          }
+      for (const [polyRow, polyCol] of polyomino.occupiedCells) {
+        const ppx = polyomino.x + polyCol * size;
+        const ppy = polyomino.y + polyRow * size;
+        if (px < ppx + size && px + size > ppx && py < ppy + size && py + size > ppy) {
+          return true;
         }
       }
     }
     return false;
   }
 
-  animate() {
-    requestAnimationFrame(() => this.animate());
-    this.polyominoes.forEach((polyomino) => polyomino.update());
+  animate(timestampMs) {
+    if (!this.isRunning) {
+      return;
+    }
+    requestAnimationFrame(this.animate);
+
+    if (!this.lastFrameTimeMs) {
+      this.lastFrameTimeMs = timestampMs;
+      this.drawContent();
+      return;
+    }
+
+    const elapsedMs = timestampMs - this.lastFrameTimeMs;
+    if (elapsedMs < this.frameDurationMs) {
+      return;
+    }
+
+    this.lastFrameTimeMs = timestampMs - (elapsedMs % this.frameDurationMs);
+    const deltaMs = Math.min(elapsedMs, this.maxDeltaMs);
+    const deltaScale = deltaMs / (1000 / 60);
+
+    this.polyominoes.forEach((polyomino) => polyomino.update(deltaScale));
     this.drawContent();
   }
 
   switchToTetris() {
+    this.isRunning = false;
     document.body.innerHTML = '';
     const canvas = document.createElement('canvas');
     canvas.id = 'canvas';
-    canvas.width = 300;
-    canvas.height = 600;
+    canvas.width = TETRIS_CONFIG.CANVAS_WIDTH;
+    canvas.height = TETRIS_CONFIG.CANVAS_HEIGHT;
     document.body.appendChild(canvas);
-
-    const control = document.createElement('canvas');
-    control.id = 'controls';
-    control.width = 300;
-    control.height = 100;
-    document.body.appendChild(control);
-
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = './js/tetris.js';
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      startTetris();
-    };
+    startTetris();
   }
 }
 

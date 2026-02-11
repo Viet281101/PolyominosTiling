@@ -1,102 +1,46 @@
+import { KEYBOARD_KEYS, TETRIMINOS, TETRIS_CONFIG } from './constants.js';
+
 class Tetris {
-  constructor(canvasId, controlsId) {
+  constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
-    this.controlsCanvas = document.getElementById(controlsId);
     this.ctx = this.canvas.getContext('2d');
-    this.controlsCtx = this.controlsCanvas.getContext('2d');
-    this.blockSize = 30;
+    this.blockSize = TETRIS_CONFIG.BLOCK_SIZE;
     this.rows = this.canvas.height / this.blockSize;
     this.cols = this.canvas.width / this.blockSize;
     this.score = 0;
     this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(0));
-    this.tetriminos = [
-      { shape: [[1, 1, 1, 1]], color: 'cyan' },
-      {
-        shape: [
-          [1, 0, 0],
-          [1, 1, 1],
-        ],
-        color: 'blue',
-      },
-      {
-        shape: [
-          [0, 0, 1],
-          [1, 1, 1],
-        ],
-        color: 'orange',
-      },
-      {
-        shape: [
-          [1, 1],
-          [1, 1],
-        ],
-        color: 'gold',
-      },
-      {
-        shape: [
-          [0, 1, 1],
-          [1, 1, 0],
-        ],
-        color: 'green',
-      },
-      {
-        shape: [
-          [1, 1, 1],
-          [0, 1, 0],
-        ],
-        color: 'purple',
-      },
-      {
-        shape: [
-          [1, 1, 0],
-          [0, 1, 1],
-        ],
-        color: 'red',
-      },
-    ];
-    this.iconSize = 48;
-    this.iconPadding = 10;
-    this.controlItems = [
-      { name: 'ic_arrow_left.png', action: () => this.move(-1) },
-      { name: 'ic_arrow_right.png', action: () => this.move(1) },
-      { name: 'ic_rotate_left.png', action: () => this.rotateLeft() },
-      { name: 'ic_rotate_right.png', action: () => this.rotateRight() },
-      { name: 'ic_home.png', action: () => this.goHome() },
-    ];
-    this.icons = {};
-    this.iconsLoaded = 0;
-    this.loadIcons();
-  }
+    this.tetriminos = TETRIMINOS;
 
-  loadIcons() {
-    const iconNames = this.controlItems.map((item) => item.name);
-    iconNames.forEach((iconName) => {
-      const img = new Image();
-      img.src = `./assets/${iconName}`;
-      img.onload = () => {
-        this.iconsLoaded++;
-        if (this.iconsLoaded === iconNames.length) {
-          this.init();
-        }
-      };
-      this.icons[iconName] = img;
-    });
+    this.controlItems = [
+      { name: 'ic_arrow_left.png', action: () => this.move(-1), holdable: true },
+      { name: 'ic_arrow_right.png', action: () => this.move(1), holdable: true },
+      { name: 'ic_rotate_left.png', action: () => this.rotateLeft(), holdable: false },
+      { name: 'ic_rotate_right.png', action: () => this.rotateRight(), holdable: false },
+      { name: 'ic_home.png', action: () => this.goHome(), holdable: false },
+    ];
+    this.holdDelayMs = 180;
+    this.holdRepeatMs = 70;
+    this.holdTimeout = null;
+    this.holdInterval = null;
+
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.init();
   }
 
   init() {
     this.applyStyles();
+    this.createControlsBar();
     this.reset();
     this.bindEvents();
     this.draw();
-    this.drawControls();
+    this.startGame();
   }
 
   applyStyles() {
     this.canvas.style.border = '1px solid black';
     this.canvas.style.display = 'block';
-    this.canvas.style.margin = 'auto';
-    this.controlsCanvas.style.display = 'block';
-    this.controlsCanvas.style.margin = 'auto';
+    this.canvas.style.margin = '16px auto 0';
+
     const html = document.querySelector('html');
     Object.assign(html.style, {
       overflow: 'hidden',
@@ -105,6 +49,142 @@ class Tetris {
       background: '#c3c3c3',
       userSelect: 'none',
     });
+
+    Object.assign(document.body.style, {
+      margin: '0',
+      overflow: 'hidden',
+      height: '100%',
+      width: '100%',
+      background: '#c3c3c3',
+      userSelect: 'none',
+    });
+  }
+
+  createControlsBar() {
+    const existingBar = document.getElementById('tetris-controls-bar');
+    if (existingBar) {
+      existingBar.remove();
+    }
+
+    const bar = document.createElement('div');
+    bar.id = 'tetris-controls-bar';
+    Object.assign(bar.style, {
+      position: 'fixed',
+      left: '50%',
+      bottom: '16px',
+      transform: 'translateX(-50%)',
+      zIndex: '1200',
+      display: 'flex',
+      gap: '8px',
+      padding: '8px',
+      border: '1px solid #2f4f4f',
+      borderRadius: '10px',
+      background: 'rgba(230, 242, 242, 0.92)',
+      touchAction: 'manipulation',
+    });
+
+    this.controlItems.forEach((item) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', item.name);
+      Object.assign(button.style, {
+        width: 'clamp(34px, 10vw, 56px)',
+        height: 'clamp(34px, 10vw, 56px)',
+        padding: '0',
+        border: '1px solid #2f4f4f',
+        borderRadius: '8px',
+        background: '#b8dede',
+        display: 'grid',
+        placeItems: 'center',
+        cursor: 'pointer',
+      });
+
+      const image = document.createElement('img');
+      image.src = `./assets/${item.name}`;
+      image.alt = item.name;
+      image.style.width = '80%';
+      image.style.height = '80%';
+      image.style.objectFit = 'contain';
+      image.onerror = () => {
+        image.remove();
+        button.textContent = this.getFallbackLabel(item.name);
+        button.style.fontFamily = 'Pixellari, sans-serif';
+        button.style.fontSize = '12px';
+        button.style.color = '#2f4f4f';
+      };
+
+      button.appendChild(image);
+      this.bindControlButtonEvents(button, item);
+      bar.appendChild(button);
+    });
+
+    document.body.appendChild(bar);
+  }
+
+  bindControlButtonEvents(button, item) {
+    const pressStart = (e) => {
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      this.runControlAction(item);
+      if (!item.holdable) {
+        return;
+      }
+      this.clearControlHold();
+      this.holdTimeout = setTimeout(() => {
+        this.holdInterval = setInterval(() => {
+          this.runControlAction(item);
+        }, this.holdRepeatMs);
+      }, this.holdDelayMs);
+    };
+
+    const pressEnd = () => {
+      this.clearControlHold();
+    };
+
+    button.addEventListener('pointerdown', pressStart);
+    button.addEventListener('pointerup', pressEnd);
+    button.addEventListener('pointercancel', pressEnd);
+    button.addEventListener('pointerleave', pressEnd);
+    button.addEventListener('touchstart', pressStart, { passive: false });
+    button.addEventListener('touchend', pressEnd);
+    button.addEventListener('touchcancel', pressEnd);
+    button.addEventListener('click', (e) => e.preventDefault());
+  }
+
+  runControlAction(item) {
+    item.action();
+    if (this.gameInterval) {
+      this.draw();
+    }
+  }
+
+  clearControlHold() {
+    if (this.holdTimeout) {
+      clearTimeout(this.holdTimeout);
+      this.holdTimeout = null;
+    }
+    if (this.holdInterval) {
+      clearInterval(this.holdInterval);
+      this.holdInterval = null;
+    }
+  }
+
+  getFallbackLabel(iconName) {
+    switch (iconName) {
+      case 'ic_arrow_left.png':
+        return 'L';
+      case 'ic_arrow_right.png':
+        return 'R';
+      case 'ic_rotate_left.png':
+        return 'RL';
+      case 'ic_rotate_right.png':
+        return 'RR';
+      case 'ic_home.png':
+        return 'H';
+      default:
+        return '?';
+    }
   }
 
   reset() {
@@ -112,7 +192,6 @@ class Tetris {
     this.y = 0;
     this.currentTetrimino = this.getRandomTetrimino();
     if (this.collides()) {
-      // game over
       alert(`Game Over, you have ${this.score} points!`);
       this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(0));
       this.score = 0;
@@ -120,6 +199,10 @@ class Tetris {
   }
 
   collides() {
+    if (!this.currentTetrimino || !this.currentTetrimino.shape) {
+      return false;
+    }
+
     for (let row = 0; row < this.currentTetrimino.shape.length; row++) {
       for (let col = 0; col < this.currentTetrimino.shape[row].length; col++) {
         if (
@@ -190,6 +273,10 @@ class Tetris {
   }
 
   drawTetrimino() {
+    if (!this.currentTetrimino || !this.currentTetrimino.shape) {
+      return;
+    }
+
     for (let row = 0; row < this.currentTetrimino.shape.length; row++) {
       for (let col = 0; col < this.currentTetrimino.shape[row].length; col++) {
         if (this.currentTetrimino.shape[row][col]) {
@@ -197,31 +284,6 @@ class Tetris {
         }
       }
     }
-  }
-
-  drawControls() {
-    const y = (this.controlsCanvas.height - this.iconSize) / 2;
-
-    this.controlItems.forEach((icon, index) => {
-      const x = this.iconPadding + index * (this.iconSize + this.iconPadding);
-      this.controlsCtx.drawImage(this.icons[icon.name], x, y, this.iconSize, this.iconSize);
-    });
-  }
-
-  handleIconClick(mouseX, mouseY) {
-    const y = (this.controlsCanvas.height - this.iconSize) / 2;
-
-    this.controlItems.forEach((icon, index) => {
-      const x = this.iconPadding + index * (this.iconSize + this.iconPadding);
-      if (
-        mouseX >= x &&
-        mouseX <= x + this.iconSize &&
-        mouseY >= y &&
-        mouseY <= y + this.iconSize
-      ) {
-        icon.action();
-      }
-    });
   }
 
   rotateLeft() {
@@ -245,30 +307,23 @@ class Tetris {
     }
   }
 
-  goHome() {
-    window.location.reload();
+  handleKeyDown(e) {
+    if (e.key === KEYBOARD_KEYS.ARROW_LEFT) {
+      this.move(-1);
+    } else if (e.key === KEYBOARD_KEYS.ARROW_RIGHT) {
+      this.move(1);
+    } else if (e.key === KEYBOARD_KEYS.ARROW_DOWN) {
+      this.drop();
+    } else if (e.key === KEYBOARD_KEYS.ARROW_UP) {
+      this.rotateRight();
+    } else {
+      return;
+    }
+    this.draw();
   }
 
   bindEvents() {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        this.move(-1);
-      } else if (e.key === 'ArrowRight') {
-        this.move(1);
-      } else if (e.key === 'ArrowDown') {
-        this.drop();
-      } else if (e.key === 'ArrowUp') {
-        this.rotateRight();
-      }
-      this.draw();
-    });
-
-    this.controlsCanvas.addEventListener('click', (e) => {
-      const rect = this.controlsCanvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      this.handleIconClick(mouseX, mouseY);
-    });
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   draw() {
@@ -279,15 +334,21 @@ class Tetris {
   }
 
   startGame() {
+    if (this.gameInterval) {
+      return;
+    }
     this.gameInterval = setInterval(() => {
       this.drop();
       this.draw();
-    }, 1000);
+    }, TETRIS_CONFIG.DROP_INTERVAL_MS);
     this.draw();
   }
 
   stopGame() {
+    this.clearControlHold();
     clearInterval(this.gameInterval);
+    this.gameInterval = null;
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
 
   clearRows() {
@@ -310,9 +371,24 @@ class Tetris {
       shape: random.shape.map((row) => [...row]),
     };
   }
+
+  goHome() {
+    this.stopGame();
+
+    const controlsBar = document.getElementById('tetris-controls-bar');
+    if (controlsBar) {
+      controlsBar.remove();
+    }
+
+    const homeButton = document.getElementById('tetris-home-button');
+    if (homeButton) {
+      homeButton.remove();
+    }
+
+    window.location.reload();
+  }
 }
 
 export function startTetris() {
-  const tetris = new Tetris('canvas', 'controls');
-  tetris.startGame();
+  new Tetris('canvas');
 }
