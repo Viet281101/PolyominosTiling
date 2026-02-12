@@ -10,3 +10,16 @@
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+#fps-debug-label {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1000;
+  padding: 8px 14px;
+  border: 2px solid #1b1b1b;
+  background: rgba(10, 10, 10, 0.78);
+  color: #8fffb1;
+  font-size: 16px;
+  line-height: 1;
+  pointer-events: none;
+}

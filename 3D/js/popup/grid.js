@@ -8,91 +8,76 @@ export function showGridPopup(toolbar) {
 
   const rows = [
     { label: 'Create new grid board here', box: true, title: true },
-    { label: 'Enter n° x size', type: 'input' },
-    { label: 'Enter n° y size', type: 'input' },
-    { label: 'Enter n° z size', type: 'input' },
-    { label: 'Draw grid by click to =>', icon: 'draw' },
-    { label: 'Delete current grid :', icon: 'trash' },
+    { label: 'Enter n° x size', type: 'input', key: 'x' },
+    { label: 'Enter n° y size', type: 'input', key: 'y' },
+    { label: 'Enter n° z size', type: 'input', key: 'z' },
+    { label: 'Draw grid by click to =>', icon: 'draw', key: 'draw' },
+    { label: 'Delete current grid :', icon: 'trash', key: 'trash' },
   ];
 
   const startY = 76;
   const rowHeight = 76;
   const colX = 30;
 
+  const values = { x: 3, y: 3, z: 3 };
+
   rows.forEach((row, index) => {
     const y = startY + index * rowHeight;
+
     if (row.box) {
-      ctx.strokeStyle = '#fff';
-      ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 5 : 1));
+      const box = document.createElement('div');
+      box.style.position = 'absolute';
+      box.style.left = '10px';
+      box.style.top = `${y - 30}px`;
+      box.style.width = `${popup.width - 26}px`;
+      box.style.height = `${rowHeight * (row.title ? 5 : 1)}px`;
+      box.style.border = '2px solid #fff';
+      box.style.zIndex = '1001';
+      box.style.pointerEvents = 'none';
+      popupContainer.appendChild(box);
     }
-    ctx.font = '22px Pixellari';
-    ctx.fillStyle = '#000';
-    ctx.fillText(row.label, colX, y + 20);
+
+    const label = document.createElement('div');
+    label.textContent = row.label;
+    label.style.position = 'absolute';
+    label.style.left = `${colX}px`;
+    label.style.top = `${y - 2}px`;
+    label.style.font = '22px Pixellari';
+    label.style.color = '#000';
+    label.style.zIndex = '1001';
+    label.style.pointerEvents = 'none';
+    popupContainer.appendChild(label);
+
+    if (row.type === 'input') {
+      const input = createInputField(popupContainer, y, 3);
+      input.addEventListener('change', (e) => {
+        values[row.key] = parseInt(e.target.value || '0', 10);
+      });
+    }
 
     if (row.icon) {
-      const icon = new Image();
-      icon.src = `../assets/ic_${row.icon}.png`;
-      icon.onload = () => {
-        ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-      };
-    } else if (row.type === 'input') {
-      createInputField(popupContainer, y, 3);
-    }
-  });
+      const iconButton = document.createElement('img');
+      iconButton.src = `../assets/ic_${row.icon}.png`;
+      iconButton.style.position = 'absolute';
+      iconButton.style.left = `${popup.width - 94}px`;
+      iconButton.style.top = `${y - 14}px`;
+      iconButton.style.width = '50px';
+      iconButton.style.height = '50px';
+      iconButton.style.cursor = 'pointer';
+      iconButton.style.zIndex = '1002';
+      popupContainer.appendChild(iconButton);
 
-  let x_size = 3;
-  let y_size = 3;
-  let z_size = 3;
-  popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
-    input.addEventListener('change', (e) => {
-      if (index === 0) x_size = parseInt(e.target.value);
-      if (index === 1) y_size = parseInt(e.target.value);
-      if (index === 2) z_size = parseInt(e.target.value);
-    });
-  });
-
-  popup.addEventListener('mousemove', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    let cursor = 'default';
-
-    rows.forEach((row, index) => {
-      const y = startY + index * rowHeight;
-      if (
-        row.icon &&
-        toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })
-      ) {
-        cursor = 'pointer';
-      }
-    });
-    popup.style.cursor = cursor;
-  });
-
-  popup.addEventListener('click', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    rows.forEach((row, index) => {
-      const y = startY + index * rowHeight;
-      if (
-        row.icon &&
-        toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })
-      ) {
-        switch (index) {
-          case 4:
-            toolbar.mainApp.createNewBoard(x_size, y_size, z_size);
-            break;
-          case 5:
-            toolbar.mainApp.clearBoard();
-            break;
+      iconButton.addEventListener('click', () => {
+        if (row.key === 'draw') {
+          toolbar.mainApp.createNewBoard(values.x, values.y, values.z);
+        } else if (row.key === 'trash') {
+          toolbar.mainApp.clearBoard();
         }
         if (toolbar.isMobile) {
           toolbar.closePopup('grid');
         }
-      }
-    });
+      });
+    }
   });
 }
 
@@ -110,7 +95,8 @@ function createInputField(popupContainer, y, defaultValue) {
   input.style.fontSize = '22px';
   input.style.fontFamily = 'Pixellari';
   input.style.color = '#000';
-  input.style.zIndex = '1001';
+  input.style.zIndex = '1002';
   input.classList.add('popup-input');
   popupContainer.appendChild(input);
+  return input;
 }

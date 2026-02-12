@@ -6,71 +6,58 @@ export function showSettingsPopup(toolbar) {
   ctx.fillStyle = '#a0a0a0';
   ctx.fillRect(0, 0, popup.width, popup.height);
 
-  const rows = [
-    { label: 'Quick settings', box: true, title: true },
-    { label: 'Delete Selected Polycube', icon: 'trash' },
-  ];
-
   const startY = 76;
   const rowHeight = 76;
   const colX = 30;
 
-  rows.forEach((row, index) => {
-    const y = startY + index * rowHeight;
-    if (row.box) {
-      ctx.strokeStyle = '#fff';
-      ctx.strokeRect(10, y - 30, popup.width - 20, rowHeight * (row.title ? 4 : 1));
+  const box = document.createElement('div');
+  box.style.position = 'absolute';
+  box.style.left = '10px';
+  box.style.top = `${startY - 30}px`;
+  box.style.width = `${popup.width - 26}px`;
+  box.style.height = `${rowHeight * 4}px`;
+  box.style.border = '2px solid #fff';
+  box.style.zIndex = '1001';
+  box.style.pointerEvents = 'none';
+  popupContainer.appendChild(box);
+
+  const title = document.createElement('div');
+  title.textContent = 'Quick settings';
+  title.style.position = 'absolute';
+  title.style.left = `${colX}px`;
+  title.style.top = `${startY - 2}px`;
+  title.style.font = '20px Pixellari';
+  title.style.color = '#000';
+  title.style.zIndex = '1001';
+  title.style.pointerEvents = 'none';
+  popupContainer.appendChild(title);
+
+  const rowLabel = document.createElement('div');
+  rowLabel.textContent = 'Delete Selected Polycube';
+  rowLabel.style.position = 'absolute';
+  rowLabel.style.left = `${colX}px`;
+  rowLabel.style.top = `${startY + rowHeight - 2}px`;
+  rowLabel.style.font = '20px Pixellari';
+  rowLabel.style.color = '#000';
+  rowLabel.style.zIndex = '1001';
+  rowLabel.style.pointerEvents = 'none';
+  popupContainer.appendChild(rowLabel);
+
+  const iconButton = document.createElement('img');
+  iconButton.src = '../assets/ic_trash.png';
+  iconButton.style.position = 'absolute';
+  iconButton.style.left = `${popup.width - 94}px`;
+  iconButton.style.top = `${startY + rowHeight - 14}px`;
+  iconButton.style.width = '50px';
+  iconButton.style.height = '50px';
+  iconButton.style.cursor = 'pointer';
+  iconButton.style.zIndex = '1002';
+  popupContainer.appendChild(iconButton);
+
+  iconButton.addEventListener('click', () => {
+    toolbar.mainApp.deleteSelectedPolycube();
+    if (toolbar.isMobile) {
+      toolbar.closePopup('settings');
     }
-    ctx.font = '20px Pixellari';
-    ctx.fillStyle = '#000';
-    ctx.fillText(row.label, colX, y + 20);
-
-    if (row.icon) {
-      const icon = new Image();
-      icon.src = `../assets/ic_${row.icon}.png`;
-      icon.onload = () => {
-        ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-      };
-    }
-  });
-
-  popup.addEventListener('mousemove', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    let cursor = 'default';
-    rows.forEach((row, index) => {
-      const y = startY + index * rowHeight;
-      if (
-        row.icon &&
-        toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })
-      ) {
-        cursor = 'pointer';
-      }
-    });
-    popup.style.cursor = cursor;
-  });
-
-  popup.addEventListener('click', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    rows.forEach((row, index) => {
-      const y = startY + index * rowHeight;
-      if (
-        row.icon &&
-        toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })
-      ) {
-        switch (index) {
-          case 1:
-            toolbar.mainApp.deleteSelectedPolycube();
-            break;
-        }
-        if (toolbar.isMobile) {
-          toolbar.closePopup('grid');
-        }
-      }
-    });
   });
 }

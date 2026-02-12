@@ -12,79 +12,38 @@ export function createCubePopup(toolbar) {
   const startX = 20;
   const startY = 80;
   const size = 60;
-  ctx.font = '20px Pixellari';
-  ctx.fillStyle = '#000';
-  ctx.fillText('N° cubes: n = ', startX, startY);
-  createInputField(popupContainer, 140, startY - 20, 1);
+  const headerSpacingOffset = 10;
+  const row1Y = startY - 20 + headerSpacingOffset;
+  const row2Y = startY + size - 20 + headerSpacingOffset;
 
-  ctx.fillText('Position x:', startX, startY + size);
-  createInputField(popupContainer, 110, startY + size - 20, 0);
-  ctx.fillText('y:', 170, startY + size);
-  createInputField(popupContainer, 190, startY + size - 20, 0);
-  ctx.fillText('z:', 250, startY + size);
-  createInputField(popupContainer, 270, startY + size - 20, 0);
+  createLabel(popupContainer, 'N° cubes: n =', startX, row1Y);
+  createInputField(popupContainer, 160, row1Y, 1);
 
-  const { scene, camera, renderer, cubes, highlightCubes, controls } =
+  createLabel(popupContainer, 'Position x:', startX, row2Y);
+  createInputField(popupContainer, 120, row2Y, 0);
+  createLabel(popupContainer, 'y:', 180, row2Y);
+  createInputField(popupContainer, 200, row2Y, 0);
+  createLabel(popupContainer, 'z:', 260, row2Y);
+  createInputField(popupContainer, 280, row2Y, 0);
+
+  const { scene, camera, renderer, cubes, highlightCubes, controls, cleanup } =
     create3DCanvas(popupContainer);
+  popupContainer.__cleanup = cleanup;
 
   createTextZone(popupContainer, 10, 660, popup.width - 48, 84, 'Polycube Info...');
-  createButton(ctx, 'Info', 10, 800);
-  createButton(ctx, 'Clear', 128, 800);
-  createButton(ctx, 'Create', 254, 800);
 
   const state = { selectedIndex: 0 };
 
   createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state);
-
-  const buttons = [
-    { label: 'Info', x: 10, y: 800, width: 128, height: 32 },
-    { label: 'Clear', x: 128, y: 800, width: 128, height: 32 },
-    { label: 'Create', x: 254, y: 800, width: 128, height: 32 },
-  ];
-
-  popup.addEventListener('mousemove', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    let cursor = 'default';
-    for (const button of buttons) {
-      if (isInside(mouseX, mouseY, button)) {
-        cursor = 'pointer';
-        break;
-      }
-    }
-    popup.style.cursor = cursor;
-  });
-
-  popup.addEventListener('click', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    if (isInside(mouseX, mouseY, buttons[0])) {
-      showPolycubeInfo(ctx, popupContainer, cubes);
-    } else if (isInside(mouseX, mouseY, buttons[1])) {
-      resetCubePopup(popupContainer, scene, cubes, highlightCubes, state, controls);
-    } else if (isInside(mouseX, mouseY, buttons[2])) {
-      const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
-      const n = parseInt(nInput.value);
-      const positionInputs = Array.from(
-        popupContainer.querySelectorAll('input[type="number"]')
-      ).slice(1);
-      const position = positionInputs.map((input) => parseInt(input.value));
-      const cubesData = cubes.map((cube) => cube.position.toArray());
-      if (n !== cubes.length) {
-        nInput.value = cubes.length;
-      }
-      toolbar.mainApp.addPolycube({
-        n: cubes.length,
-        cubes: cubesData,
-        color: 0x00ff00,
-        position: { x: position[0], y: position[1], z: position[2] },
-      });
-      if (toolbar.isMobile) toolbar.closePopup('cube');
-    }
-  });
+  createActionButtons(
+    popupContainer,
+    toolbar,
+    scene,
+    cubes,
+    highlightCubes,
+    state,
+    controls
+  );
 
   const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
   nInput.addEventListener('change', () => {
@@ -95,11 +54,7 @@ export function createCubePopup(toolbar) {
   });
 }
 
-function isInside(x, y, rect) {
-  return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-}
-
-function showPolycubeInfo(ctx, popupContainer, cubes) {
+function showPolycubeInfo(popupContainer, cubes) {
   const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(
     1
   );
@@ -156,6 +111,21 @@ function createInputField(popupContainer, x, y, defaultValue) {
   popupContainer.appendChild(input);
 }
 
+function createLabel(popupContainer, text, x, y) {
+  const label = document.createElement('div');
+  label.textContent = text;
+  label.style.position = 'absolute';
+  label.style.left = `${x}px`;
+  label.style.top = `${y}px`;
+  label.style.font = '22px Pixellari';
+  label.style.lineHeight = '24px';
+  label.style.height = '24px';
+  label.style.color = '#000';
+  label.style.zIndex = '1001';
+  label.style.pointerEvents = 'none';
+  popupContainer.appendChild(label);
+}
+
 function create3DCanvas(popupContainer) {
   const canvas3D = document.createElement('canvas');
   canvas3D.width = 370 - 24;
@@ -195,13 +165,40 @@ function create3DCanvas(popupContainer) {
   light.position.set(0, 1, 1).normalize();
   scene.add(light);
 
+  let rafId = null;
+  let disposed = false;
   const animate = function () {
-    requestAnimationFrame(animate);
+    if (disposed) return;
+    rafId = requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
   };
   animate();
-  return { scene, camera, renderer, cubes, highlightCubes, controls };
+  const cleanup = () => {
+    disposed = true;
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    controls.dispose();
+    cubes.forEach((cube) => {
+      cube.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
+          else obj.material.dispose();
+        }
+      });
+    });
+    highlightCubes.forEach((cube) => {
+      cube.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
+          else obj.material.dispose();
+        }
+      });
+    });
+    renderer.dispose();
+  };
+  return { scene, camera, renderer, cubes, highlightCubes, controls, cleanup };
 }
 
 function updateHighlightedCubes(scene, cubes, highlightCubes, n) {
@@ -265,14 +262,55 @@ function createTextZone(popupContainer, x, y, width, height, text) {
   popupContainer.appendChild(textZone);
 }
 
-function createButton(ctx, label, x, y, width = 102, height = 32) {
-  ctx.fillStyle = '#00f';
-  ctx.fillRect(x, y, width, height);
-  ctx.strokeStyle = '#000';
-  ctx.strokeRect(x, y, width, height);
-  ctx.fillStyle = '#fff';
-  ctx.font = '22px Pixellari';
-  ctx.fillText(label, x + 20, y + 24);
+function createActionButtons(popupContainer, toolbar, scene, cubes, highlightCubes, state, controls) {
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.position = 'absolute';
+  buttonContainer.style.left = '10px';
+  buttonContainer.style.top = '800px';
+  buttonContainer.style.width = '350px';
+  buttonContainer.style.height = '32px';
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.gap = '8px';
+  buttonContainer.style.zIndex = '1002';
+  popupContainer.appendChild(buttonContainer);
+
+  const createActionButton = (label, onClick) => {
+    const button = document.createElement('button');
+    button.textContent = label;
+    button.style.width = '110px';
+    button.style.height = '32px';
+    button.style.border = '1px solid #000';
+    button.style.backgroundColor = '#00f';
+    button.style.color = '#fff';
+    button.style.font = '22px Pixellari';
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', onClick);
+    buttonContainer.appendChild(button);
+  };
+
+  createActionButton('Info', () => showPolycubeInfo(popupContainer, cubes));
+  createActionButton('Clear', () =>
+    resetCubePopup(popupContainer, scene, cubes, highlightCubes, state, controls)
+  );
+  createActionButton('Create', () => {
+    const nInput = popupContainer.querySelectorAll('input[type="number"]')[0];
+    const n = parseInt(nInput.value);
+    const positionInputs = Array.from(popupContainer.querySelectorAll('input[type="number"]')).slice(
+      1
+    );
+    const position = positionInputs.map((input) => parseInt(input.value));
+    const cubesData = cubes.map((cube) => cube.position.toArray());
+    if (n !== cubes.length) {
+      nInput.value = cubes.length;
+    }
+    toolbar.mainApp.addPolycube({
+      n: cubes.length,
+      cubes: cubesData,
+      color: 0x00ff00,
+      position: { x: position[0], y: position[1], z: position[2] },
+    });
+    if (toolbar.isMobile) toolbar.closePopup('cube');
+  });
 }
 
 function createNavigationButtons(popupContainer, ctx, scene, cubes, highlightCubes, state) {

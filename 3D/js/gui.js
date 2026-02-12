@@ -6,6 +6,7 @@ export class GUIController {
     this.settings = {
       backgroundColor: '#999999',
       polycubeColor: '#0000ff',
+      showFpsDebug: true,
       tooltipToolbar: true,
       showInnerGrid: false,
       showOuterGrid: true,
@@ -38,6 +39,9 @@ export class GUIController {
     });
     this.gui.add(this.settings, 'tooltipToolbar').onChange((value) => {
       this.mainApp.toolbar.tooltipToolbar = value;
+    });
+    this.gui.add(this.settings, 'showFpsDebug').onChange((value) => {
+      this.mainApp.toggleFpsDebugLabel(value);
     });
     this.gui.add(this.settings, 'showInnerGrid').onChange((value) => {
       this.mainApp.board.toggleInnerGrid(value);

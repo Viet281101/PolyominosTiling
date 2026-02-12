@@ -5,6 +5,7 @@ export function showSolvePopup(toolbar) {
 
   ctx.fillStyle = '#a0a0a0';
   ctx.fillRect(0, 0, popup.width, popup.height);
+
   const rows = [
     { label: 'Auto tiling the Polycube blocks', title: true },
     {
@@ -114,196 +115,121 @@ export function showSolvePopup(toolbar) {
     },
   ];
 
-  const startY = 60;
-  const rowHeight = 60;
-  const colX = 30;
-  const maxWidth = 300;
-
-  const dropdowns = {};
-  let clickAreas = [];
-  let iconClickAreas = [];
+  const content = document.createElement('div');
+  content.style.position = 'absolute';
+  content.style.left = '14px';
+  content.style.top = '54px';
+  content.style.width = `${popup.width - 28}px`;
+  content.style.paddingBottom = '24px';
+  content.style.zIndex = '1002';
+  popupContainer.appendChild(content);
 
   rows.forEach((row, index) => {
-    const y = startY + index * rowHeight;
-    ctx.font = '21px Pixellari';
-    ctx.fillStyle = '#000';
-    ctx.fillText(row.label, colX, y + 20);
+    const item = document.createElement('div');
+    item.style.position = 'relative';
+    item.style.marginBottom = '14px';
+    content.appendChild(item);
+
+    const header = document.createElement('div');
+    header.textContent = row.label;
+    header.style.font = row.title ? '23px Pixellari' : '21px Pixellari';
+    header.style.color = '#000';
+    header.style.lineHeight = '1.3';
+    header.style.paddingRight = row.icon ? '58px' : '0';
+    if (row.underline) header.style.textDecoration = 'underline';
+    if (!row.title) header.style.cursor = 'pointer';
+    item.appendChild(header);
+
+    let description = null;
+    if (row.description) {
+      description = document.createElement('div');
+      description.textContent = row.description;
+      description.style.display = 'none';
+      description.style.marginTop = '8px';
+      description.style.marginLeft = '12px';
+      description.style.font = '16px Pixellari';
+      description.style.color = '#000';
+      description.style.whiteSpace = 'normal';
+      description.style.lineHeight = '1.35';
+      item.appendChild(description);
+    }
 
     if (row.icon) {
-      const icon = new Image();
-      icon.src = `../assets/ic_${row.icon}.png`;
-      icon.onload = () => {
-        ctx.drawImage(icon, popup.width - 64, y - 14, 50, 50);
-      };
-    }
-    if (row.description) {
-      dropdowns[index] = { description: row.description, expanded: false, y: y + 40 };
-    }
-  });
+      const iconButton = document.createElement('img');
+      iconButton.src = `../assets/ic_${row.icon}.png`;
+      iconButton.style.position = 'absolute';
+      iconButton.style.right = '0';
+      iconButton.style.top = '-4px';
+      iconButton.style.width = '42px';
+      iconButton.style.height = '42px';
+      iconButton.style.cursor = 'pointer';
+      item.appendChild(iconButton);
 
-  popup.addEventListener('mousemove', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    let cursor = 'default';
-
-    clickAreas.forEach((area) => {
-      if (toolbar.isInside(mouseX, mouseY, area.rect) && !rows[area.index].title) {
-        cursor = 'pointer';
-      }
-    });
-    iconClickAreas.forEach((area) => {
-      if (toolbar.isInside(mouseX, mouseY, area.rect)) {
-        cursor = 'pointer';
-      }
-    });
-    popup.style.cursor = cursor;
-  });
-
-  popup.addEventListener('click', (e) => {
-    const rect = popup.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    clickAreas.forEach((area) => {
-      if (toolbar.isInside(mouseX, mouseY, area.rect) && !rows[area.index].title) {
-        if (dropdowns[area.index]) {
-          dropdowns[area.index].expanded = !dropdowns[area.index].expanded;
-          redrawPopup();
-        }
-      }
-    });
-
-    iconClickAreas.forEach((area) => {
-      if (toolbar.isInside(mouseX, mouseY, area.rect)) {
-        handleIconClick(area.index);
-      }
-    });
-  });
-
-  function handleIconClick(index) {
-    switch (rows[index].label) {
-      case '1) First-Fit Algorithm':
-        console.log('firstFit');
-        break;
-      case '2) Best-Fit Algorithm':
-        console.log('bestFit');
-        break;
-      case '3) Next-Fit Algorithm':
-        console.log('nextFit');
-        break;
-      case '4) Genetic Algorithms (GA)':
-        console.log('genetic');
-        break;
-      case '5) Simulated Annealing (SA)':
-        console.log('simulated');
-        break;
-      case '6) Tabu Search method':
-        console.log('tabu');
-        break;
-      case '7) Branch & Bound method':
-        console.log('branch');
-        break;
-      case '8) Greedy Algorithm':
-        console.log('greedy');
-        break;
-      case '9) Constraint Programming':
-        console.log('constraint');
-        break;
-      case '10) Backtracking method':
-        console.log('backtracking');
-        break;
-      case '11) Particle Swarm Optimization':
-        console.log('pso');
-        break;
-      case '12) Ant Colony Optimization':
-        console.log('aco');
-        break;
-      case '13) Harmony Search (HS)':
-        console.log('harmony');
-        break;
-      case '14) Bee Algorithm (BA)':
-        console.log('bee');
-        break;
-      case '15) Differential Evolution (DE)':
-        console.log('de');
-        break;
-    }
-    if (toolbar.isMobile) toolbar.closePopup('solve');
-  }
-
-  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
-    const lines = [];
-
-    for (let n = 0; n < words.length; n++) {
-      let testLine = line + words[n] + ' ';
-      let metrics = ctx.measureText(testLine);
-      let testWidth = metrics.width;
-      if (testWidth > maxWidth && n > 0) {
-        lines.push(line);
-        line = words[n] + ' ';
-      } else {
-        line = testLine;
-      }
-    }
-    lines.push(line);
-    lines.forEach((line, index) => {
-      ctx.fillText(line, x, y + index * lineHeight);
-    });
-    return lines.length;
-  }
-
-  function redrawPopup() {
-    ctx.clearRect(0, 0, popup.width, popup.height);
-    ctx.fillStyle = '#a0a0a0';
-    ctx.fillRect(0, 0, popup.width, popup.height);
-
-    let yOffset = 0;
-    clickAreas = [];
-    iconClickAreas = [];
-    rows.forEach((row, index) => {
-      const y = startY + index * rowHeight + yOffset;
-      ctx.font = '21px Pixellari';
-      ctx.fillStyle = '#000';
-      ctx.fillText(row.label, colX, y + 20);
-      if (row.underline) {
-        ctx.beginPath();
-        ctx.moveTo(colX, y + 25);
-        ctx.lineTo(colX + ctx.measureText(row.label).width, y + 25);
-        ctx.stroke();
-      }
-      if (row.icon) {
-        const icon = new Image();
-        icon.src = `../assets/ic_${row.icon}.png`;
-        icon.onload = () => {
-          ctx.drawImage(icon, popup.width - 64, y - 14, 50, 50);
-        };
-        iconClickAreas.push({
-          index,
-          rect: { x: popup.width - 64, y: y - 14, width: 50, height: 50 },
-        });
-      }
-      clickAreas.push({
-        index,
-        rect: { x: colX, y, width: popup.width - colX - 100, height: rowHeight },
-        type: 'label',
+      iconButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        handleIconClick(row.label);
+        if (toolbar.isMobile) toolbar.closePopup('solve');
       });
-      if (dropdowns[index] && dropdowns[index].expanded) {
-        ctx.font = '16px Pixellari';
-        ctx.fillStyle = '#000';
-        const linesCount = wrapText(
-          ctx,
-          dropdowns[index].description,
-          colX + 20,
-          y + 55,
-          maxWidth,
-          20
-        );
-        yOffset += linesCount * 20;
-      }
-    });
+    }
+
+    if (!row.title && description) {
+      header.addEventListener('click', () => {
+        description.style.display = description.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    if (index === 0 && description) {
+      description.style.display = 'block';
+    }
+  });
+}
+
+function handleIconClick(label) {
+  switch (label) {
+    case '1) First-Fit Algorithm':
+      console.log('firstFit');
+      break;
+    case '2) Best-Fit Algorithm':
+      console.log('bestFit');
+      break;
+    case '3) Next-Fit Algorithm':
+      console.log('nextFit');
+      break;
+    case '4) Genetic Algorithms (GA)':
+      console.log('genetic');
+      break;
+    case '5) Simulated Annealing (SA)':
+      console.log('simulated');
+      break;
+    case '6) Tabu Search method':
+      console.log('tabu');
+      break;
+    case '7) Branch & Bound method':
+      console.log('branch');
+      break;
+    case '8) Greedy Algorithm':
+      console.log('greedy');
+      break;
+    case '9) Constraint Programming':
+      console.log('constraint');
+      break;
+    case '10) Backtracking method':
+      console.log('backtracking');
+      break;
+    case '11) Particle Swarm Optimization':
+      console.log('pso');
+      break;
+    case '12) Ant Colony Optimization':
+      console.log('aco');
+      break;
+    case '13) Harmony Search (HS)':
+      console.log('harmony');
+      break;
+    case '14) Bee Algorithm (BA)':
+      console.log('bee');
+      break;
+    case '15) Differential Evolution (DE)':
+      console.log('de');
+      break;
   }
-  redrawPopup();
 }

@@ -8,18 +8,30 @@ export class Toolbar {
   constructor(mainApp) {
     this.mainApp = mainApp;
     this.isMobile = this.checkIfMobile();
+    this.iconCache = new Map();
+    this.documentListenersAttached = false;
+    this.currentPopupType = null;
+    this.currentPopupElement = null;
+    this.handleCanvasMouseMoveBound = (e) => this.handleCanvasMouseMove(e);
+    this.handleCanvasMouseLeaveBound = () => this.handleCanvasMouseLeave();
+    this.handleCanvasClickBound = (e) => this.handleCanvasClick(e);
+    this.handleDocumentClickBound = (e) => this.handleDocumentClick(e);
     this.setupCanvas();
     this.buttons = this.createButtons();
     this.popupOpen = false;
-    this.currentPopup = null;
     this.currentCloseIcon = null;
+    this.homeButtonRect = this.isMobile
+      ? { x: 10, y: 10, width: 40, height: 40 }
+      : { x: 10, y: 10, width: 40, height: 40 };
     this.createTooltip();
     this.drawToolbar();
     this.addEventListeners();
     this.addHomeButton();
-    this.homeButtonRect = this.isMobile
-      ? { x: 10, y: 10, width: 40, height: 40 }
-      : { x: 10, y: 10, width: 40, height: 40 };
+
+    requestAnimationFrame(() => this.resizeToolbar());
+    window.addEventListener('load', () => this.resizeToolbar(), { once: true });
+    setTimeout(() => this.resizeToolbar(), 120);
+    setTimeout(() => this.resizeToolbar(), 360);
   }
 
   checkIfMobile() {
@@ -28,12 +40,32 @@ export class Toolbar {
   setupCanvas() {
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
-    this.canvas.width = this.isMobile ? window.innerWidth : 50;
-    this.canvas.height = this.isMobile ? 50 : window.innerHeight;
-    this.canvas.style.position = 'absolute';
-    this.canvas.style.left = this.canvas.style.top = '0';
-    this.canvas.style.zIndex = '999';
+    this.canvas.style.position = 'fixed';
+    this.canvas.style.left = '0';
+    this.canvas.style.top = '0';
+    this.canvas.style.display = 'block';
+    this.canvas.style.zIndex = '2';
     document.body.appendChild(this.canvas);
+    this.setCanvasSize();
+  }
+
+  getViewportSize() {
+    const width = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 1);
+    const height = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 1);
+    return { width, height };
+  }
+
+  setCanvasSize() {
+    const { width: viewportWidth, height: viewportHeight } = this.getViewportSize();
+    const cssWidth = this.isMobile ? viewportWidth : 50;
+    const cssHeight = this.isMobile ? 50 : viewportHeight;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+    this.canvas.style.width = `${cssWidth}px`;
+    this.canvas.style.height = `${cssHeight}px`;
+    this.canvas.width = Math.max(1, Math.floor(cssWidth * pixelRatio));
+    this.canvas.height = Math.max(1, Math.floor(cssHeight * pixelRatio));
+    this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   }
 
   createButtons() {
@@ -80,7 +112,7 @@ export class Toolbar {
     this.tooltip.style.padding = '5px';
     this.tooltip.style.display = 'none';
     this.tooltip.style.whiteSpace = 'pre';
-    this.tooltip.style.zIndex = '1001';
+    this.tooltip.style.zIndex = '9001';
     document.body.appendChild(this.tooltip);
   }
 
@@ -92,77 +124,107 @@ export class Toolbar {
 
   drawToolbarVertical() {
     const totalWidth = this.buttons.length * 60;
-    let startX = (this.canvas.width - totalWidth) / 2;
+    const startX = (this.canvas.width - totalWidth) / 2;
 
-    this.buttons.forEach((button) => {
-      const img = new Image();
-      img.src = button.icon;
-      img.onload = () => {
-        this.ctx.drawImage(img, startX, 10, 30, 30);
+    this.buttons.forEach((button, index) => {
+      const x = startX + index * 60;
+      button.x = x - 5;
+      button.y = 5;
+      button.width = 40;
+      button.height = 40;
+      this.drawIcon(button.icon, x, 10, 30, 30, () => {
         this.ctx.strokeStyle = '#fff';
-        this.ctx.strokeRect(startX - 5, 5, 40, 40);
-        button.x = startX - 5;
-        button.y = 5;
-        button.width = button.height = 40;
-        startX += 60;
-      };
+        this.ctx.strokeRect(x - 5, 5, 40, 40);
+      });
     });
   }
 
   drawToolbarHorizontal() {
     const totalHeight = this.buttons.length * 60;
-    let startY = (this.canvas.height - totalHeight) / 2;
+    const startY = (this.canvas.height - totalHeight) / 2;
 
-    this.buttons.forEach((button) => {
-      const img = new Image();
-      img.src = button.icon;
-      img.onload = () => {
-        this.ctx.drawImage(img, 10, startY, 30, 30);
+    this.buttons.forEach((button, index) => {
+      const y = startY + index * 60;
+      button.x = 5;
+      button.y = y - 5;
+      button.width = 40;
+      button.height = 40;
+      this.drawIcon(button.icon, 10, y, 30, 30, () => {
         this.ctx.strokeStyle = '#fff';
-        this.ctx.strokeRect(5, startY - 5, 40, 40);
-        button.x = 5;
-        button.y = startY - 5;
-        button.width = button.height = 40;
-        startY += 60;
-      };
+        this.ctx.strokeRect(5, y - 5, 40, 40);
+      });
     });
+  }
+
+  drawIcon(src, x, y, width, height, drawAfter) {
+    let img = this.iconCache.get(src);
+    if (!img) {
+      img = new Image();
+      this.iconCache.set(src, img);
+      img.src = src;
+    }
+
+    const draw = () => {
+      this.ctx.drawImage(img, x, y, width, height);
+      if (drawAfter) drawAfter();
+    };
+
+    if (img.complete && img.naturalWidth > 0) {
+      draw();
+    } else {
+      img.onload = draw;
+    }
   }
 
   addEventListeners() {
-    this.canvas.addEventListener('mousemove', (e) => {
-      let cursor = 'default';
-      let foundButton = null;
-      this.buttons.forEach((button) => {
-        if (this.isInside(e.clientX, e.clientY, button)) {
-          cursor = 'pointer';
-          foundButton = button;
-        }
-      });
-      if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
+    this.canvas.removeEventListener('mousemove', this.handleCanvasMouseMoveBound);
+    this.canvas.removeEventListener('mouseleave', this.handleCanvasMouseLeaveBound);
+    this.canvas.removeEventListener('mousedown', this.handleCanvasClickBound);
+    this.canvas.removeEventListener('touchstart', this.handleCanvasClickBound);
+
+    this.canvas.addEventListener('mousemove', this.handleCanvasMouseMoveBound);
+    this.canvas.addEventListener('mouseleave', this.handleCanvasMouseLeaveBound);
+    this.canvas.addEventListener('mousedown', this.handleCanvasClickBound);
+    this.canvas.addEventListener('touchstart', this.handleCanvasClickBound);
+
+    if (!this.documentListenersAttached) {
+      document.addEventListener('click', this.handleDocumentClickBound);
+      document.addEventListener('touchstart', this.handleDocumentClickBound);
+      this.documentListenersAttached = true;
+    }
+  }
+
+  handleCanvasMouseMove(e) {
+    let cursor = 'default';
+    let foundButton = null;
+    this.buttons.forEach((button) => {
+      if (this.isInside(e.clientX, e.clientY, button)) {
         cursor = 'pointer';
-        foundButton = { name: 'Home', description: 'Return to the home menu.' };
-      }
-      this.canvas.style.cursor = cursor;
-      if (this.tooltipToolbar && foundButton) {
-        this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
-        this.tooltip.style.left = `${e.clientX + 10}px`;
-        this.tooltip.style.top = `${e.clientY + 10}px`;
-        this.tooltip.style.display = 'block';
-      } else {
-        this.tooltip.style.display = 'none';
+        foundButton = button;
       }
     });
-    this.canvas.addEventListener('mouseleave', () => {
+    if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
+      cursor = 'pointer';
+      foundButton = { name: 'Home', description: 'Return to the home menu.' };
+    }
+    this.canvas.style.cursor = cursor;
+    if (this.tooltipToolbar && foundButton) {
+      this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
+      this.tooltip.style.left = `${e.clientX + 10}px`;
+      this.tooltip.style.top = `${e.clientY + 10}px`;
+      this.tooltip.style.display = 'block';
+    } else {
       this.tooltip.style.display = 'none';
-    });
-    this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
-    this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
-    document.addEventListener('click', (e) => this.handleDocumentClick(e));
-    document.addEventListener('touchstart', (e) => this.handleDocumentClick(e));
+    }
+  }
+
+  handleCanvasMouseLeave() {
+    this.tooltip.style.display = 'none';
   }
 
   handleCanvasClick(e) {
-    const { clientX: mouseX, clientY: mouseY } = e;
+    const point = e.touches?.[0] || e.changedTouches?.[0] || e;
+    const { clientX: mouseX, clientY: mouseY } = point;
     this.buttons.forEach((button) => {
       if (this.isInside(mouseX, mouseY, button)) {
         button.action();
@@ -195,11 +257,9 @@ export class Toolbar {
 
   resizeToolbar() {
     this.updateToolbarLayout();
-    this.canvas.width = this.isMobile ? window.innerWidth : 50;
-    this.canvas.height = this.isMobile ? 50 : window.innerHeight;
+    this.setCanvasSize();
     this.drawToolbar();
     this.addHomeButton();
-    this.addEventListeners();
   }
 
   updateToolbarLayout() {
@@ -225,22 +285,19 @@ export class Toolbar {
   }
 
   addHomeButton() {
-    const img = new Image();
-    img.src = '../assets/ic_home.png';
-    img.onload = () => {
-      this.ctx.drawImage(img, 10, 10, 30, 30);
+    this.drawIcon('../assets/ic_home.png', 10, 10, 30, 30, () => {
       this.ctx.strokeStyle = '#fff';
       this.ctx.strokeRect(5, 5, 40, 40);
-    };
+    });
   }
 
   togglePopup(type) {
-    if (this.currentPopup === type) {
+    if (this.currentPopupType === type) {
       this.closePopup(type);
     } else {
       this.closeCurrentPopup();
       this.showPopup(type);
-      this.currentPopup = type;
+      this.currentPopupType = type;
     }
   }
 
@@ -277,7 +334,7 @@ export class Toolbar {
     popupContainer.style.border = '3px solid #000';
     popupContainer.style.backgroundColor = '#a0a0a0';
     popupContainer.style.overflowY = 'auto';
-    popupContainer.style.zIndex = '1000';
+    popupContainer.style.zIndex = '1300';
     document.body.appendChild(popupContainer);
 
     const popup = document.createElement('canvas');
@@ -290,14 +347,14 @@ export class Toolbar {
     titleElement.style.top = '-10px';
     titleElement.style.left = '50%';
     titleElement.style.transform = 'translateX(-50%)';
-    titleElement.style.zIndex = '1001';
+    titleElement.style.zIndex = '1301';
     titleElement.style.fontSize = '22px';
     titleElement.style.color = '#00ffaa';
     titleElement.textContent = title;
     popupContainer.appendChild(titleElement);
 
     this.addCloseIcon();
-    this.currentPopup = popupContainer;
+    this.currentPopupElement = popupContainer;
     return popupContainer;
   }
 
@@ -312,7 +369,7 @@ export class Toolbar {
     closeIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
     Object.assign(closeIcon.style, {
       cursor: 'pointer',
-      zIndex: '1001',
+      zIndex: '1302',
       transform: 'translateX(-50%)',
     });
     closeIcon.addEventListener('click', () => this.closeCurrentPopup());
@@ -323,6 +380,9 @@ export class Toolbar {
   closePopup(type) {
     const popup = document.getElementById(`${type}Popup`);
     if (popup) {
+      if (typeof popup.__cleanup === 'function') {
+        popup.__cleanup();
+      }
       document.body.removeChild(popup);
     }
     if (this.currentCloseIcon) {
@@ -332,12 +392,13 @@ export class Toolbar {
     const inputs = document.querySelectorAll('.popup-input');
     inputs.forEach((input) => input.parentElement.removeChild(input));
     this.popupOpen = false;
-    this.currentPopup = null;
+    this.currentPopupType = null;
+    this.currentPopupElement = null;
   }
 
   closeCurrentPopup() {
-    if (this.currentPopup) {
-      this.closePopup(this.currentPopup);
+    if (this.currentPopupType) {
+      this.closePopup(this.currentPopupType);
     }
   }
 }
