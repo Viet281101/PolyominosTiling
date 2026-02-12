@@ -1,104 +1,128 @@
+import { GRID_POPUP_CONSTANTS, GRID_POPUP_ROWS } from '../constants.js';
+
+function applyStyles(element, styles) {
+  Object.assign(element.style, styles);
+}
+
+export class GridPopup {
+  constructor(toolbar) {
+    this.toolbar = toolbar;
+    this.popupContainer = null;
+    this.popup = null;
+    this.values = { ...GRID_POPUP_CONSTANTS.INITIAL_VALUES };
+  }
+
+  render() {
+    this.popupContainer = this.toolbar.createPopupContainer('gridPopup', this.toolbar.buttons[1].name);
+    this.popup = this.popupContainer.querySelector('canvas');
+    const ctx = this.popup.getContext('2d');
+    ctx.fillStyle = GRID_POPUP_CONSTANTS.BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, this.popup.width, this.popup.height);
+
+    GRID_POPUP_ROWS.forEach((row, index) => {
+      this.renderRow(row, index);
+    });
+  }
+
+  renderRow(row, index) {
+    const { LAYOUT, FONT, COLORS, INITIAL_VALUES } = GRID_POPUP_CONSTANTS;
+    const y = LAYOUT.START_Y + index * LAYOUT.ROW_HEIGHT;
+
+    if (row.box) {
+      const box = document.createElement('div');
+      applyStyles(box, {
+        position: 'absolute',
+        left: `${LAYOUT.BOX_LEFT}px`,
+        top: `${y + LAYOUT.BOX_TOP_OFFSET}px`,
+        width: `${this.popup.width - LAYOUT.BOX_WIDTH_OFFSET}px`,
+        height: `${LAYOUT.ROW_HEIGHT * (row.title ? 5 : 1)}px`,
+        border: LAYOUT.BOX_BORDER,
+        zIndex: LAYOUT.BOX_Z_INDEX,
+        pointerEvents: 'none',
+      });
+      this.popupContainer.appendChild(box);
+    }
+
+    const label = document.createElement('div');
+    label.textContent = row.label;
+    applyStyles(label, {
+      position: 'absolute',
+      left: `${LAYOUT.LABEL_X}px`,
+      top: `${y + LAYOUT.LABEL_TOP_OFFSET}px`,
+      font: FONT.LABEL,
+      color: COLORS.LABEL,
+      zIndex: LAYOUT.BOX_Z_INDEX,
+      pointerEvents: 'none',
+    });
+    this.popupContainer.appendChild(label);
+
+    if (row.type === 'input') {
+      const input = this.createInputField(y, INITIAL_VALUES[row.key]);
+      input.addEventListener('change', (event) => {
+        this.values[row.key] = parseInt(event.target.value || '0', 10);
+      });
+    }
+
+    if (row.icon) {
+      this.createIconButton(y, row.icon, () => this.handleAction(row.key));
+    }
+  }
+
+  createInputField(y, defaultValue) {
+    const { LAYOUT, COLORS } = GRID_POPUP_CONSTANTS;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = defaultValue;
+    applyStyles(input, {
+      position: 'absolute',
+      left: LAYOUT.INPUT_LEFT,
+      top: `${y}px`,
+      width: `${LAYOUT.INPUT_WIDTH}px`,
+      height: `${LAYOUT.INPUT_HEIGHT}px`,
+      border: LAYOUT.INPUT_BORDER,
+      backgroundColor: COLORS.INPUT_BACKGROUND,
+      fontSize: `${LAYOUT.INPUT_FONT_SIZE}px`,
+      fontFamily: 'Pixellari',
+      color: COLORS.INPUT_TEXT,
+      zIndex: LAYOUT.CONTENT_Z_INDEX,
+    });
+    input.classList.add('popup-input');
+    this.popupContainer.appendChild(input);
+    return input;
+  }
+
+  createIconButton(y, iconName, onClick) {
+    const { LAYOUT } = GRID_POPUP_CONSTANTS;
+    const iconButton = document.createElement('img');
+    iconButton.src = `../assets/ic_${iconName}.png`;
+    applyStyles(iconButton, {
+      position: 'absolute',
+      left: `${this.popup.width - LAYOUT.ICON_LEFT_OFFSET}px`,
+      top: `${y + LAYOUT.ICON_TOP_OFFSET}px`,
+      width: `${LAYOUT.ICON_SIZE}px`,
+      height: `${LAYOUT.ICON_SIZE}px`,
+      cursor: 'pointer',
+      zIndex: LAYOUT.CONTENT_Z_INDEX,
+    });
+    iconButton.addEventListener('click', onClick);
+    this.popupContainer.appendChild(iconButton);
+  }
+
+  handleAction(actionKey) {
+    if (actionKey === 'draw') {
+      this.toolbar.mainApp.createNewBoard(this.values.x, this.values.y, this.values.z);
+    } else if (actionKey === 'trash') {
+      this.toolbar.mainApp.clearBoard();
+    }
+
+    if (this.toolbar.isMobile) {
+      this.toolbar.closePopup('grid');
+    }
+  }
+}
+
 export function showGridPopup(toolbar) {
-	const popupContainer = toolbar.createPopupContainer('gridPopup', toolbar.buttons[1].name);
-	const popup = popupContainer.querySelector('canvas');
-	const ctx = popup.getContext('2d');
-
-	ctx.fillStyle = '#a0a0a0';
-	ctx.fillRect(0, 0, popup.width, popup.height);
-
-	const rows = [
-		{ label: 'Create new grid board here', box: true, title: true },
-		{ label: 'Enter n° x size', type: 'input' },
-		{ label: 'Enter n° y size', type: 'input' },
-		{ label: 'Enter n° z size', type: 'input' },
-		{ label: 'Draw grid by click to =>', icon: 'draw' },
-		{ label: 'Delete current grid :', icon: 'trash' },
-	];
-
-	const startY = 76;
-	const rowHeight = 76;
-	const colX = 30;
-
-	rows.forEach((row, index) => {
-		const y = startY + index * rowHeight;
-		if (row.box) {
-			ctx.strokeStyle = '#fff';
-			ctx.strokeRect(10, (y - 30), (popup.width - 20), (rowHeight * (row.title ? 5 : 1)));
-		}
-		ctx.font = '22px Pixellari';
-		ctx.fillStyle = '#000';
-		ctx.fillText(row.label, colX, y + 20);
-
-		if (row.icon) {
-			const icon = new Image();
-			icon.src = `../assets/ic_${row.icon}.png`;
-			icon.onload = () => {
-				ctx.drawImage(icon, popup.width - 94, y - 14, 50, 50);
-			};
-		} else if (row.type === 'input') {
-			createInputField(popupContainer, y, 3);
-		}
-	});
-
-	let x_size = 3;
-	let y_size = 3;
-	let z_size = 3;
-	popupContainer.querySelectorAll('input[type="number"]').forEach((input, index) => {
-		input.addEventListener('change', (e) => {
-			if (index === 0) x_size = parseInt(e.target.value);
-			if (index === 1) y_size = parseInt(e.target.value);
-			if (index === 2) z_size = parseInt(e.target.value);
-		});
-	});
-
-	popup.addEventListener('mousemove', (e) => {
-		const rect = popup.getBoundingClientRect();
-		const mouseX = e.clientX - rect.left;
-		const mouseY = e.clientY - rect.top;
-		let cursor = 'default';
-
-		rows.forEach((row, index) => {
-			const y = startY + index * rowHeight;
-			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
-				cursor = 'pointer';
-			}
-		});
-		popup.style.cursor = cursor;
-	});
-
-	popup.addEventListener('click', (e) => {
-		const rect = popup.getBoundingClientRect();
-		const mouseX = e.clientX - rect.left;
-		const mouseY = e.clientY - rect.top;
-
-		rows.forEach((row, index) => {
-			const y = startY + index * rowHeight;
-			if (row.icon && toolbar.isInside(mouseX, mouseY, { x: popup.width - 94, y: y - 14, width: 50, height: 50 })) {
-				switch (index) {
-					case 4: toolbar.mainApp.createNewBoard(x_size, y_size, z_size); break;
-					case 5: toolbar.mainApp.clearBoard(); break;
-				}
-				if (toolbar.isMobile) {toolbar.closePopup('grid');}
-			}
-		});
-	});
-};
-
-function createInputField(popupContainer, y, defaultValue) {
-	const input = document.createElement('input');
-	input.type = 'number';
-	input.value = defaultValue;
-	input.style.position = 'absolute';
-	input.style.left = 'calc(100% - 120px)';
-	input.style.top = `${y}px`;
-	input.style.width = '80px';
-	input.style.height = '24px';
-	input.style.border = '1px solid #000';
-	input.style.backgroundColor = '#fff';
-	input.style.fontSize = '22px';
-	input.style.fontFamily = 'Pixellari';
-	input.style.color = '#000';
-	input.style.zIndex = '1001';
-	input.classList.add('popup-input');
-	popupContainer.appendChild(input);
-};
+  const popup = new GridPopup(toolbar);
+  popup.render();
+  return popup;
+}

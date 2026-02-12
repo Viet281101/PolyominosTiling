@@ -5,269 +5,457 @@ import { showTutorialPopup } from './popup/tutorial.js';
 import { showSettingsPopup } from './popup/setting.js';
 
 export class Toolbar {
-	constructor(mainApp) {
-		this.mainApp = mainApp;
-		this.isMobile = this.checkIfMobile();
-		this.setupCanvas();
-		this.buttons = this.createButtons();
-		this.popupOpen = false;
-		this.currentPopup = null;
-		this.currentCloseIcon = null;
-		this.createTooltip();
-		this.drawToolbar();
-		this.addEventListeners();
-		this.addHomeButton();
-		this.homeButtonRect = this.isMobile ? { x: 10, y: 10, width: 40, height: 40 } : { x: 10, y: 10, width: 40, height: 40 };
-	};
+  constructor(mainApp) {
+    this.mainApp = mainApp;
+    this.isMobile = this.checkIfMobile();
 
-	checkIfMobile() { return window.innerWidth <= 800; };
+    this.popupOpen = false;
+    this.currentPopupType = null;
+    this.currentPopupElement = null;
+    this.currentCloseIcon = null;
 
-	setupCanvas() {
-		this.canvas = document.createElement('canvas');
-		this.ctx = this.canvas.getContext('2d');
-		this.canvas.width = this.isMobile ? window.innerWidth : 50;
-		this.canvas.height = this.isMobile ? 50 : window.innerHeight;
-		this.canvas.style.position = 'absolute';
-		this.canvas.style.left = this.canvas.style.top = '0';
-		this.canvas.style.zIndex = '999';
-		document.body.appendChild(this.canvas);
-	};
+    this.documentListenersAttached = false;
+    this.homeButtonRect = { x: 5, y: 5, width: 40, height: 40 };
+    this.lastTouchTime = 0;
 
-	createButtons() {
-		return [
-			{ name: 'Create Polyomino', icon: '../assets/ic_plus.png', action: () => this.togglePopup('polyomino'), description: 'To select available Polyomino blocks.\nAdd directly to canvas.' },
-			{ name: 'Grid Settings', icon: '../assets/ic_table.png', action: () => this.togglePopup('grid'), description: 'To change the grid settings.\nAdjust rows, columns, and size.' },
-			{ name: 'Solving Polyomino', icon: '../assets/ic_solving.png', action: () => this.togglePopup('solve'), description: 'To solve the polyomino puzzle.\nUse different algorithms to solve.' },
-			{ name: 'Tutorial', icon: '../assets/ic_question.png', action: () => this.togglePopup('tutorial'), description: 'To view the tutorial.\nLearn how to use the application.' },
-			{ name: 'Settings', icon: '../assets/ic_setting.png', action: () => this.togglePopup('settings'), description: 'To adjust application settings.\nChange colors, tooltips, and more.' },
-		];
-	};
+    this.buttons = this.createButtons();
+    this.setupCanvas();
+    this.preloadIcons();
+    this.createTooltip();
+    this.drawToolbar();
+    this.addEventListeners();
+  }
 
-	createTooltip() {
-		this.tooltipToolbar = this.isMobile ? false : true;
-		this.tooltip = document.createElement('div');
-		this.tooltip.style.position = 'absolute';
-		this.tooltip.style.backgroundColor = '#fff';
-		this.tooltip.style.border = '1px solid #000';
-		this.tooltip.style.padding = '5px';
-		this.tooltip.style.display = 'none';
-		this.tooltip.style.whiteSpace = 'pre';
-		this.tooltip.style.zIndex = '1001';
-		document.body.appendChild(this.tooltip);
-	};
+  checkIfMobile() {
+    return window.innerWidth <= 800;
+  }
 
-	drawToolbar() {
-		this.ctx.fillStyle = '#333';
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		this.isMobile ? this.drawToolbarVertical() : this.drawToolbarHorizontal();
-	};
+  setupCanvas() {
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.canvas.width = this.isMobile ? window.innerWidth : 50;
+    this.canvas.height = this.isMobile ? 50 : window.innerHeight;
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.left = '0';
+    this.canvas.style.top = '0';
+    this.canvas.style.zIndex = '999';
+    document.body.appendChild(this.canvas);
+  }
 
-	drawToolbarVertical() {
-		const totalWidth = this.buttons.length * 60;
-		let startX = (this.canvas.width - totalWidth) / 2;
+  preloadImage(src) {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => this.drawToolbar();
+    return img;
+  }
 
-		this.buttons.forEach(button => {
-			const img = new Image();
-			img.src = button.icon;
-			img.onload = () => {
-				this.ctx.drawImage(img, startX, 10, 30, 30);
-				this.ctx.strokeStyle = '#fff';
-				this.ctx.strokeRect(startX - 5, 5, 40, 40);
-				button.x = startX - 5;
-				button.y = 5;
-				button.width = button.height = 40;
-				startX += 60;
-			};
-		});
-	};
+  preloadIcons() {
+    this.homeImage = this.preloadImage('../assets/ic_home.png');
+    this.buttons.forEach((button) => {
+      button.image = this.preloadImage(button.icon);
+    });
+  }
 
-	drawToolbarHorizontal() {
-		const totalHeight = this.buttons.length * 60;
-		let startY = (this.canvas.height - totalHeight) / 2;
+  createButtons() {
+    return [
+      {
+        name: 'Create Polyomino',
+        icon: '../assets/ic_plus.png',
+        action: () => this.togglePopup('polyomino'),
+        description: 'To select available Polyomino blocks.\nAdd directly to canvas.',
+      },
+      {
+        name: 'Grid Settings',
+        icon: '../assets/ic_table.png',
+        action: () => this.togglePopup('grid'),
+        description: 'To change the grid settings.\nAdjust rows, columns, and size.',
+      },
+      {
+        name: 'Solving Polyomino',
+        icon: '../assets/ic_solving.png',
+        action: () => this.togglePopup('solve'),
+        description: 'To solve the polyomino puzzle.\nUse different algorithms to solve.',
+      },
+      {
+        name: 'Tutorial',
+        icon: '../assets/ic_question.png',
+        action: () => this.togglePopup('tutorial'),
+        description: 'To view the tutorial.\nLearn how to use the application.',
+      },
+      {
+        name: 'Settings',
+        icon: '../assets/ic_setting.png',
+        action: () => this.togglePopup('settings'),
+        description: 'To adjust application settings.\nChange colors, tooltips, and more.',
+      },
+    ];
+  }
 
-		this.buttons.forEach(button => {
-			const img = new Image();
-			img.src = button.icon;
-			img.onload = () => {
-				this.ctx.drawImage(img, 10, startY, 30, 30);
-				this.ctx.strokeStyle = '#fff';
-				this.ctx.strokeRect(5, startY - 5, 40, 40);
-				button.x = 5;
-				button.y = startY - 5;
-				button.width = button.height = 40;
-				startY += 60;
-			};
-		});
-	};
+  createTooltip() {
+    this.tooltipToolbar = !this.isMobile;
+    this.tooltip = document.createElement('div');
+    this.tooltip.style.position = 'absolute';
+    this.tooltip.style.backgroundColor = '#fff';
+    this.tooltip.style.border = '1px solid #000';
+    this.tooltip.style.padding = '5px';
+    this.tooltip.style.display = 'none';
+    this.tooltip.style.whiteSpace = 'pre';
+    this.tooltip.style.zIndex = '1001';
+    document.body.appendChild(this.tooltip);
+  }
 
-	addEventListeners() {
-		this.canvas.addEventListener('mousemove', (e) => {
-			let cursor = 'default';
-			let foundButton = null;
-			this.buttons.forEach(button => {
-				if (this.isInside(e.clientX, e.clientY, button)) { cursor = 'pointer'; foundButton = button; }
-			});
-			if (this.isInside(e.clientX, e.clientY, this.homeButtonRect)) {
-				cursor = 'pointer'; foundButton = { name: 'Home', description: 'Return to the home menu.' };
-			}
-			this.canvas.style.cursor = cursor;
-			if (this.tooltipToolbar && foundButton) {
-				this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
-				this.tooltip.style.left = `${e.clientX + 10}px`;
-				this.tooltip.style.top = `${e.clientY + 10}px`;
-				this.tooltip.style.display = 'block';
-			} else { this.tooltip.style.display = 'none'; }
-		});
-		this.canvas.addEventListener('mouseleave', () => { this.tooltip.style.display = 'none'; });
-		this.canvas.addEventListener('mousedown', (e) => this.handleCanvasClick(e));
-		this.canvas.addEventListener('touchstart', (e) => this.handleCanvasClick(e));
-		document.addEventListener('click', (e) => this.handleDocumentClick(e));
-		document.addEventListener('touchstart', (e) => this.handleDocumentClick(e));
-	};
+  drawToolbar() {
+    if (!this.ctx) {
+      return;
+    }
 
-	handleCanvasClick(e) {
-		const { clientX: mouseX, clientY: mouseY } = e;
-		this.buttons.forEach(button => {
-			if (this.isInside(mouseX, mouseY, button)) {
-				button.action();
-			}
-		});
-		if (this.isInside(mouseX, mouseY, this.homeButtonRect)) {
-			window.location.href = '../index.html';
-		}
-	};
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillStyle = '#333';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-	handleDocumentClick(e) {
-		if (this.popupOpen) {
-			const polyominoPopup = document.getElementById('polyominoPopup');
-			const gridPopup = document.getElementById('gridPopup');
-			const solvePopup = document.getElementById('solvePopup');
-			const tutorialPopup = document.getElementById('tutorialPopup');
-			const settingsPopup = document.getElementById('settingsPopup');
-			if (
-				(polyominoPopup && !polyominoPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-				(settingsPopup && !settingsPopup.contains(e.target) && !this.canvas.contains(e.target))
-			) {
-				this.closeCurrentPopup();
-				this.tooltip.style.display = 'none';
-			}
-		}
-	};
+    if (this.isMobile) {
+      this.drawTopToolbar();
+    } else {
+      this.drawSideToolbar();
+    }
 
-	resizeToolbar() {
-		this.updateToolbarLayout();
-		this.canvas.width = this.isMobile ? window.innerWidth : 50;
-		this.canvas.height = this.isMobile ? 50 : window.innerHeight;
-		this.drawToolbar(); this.addHomeButton(); this.addEventListeners();
-	};
-	updateToolbarLayout() {
-		const wasMobile = this.isMobile; this.isMobile = this.checkIfMobile();
-		if (wasMobile !== this.isMobile) { this.removeCanvas(); this.setupCanvas(); this.drawToolbar(); this.addHomeButton(); this.addEventListeners(); }
-	};
-	removeCanvas() {
-		if (this.canvas && this.canvas.parentNode) {
-			this.canvas.parentNode.removeChild(this.canvas);
-		}
-	};
+    this.drawHomeButton();
+  }
 
-	isInside(x, y, rect) {
-		return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-	};
+  drawTopToolbar() {
+    const preferredGap = 60;
+    const minGap = 46;
+    const leftInset = this.homeButtonRect.x + this.homeButtonRect.width + 16;
+    const rightInset = 8;
+    const availableWidth = Math.max(0, this.canvas.width - leftInset - rightInset);
 
-	addHomeButton() {
-		const img = new Image();
-		img.src = '../assets/ic_home.png';
-		img.onload = () => {
-			this.ctx.drawImage(img, 10, 10, 30, 30);
-			this.ctx.strokeStyle = '#fff';
-			this.ctx.strokeRect(5, 5, 40, 40);
-		};
-	};
+    let gap = preferredGap;
+    if (this.buttons.length > 0) {
+      gap = Math.min(preferredGap, Math.floor(availableWidth / this.buttons.length));
+      gap = Math.max(minGap, gap);
+    }
 
-	togglePopup(type) {
-		if (this.currentPopup === type) {
-			this.closePopup(type);
-		} else {
-			this.closeCurrentPopup();
-			this.showPopup(type);
-			this.currentPopup = type;
-		}
-	};
+    const totalWidth = this.buttons.length * gap;
+    const startX = leftInset + Math.max(0, (availableWidth - totalWidth) / 2);
 
-	showPopup(type) {
-		this.popupOpen = true;
-		switch (type) {
-			case 'polyomino': showPolyominoPopup(this); break;
-			case 'grid': showGridPopup(this); break;
-			case 'solve': showSolvePopup(this); break;
-			case 'tutorial': showTutorialPopup(this); break;
-			case 'settings': showSettingsPopup(this); break;
-		}
-	};
+    this.buttons.forEach((button, index) => {
+      const x = startX + index * gap + (gap - 40) / 2;
+      const y = 5;
 
-	createPopupContainer(id, title) {
-		const popupContainer = document.createElement('div');
-		popupContainer.id = id;
-		popupContainer.style.position = 'absolute';
-		popupContainer.style.top = this.isMobile ? '50px' : '160px';
-		popupContainer.style.left = this.isMobile ? '50%' : '238px';
-		popupContainer.style.transform = 'translateX(-50%)';
-		popupContainer.style.width = '370px';
-		popupContainer.style.height = '600px';
-		popupContainer.style.border = '3px solid #000';
-		popupContainer.style.backgroundColor = '#a0a0a0';
-		popupContainer.style.overflowY = 'auto';
-		popupContainer.style.zIndex = '1000';
-		document.body.appendChild(popupContainer);
+      button.x = x;
+      button.y = y;
+      button.width = 40;
+      button.height = 40;
 
-		const popup = document.createElement('canvas');
-		popup.width = 370;
-		popup.height = 6000;
-		popupContainer.appendChild(popup);
+      this.ctx.strokeStyle = '#fff';
+      this.ctx.strokeRect(x, y, 40, 40);
+      if (button.image?.complete) {
+        this.ctx.drawImage(button.image, x + 5, y + 5, 30, 30);
+      }
+    });
+  }
 
-		const titleElement = document.createElement('h3');
-		titleElement.style.position = 'absolute';
-		titleElement.style.top = '-12px';
-		titleElement.style.left = '50%';
-		titleElement.style.transform = 'translateX(-50%)';
-		titleElement.style.zIndex = '1001';
-		titleElement.style.fontSize = '20px';
-		titleElement.style.color = '#00ffaa';
-		titleElement.textContent = title;
-		popupContainer.appendChild(titleElement);
+  drawSideToolbar() {
+    const gap = 60;
+    const totalHeight = this.buttons.length * gap;
+    const startY = (this.canvas.height - totalHeight) / 2;
 
-		this.addCloseIcon();
-		this.currentPopup = popupContainer;
-		return popupContainer;
-	};
+    this.buttons.forEach((button, index) => {
+      const x = 5;
+      const y = startY + index * gap - 5;
 
-	addCloseIcon() {
-		if (this.currentCloseIcon) { document.body.removeChild(this.currentCloseIcon); }
-		const closeIcon = new Image();
-		closeIcon.src = '../assets/ic_close.png';
-		closeIcon.style.position = 'fixed';
-		closeIcon.style.top = this.isMobile ? '56px' : '166px';
-		closeIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
-		Object.assign(closeIcon.style, { cursor: 'pointer', zIndex: '1001', transform: 'translateX(-50%)' });
-		closeIcon.addEventListener('click', () => this.closeCurrentPopup());
-		document.body.appendChild(closeIcon);
-		this.currentCloseIcon = closeIcon;
-	};
+      button.x = x;
+      button.y = y;
+      button.width = 40;
+      button.height = 40;
 
-	closePopup(type) {
-		const popup = document.getElementById(`${type}Popup`);
-		if (popup) { document.body.removeChild(popup); }
-		if (this.currentCloseIcon) {
-			document.body.removeChild(this.currentCloseIcon);
-			this.currentCloseIcon = null;
-		}
-		const inputs = document.querySelectorAll('.popup-input');
-		inputs.forEach(input => input.parentElement.removeChild(input));
-		this.popupOpen = false;
-		this.currentPopup = null;
-	};
-	closeCurrentPopup() { if (this.currentPopup) { this.closePopup(this.currentPopup); } };
-};
+      this.ctx.strokeStyle = '#fff';
+      this.ctx.strokeRect(x, y, 40, 40);
+      if (button.image?.complete) {
+        this.ctx.drawImage(button.image, x + 5, y + 5, 30, 30);
+      }
+    });
+  }
+
+  drawHomeButton() {
+    this.ctx.strokeStyle = '#fff';
+    this.ctx.strokeRect(this.homeButtonRect.x, this.homeButtonRect.y, 40, 40);
+    if (this.homeImage?.complete) {
+      this.ctx.drawImage(this.homeImage, 10, 10, 30, 30);
+    }
+  }
+
+  getEventPoint(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  addEventListeners() {
+    if (!this.handleCanvasMouseMoveBound) {
+      this.handleCanvasMouseMoveBound = (e) => this.handleCanvasMouseMove(e);
+      this.handleCanvasLeaveBound = () => {
+        this.tooltip.style.display = 'none';
+      };
+      this.handleCanvasClickBound = (e) => this.handleCanvasClick(e);
+      this.handleDocumentClickBound = (e) => this.handleDocumentClick(e);
+    }
+
+    this.canvas.addEventListener('mousemove', this.handleCanvasMouseMoveBound);
+    this.canvas.addEventListener('mouseleave', this.handleCanvasLeaveBound);
+    this.canvas.addEventListener('mousedown', this.handleCanvasClickBound);
+    this.canvas.addEventListener('touchstart', this.handleCanvasClickBound);
+
+    if (!this.documentListenersAttached) {
+      document.addEventListener('click', this.handleDocumentClickBound);
+      document.addEventListener('touchstart', this.handleDocumentClickBound);
+      this.documentListenersAttached = true;
+    }
+  }
+
+  handleCanvasMouseMove(e) {
+    const { x: mouseX, y: mouseY } = this.getEventPoint(e);
+    let cursor = 'default';
+    let foundButton = null;
+
+    this.buttons.forEach((button) => {
+      if (this.isInside(mouseX, mouseY, button)) {
+        cursor = 'pointer';
+        foundButton = button;
+      }
+    });
+
+    if (this.isInside(mouseX, mouseY, this.homeButtonRect)) {
+      cursor = 'pointer';
+      foundButton = { name: 'Home', description: 'Return to the home menu.' };
+    }
+
+    this.canvas.style.cursor = cursor;
+
+    if (this.tooltipToolbar && foundButton) {
+      this.tooltip.innerHTML = `${foundButton.name}\n\n${foundButton.description}`;
+      this.tooltip.style.left = `${mouseX + 10}px`;
+      this.tooltip.style.top = `${mouseY + 10}px`;
+      this.tooltip.style.display = 'block';
+    } else {
+      this.tooltip.style.display = 'none';
+    }
+  }
+
+  handleCanvasClick(e) {
+    const isTouchEvent = e.type.startsWith('touch');
+    if (isTouchEvent) {
+      this.lastTouchTime = Date.now();
+      e.preventDefault();
+    } else if (Date.now() - this.lastTouchTime < 500) {
+      return;
+    }
+
+    const { x: mouseX, y: mouseY } = this.getEventPoint(e);
+
+    this.buttons.forEach((button) => {
+      if (this.isInside(mouseX, mouseY, button)) {
+        button.action();
+      }
+    });
+
+    if (this.isInside(mouseX, mouseY, this.homeButtonRect)) {
+      window.location.href = '../index.html';
+    }
+  }
+
+  handleDocumentClick(e) {
+    if (e.type === 'click' && Date.now() - this.lastTouchTime < 500) {
+      return;
+    }
+
+    if (!this.popupOpen || !this.currentPopupElement) {
+      return;
+    }
+
+    if (
+      this.currentPopupElement.contains(e.target) ||
+      this.canvas.contains(e.target) ||
+      (this.currentCloseIcon && this.currentCloseIcon.contains(e.target))
+    ) {
+      return;
+    }
+
+    this.closeCurrentPopup();
+    this.tooltip.style.display = 'none';
+  }
+
+  resizeToolbar() {
+    const layoutChanged = this.updateToolbarLayout();
+    this.tooltipToolbar = !this.isMobile;
+
+    if (!layoutChanged) {
+      this.canvas.width = this.isMobile ? window.innerWidth : 50;
+      this.canvas.height = this.isMobile ? 50 : window.innerHeight;
+      this.drawToolbar();
+      this.updateCloseIconPosition();
+    }
+  }
+
+  updateToolbarLayout() {
+    const wasMobile = this.isMobile;
+    this.isMobile = this.checkIfMobile();
+
+    if (wasMobile === this.isMobile) {
+      return false;
+    }
+
+    this.removeCanvas();
+    this.setupCanvas();
+    this.addEventListeners();
+    this.drawToolbar();
+    this.updateCloseIconPosition();
+    return true;
+  }
+
+  removeCanvas() {
+    if (this.canvas && this.canvas.parentNode) {
+      this.canvas.removeEventListener('mousemove', this.handleCanvasMouseMoveBound);
+      this.canvas.removeEventListener('mouseleave', this.handleCanvasLeaveBound);
+      this.canvas.removeEventListener('mousedown', this.handleCanvasClickBound);
+      this.canvas.removeEventListener('touchstart', this.handleCanvasClickBound);
+      this.canvas.parentNode.removeChild(this.canvas);
+    }
+  }
+
+  isInside(x, y, rect) {
+    return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
+  }
+
+  togglePopup(type) {
+    if (this.currentPopupType === type) {
+      this.closePopup(type);
+      return;
+    }
+
+    this.closeCurrentPopup();
+    this.showPopup(type);
+    this.currentPopupType = type;
+  }
+
+  showPopup(type) {
+    this.popupOpen = true;
+    switch (type) {
+      case 'polyomino':
+        showPolyominoPopup(this);
+        break;
+      case 'grid':
+        showGridPopup(this);
+        break;
+      case 'solve':
+        showSolvePopup(this);
+        break;
+      case 'tutorial':
+        showTutorialPopup(this);
+        break;
+      case 'settings':
+        showSettingsPopup(this);
+        break;
+      default:
+        break;
+    }
+  }
+
+  createPopupContainer(id, title, canvasHeight = 1800) {
+    const popupContainer = document.createElement('div');
+    popupContainer.id = id;
+    popupContainer.style.position = 'absolute';
+    popupContainer.style.top = this.isMobile ? '50px' : '160px';
+    popupContainer.style.left = this.isMobile ? '50%' : '238px';
+    popupContainer.style.transform = 'translateX(-50%)';
+    popupContainer.style.width = '370px';
+    popupContainer.style.height = '600px';
+    popupContainer.style.border = '3px solid #000';
+    popupContainer.style.backgroundColor = '#a0a0a0';
+    popupContainer.style.overflowY = 'auto';
+    popupContainer.style.zIndex = '1000';
+    document.body.appendChild(popupContainer);
+
+    const popup = document.createElement('canvas');
+    popup.width = 370;
+    popup.height = canvasHeight;
+    popupContainer.appendChild(popup);
+
+    const titleElement = document.createElement('h3');
+    titleElement.style.position = 'absolute';
+    titleElement.style.top = '-12px';
+    titleElement.style.left = '50%';
+    titleElement.style.transform = 'translateX(-50%)';
+    titleElement.style.zIndex = '1001';
+    titleElement.style.fontSize = '20px';
+    titleElement.style.color = '#00ffaa';
+    titleElement.textContent = title;
+    popupContainer.appendChild(titleElement);
+
+    this.currentPopupElement = popupContainer;
+    this.addCloseIcon();
+
+    return popupContainer;
+  }
+
+  addCloseIcon() {
+    if (this.currentCloseIcon) {
+      document.body.removeChild(this.currentCloseIcon);
+    }
+
+    const closeIcon = new Image();
+    closeIcon.src = '../assets/ic_close.png';
+    closeIcon.style.position = 'fixed';
+    Object.assign(closeIcon.style, {
+      cursor: 'pointer',
+      zIndex: '1001',
+      transform: 'translateX(-50%)',
+    });
+
+    closeIcon.addEventListener('click', () => this.closeCurrentPopup());
+    document.body.appendChild(closeIcon);
+    this.currentCloseIcon = closeIcon;
+    this.updateCloseIconPosition();
+  }
+
+  updateCloseIconPosition() {
+    if (!this.currentCloseIcon) {
+      return;
+    }
+
+    this.currentCloseIcon.style.top = this.isMobile ? '56px' : '166px';
+    this.currentCloseIcon.style.left = this.isMobile ? 'calc(50% + 162px)' : '400px';
+  }
+
+  closePopup(type) {
+    const popup = document.getElementById(`${type}Popup`);
+    if (popup) {
+      popup.remove();
+    }
+
+    if (this.currentCloseIcon) {
+      this.currentCloseIcon.remove();
+      this.currentCloseIcon = null;
+    }
+
+    if (this.currentPopupElement && this.currentPopupElement.id === `${type}Popup`) {
+      this.currentPopupElement = null;
+    }
+
+    if (this.currentPopupType === type) {
+      this.currentPopupType = null;
+    }
+
+    this.popupOpen = !!this.currentPopupType;
+  }
+
+  closeCurrentPopup() {
+    if (this.currentPopupType) {
+      this.closePopup(this.currentPopupType);
+    }
+  }
+}

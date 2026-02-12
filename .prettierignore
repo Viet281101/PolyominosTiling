@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Third-party libraries / generated files
+2D/js/libs/
+3D/js/libs/
+
+# Binary assets
+assets/
