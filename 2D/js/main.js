@@ -36,6 +36,7 @@ class MainApp {
     this.isBlackening = false;
     this.blackenedCells = new Set();
     this.redrawPending = false;
+    this.isSolving = false;
     this.tooltipPolyominoBlocks();
     this.init();
   }
@@ -492,10 +493,25 @@ class MainApp {
     }, 2000);
   }
 
+  runSolver(solverFn) {
+    if (this.isSolving) {
+      return;
+    }
+    this.isSolving = true;
+    Promise.resolve()
+      .then(() => solverFn())
+      .catch((error) => {
+        console.error('Solver failed:', error);
+      })
+      .finally(() => {
+        this.isSolving = false;
+      });
+  }
+
   backtrackingAutoTiling() {
     this.resetBoard();
     const messageBox = this.createMessageBox(1);
-    setTimeout(() => {
+    this.runSolver(() =>
       backtrackingAutoTiling(
         this.polyominoes,
         this.gridBoard,
@@ -505,14 +521,14 @@ class MainApp {
         () => {
           this.showMessageBox(messageBox);
         }
-      );
-    }, 1000);
+      )
+    );
   }
 
   bruteForceTiling() {
     this.resetBoard();
     const messageBox = this.createMessageBox(2);
-    setTimeout(() => {
+    this.runSolver(() =>
       bruteForceTiling(
         this.gridBoard,
         this.polyominoes,
@@ -521,14 +537,14 @@ class MainApp {
         () => {
           this.showMessageBox(messageBox);
         }
-      );
-    }, 1000);
+      )
+    );
   }
 
   randomTiling() {
     this.resetBoard();
     const messageBox = this.createMessageBox(3);
-    setTimeout(() => {
+    this.runSolver(() =>
       randomTiling(
         this.gridBoard,
         this.polyominoes,
@@ -537,14 +553,14 @@ class MainApp {
         () => {
           this.showMessageBox(messageBox);
         }
-      );
-    }, 1000);
+      )
+    );
   }
 
   randomBacktrackingTiling() {
     this.resetBoard();
     const messageBox = this.createMessageBox(4);
-    setTimeout(() => {
+    this.runSolver(() =>
       randomBacktrackingTiling(
         this.polyominoes,
         this.gridBoard,
@@ -554,14 +570,14 @@ class MainApp {
         () => {
           this.showMessageBox(messageBox);
         }
-      );
-    }, 1000);
+      )
+    );
   }
 
   fullAutoTiling() {
     this.resetBoard();
     const messageBox = this.createMessageBox(5);
-    setTimeout(() => {
+    this.runSolver(() =>
       fullAutoTiling(
         this.gridBoard,
         this.polyominoes,
@@ -572,8 +588,8 @@ class MainApp {
         () => {
           this.showMessageBox(messageBox);
         }
-      );
-    }, 1000);
+      )
+    );
   }
 }
 
