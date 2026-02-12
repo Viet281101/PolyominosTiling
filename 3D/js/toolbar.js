@@ -3,6 +3,7 @@ import { showGridPopup } from './popup/grid.js';
 import { showSolvePopup } from './popup/solve.js';
 import { showTutorialPopup } from './popup/tutorial.js';
 import { showSettingsPopup } from './popup/setting.js';
+import { TOOLBAR_CONSTANTS } from './constants.js';
 
 export class Toolbar {
   constructor(mainApp) {
@@ -11,7 +12,6 @@ export class Toolbar {
     this.iconCache = new Map();
     this.documentListenersAttached = false;
     this.currentPopupType = null;
-    this.currentPopupElement = null;
     this.handleCanvasMouseMoveBound = (e) => this.handleCanvasMouseMove(e);
     this.handleCanvasMouseLeaveBound = () => this.handleCanvasMouseLeave();
     this.handleCanvasClickBound = (e) => this.handleCanvasClick(e);
@@ -20,22 +20,16 @@ export class Toolbar {
     this.buttons = this.createButtons();
     this.popupOpen = false;
     this.currentCloseIcon = null;
-    this.homeButtonRect = this.isMobile
-      ? { x: 10, y: 10, width: 40, height: 40 }
-      : { x: 10, y: 10, width: 40, height: 40 };
+    this.homeButtonRect = { ...TOOLBAR_CONSTANTS.HOME_BUTTON_RECT };
     this.createTooltip();
     this.drawToolbar();
     this.addEventListeners();
     this.addHomeButton();
-
-    requestAnimationFrame(() => this.resizeToolbar());
-    window.addEventListener('load', () => this.resizeToolbar(), { once: true });
-    setTimeout(() => this.resizeToolbar(), 120);
-    setTimeout(() => this.resizeToolbar(), 360);
+    this.scheduleInitialLayoutPasses();
   }
 
   checkIfMobile() {
-    return window.innerWidth <= 800;
+    return window.innerWidth <= TOOLBAR_CONSTANTS.MOBILE_BREAKPOINT;
   }
   setupCanvas() {
     this.canvas = document.createElement('canvas');
@@ -44,9 +38,22 @@ export class Toolbar {
     this.canvas.style.left = '0';
     this.canvas.style.top = '0';
     this.canvas.style.display = 'block';
-    this.canvas.style.zIndex = '2';
+    this.canvas.style.zIndex = TOOLBAR_CONSTANTS.CANVAS_Z_INDEX;
     document.body.appendChild(this.canvas);
     this.setCanvasSize();
+  }
+
+  scheduleInitialLayoutPasses() {
+    const pass = (remaining) => {
+      if (remaining <= 0) return;
+      requestAnimationFrame(() => {
+        this.resizeToolbar();
+        pass(remaining - 1);
+      });
+    };
+
+    pass(TOOLBAR_CONSTANTS.INITIAL_LAYOUT_PASSES);
+    window.addEventListener('load', () => this.resizeToolbar(), { once: true });
   }
 
   getViewportSize() {
@@ -57,8 +64,8 @@ export class Toolbar {
 
   setCanvasSize() {
     const { width: viewportWidth, height: viewportHeight } = this.getViewportSize();
-    const cssWidth = this.isMobile ? viewportWidth : 50;
-    const cssHeight = this.isMobile ? 50 : viewportHeight;
+    const cssWidth = this.isMobile ? viewportWidth : TOOLBAR_CONSTANTS.DESKTOP_WIDTH;
+    const cssHeight = this.isMobile ? TOOLBAR_CONSTANTS.MOBILE_HEIGHT : viewportHeight;
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
     this.canvas.style.width = `${cssWidth}px`;
@@ -66,6 +73,8 @@ export class Toolbar {
     this.canvas.width = Math.max(1, Math.floor(cssWidth * pixelRatio));
     this.canvas.height = Math.max(1, Math.floor(cssHeight * pixelRatio));
     this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    this.cssWidth = cssWidth;
+    this.cssHeight = cssHeight;
   }
 
   createButtons() {
@@ -112,47 +121,78 @@ export class Toolbar {
     this.tooltip.style.padding = '5px';
     this.tooltip.style.display = 'none';
     this.tooltip.style.whiteSpace = 'pre';
-    this.tooltip.style.zIndex = '9001';
+    this.tooltip.style.zIndex = TOOLBAR_CONSTANTS.TOOLTIP_Z_INDEX;
     document.body.appendChild(this.tooltip);
   }
 
   drawToolbar() {
-    this.ctx.fillStyle = '#333';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.cssWidth, this.cssHeight);
+    this.ctx.fillStyle = TOOLBAR_CONSTANTS.TOOLBAR_BG_COLOR;
+    this.ctx.fillRect(0, 0, this.cssWidth, this.cssHeight);
     this.isMobile ? this.drawToolbarVertical() : this.drawToolbarHorizontal();
   }
 
   drawToolbarVertical() {
-    const totalWidth = this.buttons.length * 60;
-    const startX = (this.canvas.width - totalWidth) / 2;
+    const leftBound = TOOLBAR_CONSTANTS.MOBILE_LEFT_PADDING;
+    const rightBound = this.cssWidth - TOOLBAR_CONSTANTS.MOBILE_RIGHT_PADDING;
+    const availableWidth = rightBound - leftBound;
+    const slotWidth = Math.max(
+      TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE + 4,
+      Math.min(TOOLBAR_CONSTANTS.BUTTON_SPACING, availableWidth / this.buttons.length)
+    );
 
     this.buttons.forEach((button, index) => {
-      const x = startX + index * 60;
-      button.x = x - 5;
-      button.y = 5;
-      button.width = 40;
-      button.height = 40;
-      this.drawIcon(button.icon, x, 10, 30, 30, () => {
+      const centerX = leftBound + slotWidth * (index + 0.5);
+      const x = Math.round(centerX - TOOLBAR_CONSTANTS.BUTTON_ICON_SIZE / 2);
+      button.x = x - TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET;
+      button.y = TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET;
+      button.width = TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE;
+      button.height = TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE;
+      this.drawIcon(
+        button.icon,
+        x,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_OFFSET,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_SIZE,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_SIZE,
+        () => {
         this.ctx.strokeStyle = '#fff';
-        this.ctx.strokeRect(x - 5, 5, 40, 40);
-      });
+        this.ctx.strokeRect(
+          x - TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET,
+          TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET,
+          TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE,
+          TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE
+        );
+      }
+      );
     });
   }
 
   drawToolbarHorizontal() {
-    const totalHeight = this.buttons.length * 60;
-    const startY = (this.canvas.height - totalHeight) / 2;
+    const totalHeight = this.buttons.length * TOOLBAR_CONSTANTS.BUTTON_SPACING;
+    const startY = (this.cssHeight - totalHeight) / 2;
 
     this.buttons.forEach((button, index) => {
-      const y = startY + index * 60;
-      button.x = 5;
-      button.y = y - 5;
-      button.width = 40;
-      button.height = 40;
-      this.drawIcon(button.icon, 10, y, 30, 30, () => {
+      const y = startY + index * TOOLBAR_CONSTANTS.BUTTON_SPACING;
+      button.x = TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET;
+      button.y = y - TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET;
+      button.width = TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE;
+      button.height = TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE;
+      this.drawIcon(
+        button.icon,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_OFFSET,
+        y,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_SIZE,
+        TOOLBAR_CONSTANTS.BUTTON_ICON_SIZE,
+        () => {
         this.ctx.strokeStyle = '#fff';
-        this.ctx.strokeRect(5, y - 5, 40, 40);
-      });
+        this.ctx.strokeRect(
+          TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET,
+          y - TOOLBAR_CONSTANTS.BUTTON_STROKE_OFFSET,
+          TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE,
+          TOOLBAR_CONSTANTS.BUTTON_OUTER_SIZE
+        );
+      }
+      );
     });
   }
 
@@ -179,17 +219,14 @@ export class Toolbar {
   addEventListeners() {
     this.canvas.removeEventListener('mousemove', this.handleCanvasMouseMoveBound);
     this.canvas.removeEventListener('mouseleave', this.handleCanvasMouseLeaveBound);
-    this.canvas.removeEventListener('mousedown', this.handleCanvasClickBound);
-    this.canvas.removeEventListener('touchstart', this.handleCanvasClickBound);
+    this.canvas.removeEventListener('pointerdown', this.handleCanvasClickBound);
 
     this.canvas.addEventListener('mousemove', this.handleCanvasMouseMoveBound);
     this.canvas.addEventListener('mouseleave', this.handleCanvasMouseLeaveBound);
-    this.canvas.addEventListener('mousedown', this.handleCanvasClickBound);
-    this.canvas.addEventListener('touchstart', this.handleCanvasClickBound);
+    this.canvas.addEventListener('pointerdown', this.handleCanvasClickBound);
 
     if (!this.documentListenersAttached) {
-      document.addEventListener('click', this.handleDocumentClickBound);
-      document.addEventListener('touchstart', this.handleDocumentClickBound);
+      document.addEventListener('pointerdown', this.handleDocumentClickBound);
       this.documentListenersAttached = true;
     }
   }
@@ -223,32 +260,29 @@ export class Toolbar {
   }
 
   handleCanvasClick(e) {
-    const point = e.touches?.[0] || e.changedTouches?.[0] || e;
-    const { clientX: mouseX, clientY: mouseY } = point;
+    const { clientX: mouseX, clientY: mouseY } = e;
+    e.stopPropagation();
+
     this.buttons.forEach((button) => {
       if (this.isInside(mouseX, mouseY, button)) {
         button.action();
       }
     });
+
     if (this.isInside(mouseX, mouseY, this.homeButtonRect)) {
-      window.location.href = '../index.html';
+      window.location.href = TOOLBAR_CONSTANTS.HOME_REDIRECT_PATH;
     }
   }
 
   handleDocumentClick(e) {
     if (this.popupOpen) {
-      const cubePopup = document.getElementById('cubePopup');
-      const gridPopup = document.getElementById('gridPopup');
-      const solvePopup = document.getElementById('solvePopup');
-      const tutorialPopup = document.getElementById('tutorialPopup');
-      const settingsPopup = document.getElementById('settingsPopup');
-      if (
-        (cubePopup && !cubePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-        (gridPopup && !gridPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-        (solvePopup && !solvePopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-        (tutorialPopup && !tutorialPopup.contains(e.target) && !this.canvas.contains(e.target)) ||
-        (settingsPopup && !settingsPopup.contains(e.target) && !this.canvas.contains(e.target))
-      ) {
+      const clickedOutsideCanvas = !this.canvas.contains(e.target);
+      const shouldClose = TOOLBAR_CONSTANTS.POPUP_IDS.some((id) => {
+        const popup = document.getElementById(id);
+        return popup && !popup.contains(e.target) && clickedOutsideCanvas;
+      });
+
+      if (shouldClose) {
         this.closeCurrentPopup();
         this.tooltip.style.display = 'none';
       }
@@ -265,6 +299,7 @@ export class Toolbar {
   updateToolbarLayout() {
     const wasMobile = this.isMobile;
     this.isMobile = this.checkIfMobile();
+    this.tooltipToolbar = !this.isMobile;
     if (wasMobile !== this.isMobile) {
       this.removeCanvas();
       this.setupCanvas();
@@ -354,7 +389,6 @@ export class Toolbar {
     popupContainer.appendChild(titleElement);
 
     this.addCloseIcon();
-    this.currentPopupElement = popupContainer;
     return popupContainer;
   }
 
@@ -390,10 +424,13 @@ export class Toolbar {
       this.currentCloseIcon = null;
     }
     const inputs = document.querySelectorAll('.popup-input');
-    inputs.forEach((input) => input.parentElement.removeChild(input));
+    inputs.forEach((input) => {
+      if (input.parentElement) {
+        input.parentElement.removeChild(input);
+      }
+    });
     this.popupOpen = false;
     this.currentPopupType = null;
-    this.currentPopupElement = null;
   }
 
   closeCurrentPopup() {

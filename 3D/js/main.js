@@ -4,6 +4,7 @@ import { Board } from './board.js';
 import { GUIController } from './gui.js';
 import { Toolbar } from './toolbar.js';
 import { Polycube } from './polycube.js';
+import { MAIN_CONSTANTS } from './constants.js';
 
 class MainApp {
   constructor() {
@@ -41,12 +42,12 @@ class MainApp {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(
-      75,
+      MAIN_CONSTANTS.CAMERA.FOV,
       window.innerWidth / window.innerHeight,
-      0.1,
-      1000
+      MAIN_CONSTANTS.CAMERA.NEAR,
+      MAIN_CONSTANTS.CAMERA.FAR
     );
-    this.camera.position.z = 15;
+    this.camera.position.z = MAIN_CONSTANTS.CAMERA.DEFAULT_Z;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: document.getElementById('myCanvas'),
@@ -54,8 +55,10 @@ class MainApp {
       powerPreference: 'low-power',
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    this.renderer.setClearColor('#c3c3c3');
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio || 1, MAIN_CONSTANTS.RENDERER.PIXEL_RATIO_MAX)
+    );
+    this.renderer.setClearColor(MAIN_CONSTANTS.RENDERER.CLEAR_COLOR);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.addEventListener('change', () => this.requestRender());
@@ -145,9 +148,10 @@ class MainApp {
   }
 
   positionToKey(position) {
-    const rx = Math.round(position.x * 1000) / 1000;
-    const ry = Math.round(position.y * 1000) / 1000;
-    const rz = Math.round(position.z * 1000) / 1000;
+    const precision = MAIN_CONSTANTS.GRID.POSITION_KEY_PRECISION;
+    const rx = Math.round(position.x * precision) / precision;
+    const ry = Math.round(position.y * precision) / precision;
+    const rz = Math.round(position.z * precision) / precision;
     return `${rx}|${ry}|${rz}`;
   }
 
@@ -155,7 +159,9 @@ class MainApp {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio || 1, MAIN_CONSTANTS.RENDERER.PIXEL_RATIO_MAX)
+    );
     if (this.toolbar) this.toolbar.resizeToolbar();
     if (this.guiController) this.guiController.checkWindowSize();
     this.requestRender();
@@ -197,7 +203,7 @@ class MainApp {
     this.frameCount += 1;
     const elapsed = time - this.lastFpsSampleTime;
 
-    if (elapsed >= 500) {
+    if (elapsed >= MAIN_CONSTANTS.FPS.SAMPLE_MS) {
       const fps = (this.frameCount * 1000) / elapsed;
       this.fpsLabel.textContent = `FPS: ${fps.toFixed(1)}`;
       this.frameCount = 0;
@@ -254,19 +260,23 @@ class MainApp {
       const deltaX = event.clientX - this.lastMousePosition.x;
       const deltaY = event.clientY - this.lastMousePosition.y;
 
-      this.dragMoveVector.set(deltaX * 0.01, -deltaY * 0.01, 0);
+      this.dragMoveVector.set(
+        deltaX * MAIN_CONSTANTS.INTERACTION.DRAG_SCALE,
+        -deltaY * MAIN_CONSTANTS.INTERACTION.DRAG_SCALE,
+        0
+      );
       this.dragMoveVector.applyQuaternion(this.camera.quaternion);
       this.selectedPolycube.group.position.add(this.dragMoveVector);
 
       this.lastMousePosition = { x: event.clientX, y: event.clientY };
     } else {
-      this.selectedPolycube.group.rotation.y += movementX * 0.01;
-      this.selectedPolycube.group.rotation.x += movementY * 0.01;
+      this.selectedPolycube.group.rotation.y += movementX * MAIN_CONSTANTS.INTERACTION.DRAG_SCALE;
+      this.selectedPolycube.group.rotation.x += movementY * MAIN_CONSTANTS.INTERACTION.DRAG_SCALE;
     }
     this.requestRender();
   }
 
-  onMouseUp(event) {
+  onMouseUp() {
     if (this.isRightClick && this.selectedPolycube) {
       if (this.snapToGrid(this.selectedPolycube)) {
         this.lastValidPosition = this.selectedPolycube.group.position.clone();
@@ -301,7 +311,7 @@ class MainApp {
   }
 
   snapToGrid(polycube) {
-    const gridSize = 1;
+    const gridSize = MAIN_CONSTANTS.GRID.SIZE;
     const group = polycube.group;
     const size = this.board.size;
 
@@ -324,9 +334,15 @@ class MainApp {
     rotationMatrix.decompose(decomposed.position, decomposed.rotation, decomposed.scale);
 
     const euler = new THREE.Euler().setFromQuaternion(decomposed.rotation, 'XYZ');
-    euler.x = Math.round(euler.x / (Math.PI / 2)) * (Math.PI / 2);
-    euler.y = Math.round(euler.y / (Math.PI / 2)) * (Math.PI / 2);
-    euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
+    euler.x =
+      Math.round(euler.x / MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP) *
+      MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP;
+    euler.y =
+      Math.round(euler.y / MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP) *
+      MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP;
+    euler.z =
+      Math.round(euler.z / MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP) *
+      MAIN_CONSTANTS.GRID.ROTATION_SNAP_STEP;
 
     group.setRotationFromEuler(euler);
 
