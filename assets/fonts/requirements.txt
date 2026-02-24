@@ -1,0 +1,6 @@
+# Python dependencies for scripts in this folder.
+# NOTE: `fontforge` is usually installed via OS package manager (not reliable via pip).
+# Ubuntu/Debian example:
+#   sudo apt update && sudo apt install fontforge python3-fontforge
+
+fontforge
