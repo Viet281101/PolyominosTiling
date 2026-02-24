@@ -40,7 +40,7 @@ class MainApp {
     ];
     this.usedColors = [];
     this.iconImage = new Image();
-    this.iconImage.src = './assets/ic_arrow_right.png';
+    this.iconImage.src = './assets/icons/arrow_right.png';
     this.targetFps = 60;
     this.frameDurationMs = 1000 / this.targetFps;
     this.maxDeltaMs = 100;

@@ -36,7 +36,7 @@ export function showGridPopup(toolbar) {
 
   const assetsReady = Promise.all(
     iconRows.map((row) =>
-      loadImage(`../assets/ic_${row.icon}.png`).then((image) => {
+      loadImage(`../assets/icons/${row.icon}.png`).then((image) => {
         if (image) iconMap.set(row.icon, image);
       })
     )

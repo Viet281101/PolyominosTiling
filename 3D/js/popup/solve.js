@@ -12,7 +12,10 @@ export class SolvePopup {
   }
 
   render() {
-    this.popupContainer = this.toolbar.createPopupContainer('solvePopup', this.toolbar.buttons[2].name);
+    this.popupContainer = this.toolbar.createPopupContainer(
+      'solvePopup',
+      this.toolbar.buttons[2].name
+    );
     this.popup = this.popupContainer.querySelector('canvas');
     const ctx = this.popup.getContext('2d');
     const { LAYOUT, FONT, COLORS } = SOLVE_POPUP_CONSTANTS;
@@ -69,7 +72,7 @@ export class SolvePopup {
 
       if (row.icon) {
         const iconButton = document.createElement('img');
-        iconButton.src = `../assets/ic_${row.icon}.png`;
+        iconButton.src = `../assets/icons/${row.icon}.png`;
         applyStyles(iconButton, {
           position: 'absolute',
           right: '0',

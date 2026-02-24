@@ -10,7 +10,10 @@ export class CubePopupView {
   }
 
   render({ onNChange, onNavigate, onInfo, onClear, onCreate }) {
-    this.popupContainer = this.toolbar.createPopupContainer('cubePopup', this.toolbar.buttons[0].name);
+    this.popupContainer = this.toolbar.createPopupContainer(
+      'cubePopup',
+      this.toolbar.buttons[0].name
+    );
 
     const popup = this.popupContainer.querySelector('canvas');
     const ctx = popup.getContext('2d');
@@ -19,7 +22,10 @@ export class CubePopupView {
 
     this.renderFormFields(onNChange);
     const previewCanvas = this.createPreviewCanvas();
-    this.createTextZone(popup.width - CUBE_POPUP_CONSTANTS.TEXT_ZONE.WIDTH_OFFSET, 'Polycube Info...');
+    this.createTextZone(
+      popup.width - CUBE_POPUP_CONSTANTS.TEXT_ZONE.WIDTH_OFFSET,
+      'Polycube Info...'
+    );
     this.createNavigationButtons(onNavigate);
     this.createActionButtons({ onInfo, onClear, onCreate });
 
@@ -38,7 +44,9 @@ export class CubePopupView {
 
     FORM_FIELD_LAYOUT.forEach((field, index) => {
       const rowY =
-        field.row === 1 ? startY - inputOffset + rowOffset : startY + rowSpacing - inputOffset + rowOffset;
+        field.row === 1
+          ? startY - inputOffset + rowOffset
+          : startY + rowSpacing - inputOffset + rowOffset;
 
       this.createLabel(field.label, field.labelX, rowY);
       const input = this.createInputField(field.inputX, rowY, field.defaultValue);
@@ -147,7 +155,7 @@ export class CubePopupView {
       buttonContainer.appendChild(label);
 
       const icon = document.createElement('img');
-      icon.src = `../assets/ic_${item.icon}.png`;
+      icon.src = `../assets/icons/${item.icon}.png`;
       icon.width = CUBE_POPUP_CONSTANTS.NAV.ICON_SIZE;
       icon.height = CUBE_POPUP_CONSTANTS.NAV.ICON_SIZE;
       icon.style.cursor = 'pointer';

@@ -12,11 +12,11 @@ class Tetris {
     this.tetriminos = TETRIMINOS;
 
     this.controlItems = [
-      { name: 'ic_arrow_left.png', action: () => this.move(-1), holdable: true },
-      { name: 'ic_arrow_right.png', action: () => this.move(1), holdable: true },
-      { name: 'ic_rotate_left.png', action: () => this.rotateLeft(), holdable: false },
-      { name: 'ic_rotate_right.png', action: () => this.rotateRight(), holdable: false },
-      { name: 'ic_home.png', action: () => this.goHome(), holdable: false },
+      { name: 'icons/arrow_left.png', action: () => this.move(-1), holdable: true },
+      { name: 'icons/arrow_right.png', action: () => this.move(1), holdable: true },
+      { name: 'icons/rotate_left.png', action: () => this.rotateLeft(), holdable: false },
+      { name: 'icons/rotate_right.png', action: () => this.rotateRight(), holdable: false },
+      { name: 'icons/home.png', action: () => this.goHome(), holdable: false },
     ];
     this.holdDelayMs = 180;
     this.holdRepeatMs = 70;
@@ -172,15 +172,15 @@ class Tetris {
 
   getFallbackLabel(iconName) {
     switch (iconName) {
-      case 'ic_arrow_left.png':
+      case 'icons/arrow_left.png':
         return 'L';
-      case 'ic_arrow_right.png':
+      case 'icons/arrow_right.png':
         return 'R';
-      case 'ic_rotate_left.png':
+      case 'icons/rotate_left.png':
         return 'RL';
-      case 'ic_rotate_right.png':
+      case 'icons/rotate_right.png':
         return 'RR';
-      case 'ic_home.png':
+      case 'icons/home.png':
         return 'H';
       default:
         return '?';
