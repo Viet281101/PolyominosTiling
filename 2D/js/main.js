@@ -24,12 +24,12 @@ class MainApp {
       duplicate: new Image(),
       trash: new Image(),
     };
-    const as = '../assets/';
-    this.icons.flip.src = as + 'ic_flip.png';
-    this.icons.rotateLeft.src = as + 'ic_rotate_left.png';
-    this.icons.rotateRight.src = as + 'ic_rotate_right.png';
-    this.icons.duplicate.src = as + 'ic_duplicate.png';
-    this.icons.trash.src = as + 'ic_trash.png';
+    const as = '../assets/icons/';
+    this.icons.flip.src = as + 'flip.png';
+    this.icons.rotateLeft.src = as + 'rotate_left.png';
+    this.icons.rotateRight.src = as + 'rotate_right.png';
+    this.icons.duplicate.src = as + 'duplicate.png';
+    this.icons.trash.src = as + 'trash.png';
     this.gridBoard = new GridBoard(this.canvas, this.gridSize, this.rows, this.cols);
     this.guiController = new GUIController(this);
     this.toolbar = new Toolbar(this);

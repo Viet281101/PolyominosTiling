@@ -63,7 +63,7 @@ export class SettingsPopup {
     this.popupContainer.appendChild(rowLabel);
 
     const iconButton = document.createElement('img');
-    iconButton.src = `../assets/ic_${SETTINGS_POPUP_CONTENT.ACTION_ICON}.png`;
+    iconButton.src = `../assets/icons/${SETTINGS_POPUP_CONTENT.ACTION_ICON}.png`;
     applyStyles(iconButton, {
       position: 'absolute',
       left: `${this.popup.width - LAYOUT.ICON_LEFT_OFFSET}px`,

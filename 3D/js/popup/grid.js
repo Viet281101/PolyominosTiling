@@ -13,7 +13,10 @@ export class GridPopup {
   }
 
   render() {
-    this.popupContainer = this.toolbar.createPopupContainer('gridPopup', this.toolbar.buttons[1].name);
+    this.popupContainer = this.toolbar.createPopupContainer(
+      'gridPopup',
+      this.toolbar.buttons[1].name
+    );
     this.popup = this.popupContainer.querySelector('canvas');
     const ctx = this.popup.getContext('2d');
     ctx.fillStyle = GRID_POPUP_CONSTANTS.BACKGROUND_COLOR;
@@ -94,7 +97,7 @@ export class GridPopup {
   createIconButton(y, iconName, onClick) {
     const { LAYOUT } = GRID_POPUP_CONSTANTS;
     const iconButton = document.createElement('img');
-    iconButton.src = `../assets/ic_${iconName}.png`;
+    iconButton.src = `../assets/icons/${iconName}.png`;
     applyStyles(iconButton, {
       position: 'absolute',
       left: `${this.popup.width - LAYOUT.ICON_LEFT_OFFSET}px`,

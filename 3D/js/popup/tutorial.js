@@ -1,8 +1,4 @@
-import {
-  TUTORIAL_POPUP_CONSTANTS,
-  TUTORIAL_POPUP_ROWS,
-  TUTORIAL_ICON_MAP,
-} from '../constants.js';
+import { TUTORIAL_POPUP_CONSTANTS, TUTORIAL_POPUP_ROWS, TUTORIAL_ICON_MAP } from '../constants.js';
 
 function applyStyles(element, styles) {
   Object.assign(element.style, styles);
@@ -60,7 +56,7 @@ export class TutorialPopup {
 
       if (row.icon) {
         const icon = document.createElement('img');
-        icon.src = `../assets/ic_${row.icon}.png`;
+        icon.src = `../assets/icons/${row.icon}.png`;
         applyStyles(icon, {
           position: 'absolute',
           right: '0',

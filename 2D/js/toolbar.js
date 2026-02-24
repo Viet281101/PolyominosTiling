@@ -50,7 +50,7 @@ export class Toolbar {
   }
 
   preloadIcons() {
-    this.homeImage = this.preloadImage('../assets/ic_home.png');
+    this.homeImage = this.preloadImage('../assets/icons/home.png');
     this.buttons.forEach((button) => {
       button.image = this.preloadImage(button.icon);
     });
@@ -60,31 +60,31 @@ export class Toolbar {
     return [
       {
         name: 'Create Polyomino',
-        icon: '../assets/ic_plus.png',
+        icon: '../assets/icons/plus.png',
         action: () => this.togglePopup('polyomino'),
         description: 'To select available Polyomino blocks.\nAdd directly to canvas.',
       },
       {
         name: 'Grid Settings',
-        icon: '../assets/ic_table.png',
+        icon: '../assets/icons/table.png',
         action: () => this.togglePopup('grid'),
         description: 'To change the grid settings.\nAdjust rows, columns, and size.',
       },
       {
         name: 'Solving Polyomino',
-        icon: '../assets/ic_solving.png',
+        icon: '../assets/icons/solving.png',
         action: () => this.togglePopup('solve'),
         description: 'To solve the polyomino puzzle.\nUse different algorithms to solve.',
       },
       {
         name: 'Tutorial',
-        icon: '../assets/ic_question.png',
+        icon: '../assets/icons/question.png',
         action: () => this.togglePopup('tutorial'),
         description: 'To view the tutorial.\nLearn how to use the application.',
       },
       {
         name: 'Settings',
-        icon: '../assets/ic_setting.png',
+        icon: '../assets/icons/setting.png',
         action: () => this.togglePopup('settings'),
         description: 'To adjust application settings.\nChange colors, tooltips, and more.',
       },
@@ -408,7 +408,7 @@ export class Toolbar {
     }
 
     const closeIcon = new Image();
-    closeIcon.src = '../assets/ic_close.png';
+    closeIcon.src = '../assets/icons/close.png';
     closeIcon.style.position = 'fixed';
     Object.assign(closeIcon.style, {
       cursor: 'pointer',

@@ -85,8 +85,8 @@ export function showTutorialPopup(toolbar) {
 
   const iconMap = new Map();
   const allIconPaths = [
-    ...rows.filter((row) => row.icon).map((row) => `ic_${row.icon}.png`),
-    ...subIcons.map((icon) => `ic_${icon.path}.png`),
+    ...rows.filter((row) => row.icon).map((row) => `icons/${row.icon}.png`),
+    ...subIcons.map((icon) => `icons/${icon.path}.png`),
   ];
 
   const uniqueIconPaths = [...new Set(allIconPaths)];
@@ -160,7 +160,7 @@ export function showTutorialPopup(toolbar) {
       }
 
       if (row.icon) {
-        const icon = iconMap.get(`ic_${row.icon}.png`);
+        const icon = iconMap.get(`icons/${row.icon}.png`);
         if (icon) {
           ctx.drawImage(icon, popup.width - 64, y - 14, 50, 50);
         }
@@ -193,7 +193,7 @@ export function showTutorialPopup(toolbar) {
     });
 
     subIcons.forEach((subIcon) => {
-      const subIconImage = iconMap.get(`ic_${subIcon.path}.png`);
+      const subIconImage = iconMap.get(`icons/${subIcon.path}.png`);
       if (subIconImage) {
         ctx.drawImage(subIconImage, subIcon.x, subIcon.y, 25, 25);
       }

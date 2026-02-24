@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @font-face {
   font-family: 'Pixellari';
-  src: url('./assets/Pixellari.ttf') format('truetype');
+  src: url('./assets/fonts/Pixellari.ttf') format('truetype');
 }
 
 html,
