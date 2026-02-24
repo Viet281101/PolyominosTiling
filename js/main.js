@@ -122,7 +122,9 @@ class MainApp {
     this.ctx.textAlign = 'center';
     this.ctx.fillText('Research polyominoes &', this.canvas.width / 2, 200);
     this.ctx.fillText('Propose solving solutions.', this.canvas.width / 2, 230);
-    this.ctx.fillText('Mini Polyominoes Games :', this.canvas.width / 2, this.miniGamesLabelY);
+    if (this.canvas.width >= 700) {
+      this.ctx.fillText('Mini Polyominoes Games :', this.canvas.width / 2, this.miniGamesLabelY);
+    }
 
     this.buttons.forEach((button) => this.drawButton(button));
   }
